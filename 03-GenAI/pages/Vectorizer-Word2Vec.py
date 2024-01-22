@@ -15,7 +15,7 @@ st.title("Vertorizer using using Word2Vec")
 vector_size = st.slider(":orange[Dimensions]",min_value=1,max_value=10,value=1,step = 1)
 
 with st.form("myform"):
-    f = st.text_input("Enter a prompt to vetorize", 
+    f = st.text_input("Enter a prompt to vectorize", 
                       placeholder="Hello World",
                       value="Hello World")
     submitted = st.form_submit_button("Vectorize")
