@@ -1,6 +1,6 @@
-from langchain.embeddings import BedrockEmbeddings
+from langchain_community.embeddings import BedrockEmbeddings
 from langchain.indexes import VectorstoreIndexCreator
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.document_loaders.csv_loader import CSVLoader
 import boto3
@@ -11,12 +11,11 @@ bedrock_runtime = boto3.client(
     
 )
 
-
 def get_index(): #creates and returns an in-memory vector store to be used in the application
     
     embeddings = BedrockEmbeddings(client=bedrock_runtime) #create a Titan Embeddings client
     
-    loader = CSVLoader(file_path="/home/ubuntu/GENAI/99-Temp/90-BedrockSamples/amazon-bedrock-samples/rag-solutions/semantic-search/bedrock_faqs.csv")
+    loader = CSVLoader(file_path="/home/ubuntu/GENAI/genaionaws/03-GenAI/bedrock_faqs.csv")
     
     documents = loader.load()
 

@@ -3,6 +3,9 @@ import search_lib as glib #reference to local lib script
 
 st.set_page_config(page_title="Embeddings Search", layout="wide") #HTML title
 st.title("Embeddings Search") #page title
+st.write("Facebook AI Similarity Search (Faiss), a library that allows us to quickly search for multimedia documents that are similar to each other — a challenge where traditional query search engines fall short. ")
+
+
 
 
 if 'vector_index' not in st.session_state: #see if the vector index hasn't been created yet

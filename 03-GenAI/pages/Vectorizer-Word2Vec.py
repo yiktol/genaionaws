@@ -6,16 +6,13 @@ import gensim
 from nltk.tokenize import sent_tokenize, word_tokenize
 import warnings
 import numpy as np
-
+import nltk
+nltk.download('punkt')
 warnings.filterwarnings(action='ignore')
 
-with st.sidebar:
-    with st.form(key ='Form1'):
-        "Parameters:"
-        vector_size =st.number_input('vector_size',min_value = 1, max_value = 10, value = 1, step = 1)
-        submitted1 = st.form_submit_button(label = 'Set Parameters') 
-
 st.title("Vertorizer using using Word2Vec")
+
+vector_size = st.slider(":orange[Dimensions]",min_value=1,max_value=10,value=1,step = 1)
 
 with st.form("myform"):
     f = st.text_input("Enter a prompt to vetorize", 
@@ -25,7 +22,7 @@ with st.form("myform"):
 
 data = []
 
-if f and submitted:
+if f:
 # iterate through each sentence in the file
 	for i in sent_tokenize(f):
 		temp = []
