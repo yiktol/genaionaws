@@ -2,5 +2,7 @@ botocore
 boto3
 faiss-cpu
 transformers
-langchain==0.0.330
+langchain
 streamlit
+nltk 
+gensim
