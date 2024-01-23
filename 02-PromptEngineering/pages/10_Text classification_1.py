@@ -1,20 +1,15 @@
 import streamlit as st
-import boto3
-from langchain.llms.bedrock import Bedrock
+from langchain_community.llms import Bedrock
 from langchain.prompts import PromptTemplate
 from helpers import getmodelId, getmodelparams, set_page_config, bedrock_runtime_client
 
 set_page_config()
+  
+row1_col1, row1_col2 = st.columns([0.7,0.3])
+row2_col1 = st.columns(1)
 
-with st.sidebar:
-    "Parameters:"
-    with st.form(key ='Form1'):
-        provider = st.selectbox('Provider',('Amazon','AI21'))
-        model_id=st.text_input('model_id',getmodelId(provider))
-        submitted1 = st.form_submit_button(label = 'Set Parameters') 
-    
-    
-st.title("Text classification")
+row1_col1.title("Text classification")
+
 t = '''
 ### Multiple-choice classification question
 
@@ -23,13 +18,19 @@ For text classification, the prompt includes a question with several possible ch
 The first example is a straightforward multiple-choice classification question.
 '''
 
-st.markdown(t)
-st.write("**:orange[Template:]**")
+row1_col1.markdown(t)
+with row1_col2.form(key ='Form1'):
+        provider = st.selectbox('Provider',('Amazon','AI21'))
+        model_id=st.text_input('model_id',getmodelId(provider))
+        submitted1 = st.form_submit_button(label = 'Set Parameters') 
+
+
+st.write(":orange[Template:]")
 template = '''
 {context}\n
 {question}? Choose from the following:\n
-{choice1}\n
-{choice2}\n
+{choice1}
+{choice2}
 {choice3}
 '''
 st.code(template, language='text')

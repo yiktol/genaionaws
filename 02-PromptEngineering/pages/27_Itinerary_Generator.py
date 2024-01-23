@@ -1,30 +1,34 @@
 import streamlit as st
 import boto3
-from langchain.llms.bedrock import Bedrock
+from langchain_community.llms import Bedrock
 from langchain.prompts import PromptTemplate
-from helpers import getmodelId, getmodelparams, set_page_config
+from helpers import getmodelId, getmodelparams, set_page_config, bedrock_runtime_client
 
 set_page_config()
+   
+row1_col1, row1_col2 = st.columns([0.7,0.3])
 
-with st.sidebar:
-    "model_id=\"anthropic.claude-v2\""
-    with st.form(key ='Form1'):
-        "Parameters:"
+row1_col1.title("✈️ Travel Itinerary Generator")
+
+with row1_col2.form(key ='Form1'):
+        provider = st.selectbox('Provider',('Antropic','AI21'),disabled=True)
+        model_id=st.text_input('model_id',getmodelId(provider))
         temperature =st.number_input('temperature',min_value = 0.0, max_value = 1.0, value = 0.5, step = 0.1)
         top_k=st.number_input('top_k',min_value = 0, max_value = 300, value = 250, step = 1)
         top_p=st.number_input('top_p',min_value = 0.0, max_value = 1.0, value = 0.9, step = 0.1)
         max_tokens_to_sample=st.number_input('max_tokens_to_sample',min_value = 50, max_value = 4096, value = 4096, step = 1)
         submitted1 = st.form_submit_button(label = 'Set Parameters') 
-    
-    
-st.title("✈️ Travel Itinerary Generator")
+
+template = """Human: As a professional travel agent and a expert tour guide,\n 
+Generate a {numdays}-day itinerary for upcoming visit to {city}. {timing}.\n
+Assistant:"""
+row1_col1.text_area(":orange[Template]",
+                    value=template,
+                    height = 160,
+                    disabled = True,)
 
 #Create the connection to Bedrock
-bedrock_runtime = boto3.client(
-    service_name='bedrock-runtime',
-    region_name='us-east-1', 
-    
-)
+bedrock_runtime = bedrock_runtime_client()
 
 inference_modifier = {
     "max_tokens_to_sample": max_tokens_to_sample,
@@ -42,25 +46,20 @@ def itinerary(numdays, city, timing):
     client=bedrock_runtime,
     model_kwargs=inference_modifier,
 )
-    # Prompt
-    
-    template = "As a professional travel agent and a expert tour guide, generate a {numdays}-day itinerary for upcoming visit to {city}. {timing}"
     prompt= PromptTemplate(input_variables=["numdays","city","timing"],template=template)
     prompt_query = prompt.format(numdays=numdays,city=city,timing=timing)
-    # Run LLM model
     response = llm(prompt_query)
-    # Print results
+
     return st.info(response)
 
 
-with st.form("myform"):
-    st.markdown("**Template:** \"As a professional travel agent and a expert tour guide, generate a :orange[{numdays}]-day itinerary for upcoming visit to :orange[{city}]. :orange[{timing}]\"")
+with row1_col1.form("myform"):
     numdays = st.text_input("Enter the Number of day(s):", 
                               placeholder="2")
     city = st.text_input("Enter the City name:",
                          placeholder="Paris")
     check = st.checkbox('Display time and duration')
-    submitted = st.form_submit_button("Submit")
+    submitted = st.form_submit_button("Generate")
     
     
 if numdays and city and submitted and check:

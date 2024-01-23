@@ -1,32 +1,31 @@
 import streamlit as st
-import boto3
-from langchain.llms.bedrock import Bedrock
+from langchain_community.llms import Bedrock
 from langchain.prompts import PromptTemplate
 from helpers import getmodelId, getmodelparams, set_page_config, bedrock_runtime_client
 
 set_page_config()
 
-with st.sidebar:
-    "Parameters:"
-    with st.form(key ='Form1'):
-        provider = st.selectbox('Provider',('Amazon','AI21','Antropic'))
-        model_id=st.text_input('model_id',getmodelId(provider))
-        submitted1 = st.form_submit_button(label = 'Set Parameters') 
-    
-    
-st.title("Question-answer")
+row1_col1, row1_col2 = st.columns([0.7,0.3])
+row2_col1 = st.columns(1)
+
+row1_col1.title("Question-answer")
+
 t = '''
 ### Question-answer, with context
 
 In a question-answer prompt with context, an input text followed by a question is provided by the user, and the model must answer the question based on information provided within the input text. Putting the question in the end after the text can help LLMs on Amazon Bedrock better answer the question. Model encouragement works for this use case as well.
 '''
+row1_col1.markdown(t)
+with row1_col2.form(key ='Form1'):
+        provider = st.selectbox('Provider',('Amazon','AI21','Antropic'))
+        model_id=st.text_input('model_id',getmodelId(provider))
+        submitted1 = st.form_submit_button(label = 'Set Parameters') 
 
-st.markdown(t)
-st.write("**:orange[Template:]**")
-template = '''
-{Context}\n
-{Question}
-'''
+
+st.write(":orange[Template:]")
+template = '''{Context}
+
+{Question}'''
 st.code(template, language='None')
 
 #Create the connection to Bedrock

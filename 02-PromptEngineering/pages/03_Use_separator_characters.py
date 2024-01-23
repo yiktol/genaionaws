@@ -1,11 +1,15 @@
-import boto3
-from langchain.llms.bedrock import Bedrock
+from langchain_community.llms import Bedrock
 import streamlit as st
 from helpers import getmodelId, getmodelparams, set_page_config, bedrock_runtime_client
 
 set_page_config()
 
-st.title("Use separator characters")
+
+
+row1_col1, row1_col2 = st.columns([0.7,0.3])
+row2_col1 = st.columns(1)
+
+row1_col1.title("Use separator characters")
 
 t = '''
 ### Use separator characters for API calls
@@ -14,7 +18,11 @@ Separator characters such as :orange[\\n] can affect the performance of LLMs sig
 The formatting should always follow: :orange[\\n\\nHuman: {{Query Content}}\\n\\nAssistant:]. For Amazon Titan models, adding :orange[\\n] at the end of a prompt helps improve the performance of the model.\n
 For classification tasks or questions with answer options, you can also separate the answer options by :orange[\\n] for Titan models. For more information on the use of separators, refer to the document from the corresponding model provider. The following example is a template for a classification task.
 '''
-st.markdown(t)
+row1_col1.markdown(t)
+with row1_col2.form(key ='Form1'):
+        provider = st.selectbox('Provider',('Amazon','Antropic'), index=1, disabled=True)
+        model_id=st.text_input('model_id',getmodelId(provider))
+        submitted = st.form_submit_button(label = 'Set Parameters') 
 st.write("**:orange[Template:]**")
 template = '''
 \\n\\nHuman: {Text}\\n
@@ -32,11 +40,7 @@ st.code(template, language='None')
 
 
 #Create the connection to Bedrock
-bedrock_runtime = boto3.client(
-    service_name='bedrock-runtime',
-    region_name='us-east-1', 
-    
-)
+bedrock_runtime =  bedrock_runtime_client()
 
 inference_modifier = {
     "max_tokens_to_sample": 4096,

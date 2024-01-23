@@ -1,18 +1,13 @@
-import boto3
-from langchain.llms.bedrock import Bedrock
+from langchain_community.llms import Bedrock
 import streamlit as st
 from helpers import getmodelId, getmodelparams, set_page_config, bedrock_runtime_client
 
 set_page_config()
 
-st.title("Provide a default output")
+row1_col1, row1_col2 = st.columns([0.7,0.3])
+row2_col1 = st.columns(1)
 
-with st.sidebar:
-    "Parameters:"
-    with st.form(key ='Form1'):
-        provider = st.selectbox('Provider',('Amazon','Antropic','AI21'))
-        model_id=st.text_input('model_id',getmodelId(provider))
-        submitted1 = st.form_submit_button(label = 'Set Parameters') 
+row1_col1.title("Provide a default output")
 
 t = '''
 ### Provide a default output that the model should present if it's unsure about the answers.
@@ -20,7 +15,12 @@ t = '''
 A default output can help prevent LLMs from returning answers that sound like they could be correct, even if the model has low confidence.
 '''
 
-st.markdown(t)
+row1_col1.markdown(t)
+with row1_col2.form(key ='Form1'):
+        provider = st.selectbox('Provider',('Amazon','Antropic','AI21'))
+        model_id=st.text_input('model_id',getmodelId(provider))
+        submitted1 = st.form_submit_button(label = 'Set Parameters') 
+
 
 #Create the connection to Bedrock
 bedrock_runtime = bedrock_runtime_client()

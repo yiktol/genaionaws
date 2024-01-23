@@ -1,25 +1,24 @@
-import boto3
-from langchain.llms.bedrock import Bedrock
+from langchain_community.llms import Bedrock
 import streamlit as st
 from helpers import getmodelId, getmodelparams, set_page_config, bedrock_runtime_client
 
 set_page_config()
 
-st.title("Answer step by step")
-with st.sidebar:
-    "Parameters:"
-    with st.form(key ='Form1'):
-        provider = st.selectbox('Provider',('Antropic','AI21','Amazon'))
-        model_id=st.text_input('model_id',getmodelId(provider))
-        submitted1 = st.form_submit_button(label = 'Set Parameters') 
+row1_col1, row1_col2 = st.columns([0.7,0.3])
+row2_col1 = st.columns(1)
 
+row1_col1.title("Answer step by step")
 
 t = '''
 ### Complex tasks: build toward the answer step by step
 LLM models can provide clear steps for certain tasks, and including the phrase Think step-by-step to come up with the right answer can help produce the appropriate output.
 '''
 
-st.markdown(t)
+row1_col1.markdown(t)
+with row1_col2.form(key ='Form1'):
+        provider = st.selectbox('Provider',('Antropic','AI21','Amazon'))
+        model_id=st.text_input('model_id',getmodelId(provider))
+        submitted1 = st.form_submit_button(label = 'Set Parameters') 
 
 #Create the connection to Bedrock
 bedrock_runtime = bedrock_runtime_client()

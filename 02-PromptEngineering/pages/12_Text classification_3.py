@@ -1,38 +1,34 @@
 import streamlit as st
-import boto3
-from langchain.llms.bedrock import Bedrock
+from langchain_community.llms import Bedrock
 from langchain.prompts import PromptTemplate
 from helpers import getmodelId, getmodelparams, set_page_config, bedrock_runtime_client
 
 set_page_config()
 
-with st.sidebar:
-    "Parameters:"
-    with st.form(key ='Form1'):
-        # provider = st.selectbox('Provider',('Antropic'))
-        model_id=st.text_input('model_id',getmodelId('Antropic'))
-        # temperature = st.number_input('temperature',min_value = 0.0, max_value = 1.0, value = 0.5, step = 0.1)
-        # top_k=st.number_input('top_k',min_value = 0, max_value = 300, value = 250, step = 1)
-        # top_p=st.number_input('top_p',min_value = 0.0, max_value = 1.0, value = 0.9, step = 0.1)
-        # max_tokens_to_sample=st.number_input('max_tokens_to_sample',min_value = 50, max_value = 4096, value = 4096, step = 1)
-        submitted1 = st.form_submit_button(label = 'Set Parameters') 
-    
-    
-st.title("Text classification")
+row1_col1, row1_col2 = st.columns([0.7,0.3])
+row2_col1 = st.columns(1)
+
+row1_col1.title("Text classification")
+
 t = '''
 ### Generate output enclosed in XML tags
 
 The following example uses Claude models to classify text. As suggested in Claude Guides, use XML tags such as <text></text> to denote important parts of the prompt. Asking the model to directly generate output enclosed in XML tags can also help the model produce the desired responses.
 '''
 
-st.markdown(t)
-st.write("**:orange[Template:]**")
+row1_col1.markdown(t)
+with row1_col2.form(key ='Form1'):
+        provider = st.selectbox('Provider',('Antropic','AI21'),disabled=True)
+        model_id=st.text_input('model_id',getmodelId(provider))
+        submitted1 = st.form_submit_button(label = 'Set Parameters') 
+
+st.write(":orange[Template:]")
 template = '''
 Human: {task}\n
 <text>{context}</text>\n
 Categories are:\n
-{category1}\n
-{category2}\n
+{category1}
+{category2}
 {category3}\n
 Assistant:
 '''
@@ -46,7 +42,7 @@ def call_llm():
     llm = Bedrock(
     model_id=model_id,
     client=bedrock_runtime,
-    model_kwargs=getmodelparams('Antropic')
+    model_kwargs=getmodelparams(provider)
     )
     # Prompt
     

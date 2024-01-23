@@ -1,31 +1,30 @@
 import streamlit as st
-import boto3
-from langchain.llms.bedrock import Bedrock
+from langchain_community.llms import Bedrock
 from langchain.prompts import PromptTemplate
 from helpers import getmodelId, getmodelparams, set_page_config, bedrock_runtime_client
 
 set_page_config()
 
-with st.sidebar:
-    "Parameters:"
-    with st.form(key ='Form1'):
-        provider = st.selectbox('Provider',('Amazon','AI21'))
-        model_id=st.text_input('model_id',getmodelId(provider))
-        submitted1 = st.form_submit_button(label = 'Set Parameters') 
-    
-    
-st.title("Summarization")
+row1_col1, row1_col2 = st.columns([0.7,0.3])
+row2_col1 = st.columns(1)
+
+row1_col1.title("Summarization")
+
 t = '''
 ### Summarization
 
 For a summarization task, the prompt is a passage of text, and the model must respond with a shorter passage that captures the main points of the input. Specification of the output in terms of length (number of sentences or paragraphs) is helpful for this use case.
 '''
 
-st.markdown(t)
-st.write("**:orange[Template:]**")
-template = '''
-The following is text from a {Category}:\n
-\"{Context}\"\n
+row1_col1.markdown(t)
+with row1_col2.form(key ='Form1'):
+        provider = st.selectbox('Provider',('Amazon','AI21'))
+        model_id=st.text_input('model_id',getmodelId(provider))
+        submitted1 = st.form_submit_button(label = 'Set Parameters') 
+
+st.write(":orange[Template:]")
+template = '''The following is text from a {Category}:\n
+{Context}\n
 Summarize the above {Category} in {length_of_summary}
 '''
 st.code(template, language='None')

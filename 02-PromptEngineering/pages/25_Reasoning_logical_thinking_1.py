@@ -1,28 +1,26 @@
 import streamlit as st
-import boto3
-from langchain.llms.bedrock import Bedrock
+from langchain_community.llms import Bedrock
 from langchain.prompts import PromptTemplate
 from helpers import getmodelId, getmodelparams, set_page_config, bedrock_runtime_client
 
 set_page_config()
 
-with st.sidebar:
-    "Parameters:"
-    with st.form(key ='Form1'):
-        provider = st.selectbox('Provider',('Amazon','Antropic'))
-        model_id=st.text_input('model_id',getmodelId(provider))
-        submitted1 = st.form_submit_button(label = 'Set Parameters') 
-    
-    
-st.title("Reasoning/logical thinking")
+row1_col1, row1_col2 = st.columns([0.7,0.3])
+row2_col1 = st.columns(1)
+
+row1_col1.title("Reasoning/logical thinking")
+
 t = '''
 ### Reasoning/logical thinking
 
 For complex reasoning tasks or problems that requires logical thinking, we can ask the model to make logical deductions and explain its answers.
 '''
 
-st.markdown(t)
-# t = st.markdown("**:orange[Template:]**")
+row1_col1.markdown(t)
+with row1_col2.form(key ='Form1'):
+        provider = st.selectbox('Provider',('Amazon','Antropic'))
+        model_id=st.text_input('model_id',getmodelId(provider))
+        submitted1 = st.form_submit_button(label = 'Set Parameters') 
 
 template1 = '''Question: {question}\n\nPlease output the answer and then explain your answer:
 '''
@@ -30,7 +28,7 @@ template2 = '''Human: {question}\n
 Please provide the answer and show the reasoning.\n
 Assistant:
 '''
-st.write("**:orange[Template:]**")
+st.write(":orange[Template:]")
 if provider == 'Antropic':
     template = template2
     st.code(template, language='None')

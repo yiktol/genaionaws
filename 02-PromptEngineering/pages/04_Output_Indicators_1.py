@@ -1,24 +1,22 @@
-import boto3
-from langchain.llms.bedrock import Bedrock
+from langchain_community.llms import Bedrock
 import streamlit as st
 from helpers import getmodelId, getmodelparams, set_page_config, bedrock_runtime_client
 
 set_page_config()
 
-st.title("Output indicators")
+
+row1_col1, row1_col2 = st.columns([0.7,0.3])
+row2_col1 = st.columns(1)
 
 t = '''
 ### Output indicators
 
 Add details about the constraints you would like to have on the output that the model should produce. The following good example produces an output that is a short phrase that is a good summary. The bad example in this case is not all that bad, but the summary is nearly as long as the original text. Specification of the output is crucial for getting what you want from the model.
 '''
+row1_col1.title("Output indicators")
 
-st.markdown(t)
-
-
-with st.sidebar:
-    "Parameters:"
-    with st.form(key ='Form1'):
+row1_col1.markdown(t)
+with row1_col2.form(key ='Form1'):
         provider = st.selectbox('Provider',('Amazon','Antropic'))
         model_id=st.text_input('model_id',getmodelId(provider))
         submitted1 = st.form_submit_button(label = 'Set Parameters') 

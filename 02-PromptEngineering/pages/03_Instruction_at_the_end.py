@@ -1,19 +1,15 @@
-import boto3
-from langchain.llms.bedrock import Bedrock
+from langchain_community.llms import Bedrock
 import streamlit as st
 from helpers import getmodelId, getmodelparams, set_page_config, bedrock_runtime_client
 
 set_page_config()
 
-st.title("Question or Instruction should be placed at the end")
 
-with st.sidebar:
-    "Parameters:"
-    with st.form(key ='Form1'):
-        provider = st.selectbox('Provider',('Amazon','Antropic'))
-        model_id=st.text_input('model_id',getmodelId(provider))
-        submitted1 = st.form_submit_button(label = 'Set Parameters') 
 
+row1_col1, row1_col2 = st.columns([0.7,0.3])
+row2_col1 = st.columns(1)
+
+row1_col1.title("Question or Instruction should be placed at the end")
 
 t = '''
 ### The question or instruction should be placed at the end of the prompt for best results
@@ -23,7 +19,11 @@ Including the task description, instruction or question at the end aids the mode
 In the following open-book question-answer example, the user has a specific question about the text. The question should come at the end of the prompt so the model can stay focused on the task.
 '''
 
-st.markdown(t)
+row1_col1.markdown(t)
+with row1_col2.form(key ='Form1'):
+        provider = st.selectbox('Provider',('Amazon','Antropic'))
+        model_id=st.text_input('model_id',getmodelId(provider))
+        submitted1 = st.form_submit_button(label = 'Set Parameters') 
 
 #Create the connection to Bedrock
 bedrock_runtime = bedrock_runtime_client()

@@ -1,24 +1,15 @@
 import streamlit as st
-import boto3
-from langchain.llms.bedrock import Bedrock
+from langchain_community.llms import Bedrock
 from langchain.prompts import PromptTemplate
 from helpers import getmodelId, getmodelparams, set_page_config, bedrock_runtime_client
 
 set_page_config()
+   
+row1_col1, row1_col2 = st.columns([0.7,0.3])
+row2_col1 = st.columns(1)
 
-with st.sidebar:
-    "Parameters:"
-    with st.form(key ='Form1'):
-        provider = st.selectbox('Provider',('Amazon','AI21'))
-        model_id=st.text_input('model_id',getmodelId(provider))
-        # temperature = st.number_input('temperature',min_value = 0.0, max_value = 1.0, value = 0.5, step = 0.1)
-        # top_k=st.number_input('top_k',min_value = 0, max_value = 300, value = 250, step = 1)
-        # top_p=st.number_input('top_p',min_value = 0.0, max_value = 1.0, value = 0.9, step = 0.1)
-        # max_tokens_to_sample=st.number_input('max_tokens_to_sample',min_value = 50, max_value = 4096, value = 4096, step = 1)
-        submitted1 = st.form_submit_button(label = 'Set Parameters') 
-    
-    
-st.title("Text classification")
+row1_col1.title("Text classification")
+
 t = '''
 ### Sentiment analysis
 
@@ -27,14 +18,19 @@ For text classification, the prompt includes a question with several possible ch
 Sentiment analysis is a form of classification, where the model chooses the sentiment from a list of choices expressed in the text.
 '''
 
-st.markdown(t)
-st.write("**:orange[Template:]**")
+row1_col1.markdown(t)
+with row1_col2.form(key ='Form1'):
+        provider = st.selectbox('Provider',('Amazon','AI21'))
+        model_id=st.text_input('model_id',getmodelId(provider))
+        submitted1 = st.form_submit_button(label = 'Set Parameters') 
+
+st.write(":orange[Template:]")
 template = '''
 The following is text from a {text_type}:\n
 {context}\n
 Tell me the sentiment of the {text_type} and categorize it as one of the following:\n
-{sentimentA}\n
-{sentimentB}\n
+{sentimentA}
+{sentimentB}
 {sentimentC}
 
 '''
