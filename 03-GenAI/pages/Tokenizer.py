@@ -9,8 +9,8 @@ tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 with st.form("myform"):
     prompt = st.text_input(
         "Enter prompt to tokenize",
-        placeholder="where is Himalayas in the world map?",
-        value="where is Himalayas in the world map?",)
+        placeholder="Where is Himalayas in the world map?",
+        value="Where is Himalayas in the world map?",)
     submit = st.form_submit_button("Tokenize")
 
 
