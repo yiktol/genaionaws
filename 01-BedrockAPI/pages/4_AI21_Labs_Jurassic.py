@@ -65,10 +65,8 @@ with text:
   }
   if prompt_data and submit:
 
-    body = json.dumps(body) # Encode body as JSON string
-
     #Invoke the model
-    response = bedrock_runtime.invoke_model(body=body, modelId=modelId, accept=accept, contentType=contentType)
+    response = bedrock_runtime.invoke_model(body=json.dumps(body), modelId=modelId, accept=accept, contentType=contentType)
     response_body = json.loads(response.get('body').read())
 
     print(response_body.get('completions')[0].get('data').get('text'))

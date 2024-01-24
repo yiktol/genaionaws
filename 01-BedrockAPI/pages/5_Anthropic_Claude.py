@@ -49,11 +49,8 @@ with text:
             "anthropic_version": "bedrock-2023-05-31"}
 
     if prompt_data and submit:
-        body = json.dumps(body) # Encode body as JSON string
-
-
         #Invoke the model
-        response = bedrock_runtime.invoke_model(body=body.encode('utf-8'), # Encode to bytes
+        response = bedrock_runtime.invoke_model(body=json.dumps(body).encode('utf-8'), # Encode to bytes
                                         modelId=modelId, 
                                         accept=accept, 
                                         contentType=contentType)
