@@ -60,5 +60,5 @@ if prompt_data and submit:
 
     print(response)
     st.write("### Answer")
-    st.write(response)
+    st.info(response)
   

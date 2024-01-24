@@ -61,7 +61,7 @@ with text:
 
 
         st.write("### Answer")
-        st.write(response_body.get('completion'))
+        st.info(response_body.get('completion'))
 
 with code:
 

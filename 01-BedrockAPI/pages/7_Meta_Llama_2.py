@@ -62,7 +62,7 @@ with text:
         print(response_body.get('generation'))
 
         st.write("### Answer")
-        st.write(response_body.get('generation'))
+        st.info(response_body.get('generation'))
 
     #We can also call the Meta Llama 2 models via the streaming API
             

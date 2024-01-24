@@ -69,7 +69,7 @@ with text:
         for event in response['body']:
             data = json.loads(event['chunk']['bytes'])
             #print(data['outputText'])
-            st.write(data['outputText'])
+            st.info(data['outputText'])
             
 
 

@@ -67,7 +67,7 @@ with text:
         response_body = json.loads(response['body'].read())
         if response_body:
             st.write("### Answer")
-            st.write(response_body['results'][0]['outputText'])
+            st.info(response_body['results'][0]['outputText'])
 
 with code:
     code = f"""

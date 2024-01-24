@@ -68,7 +68,7 @@ with text:
 
         if response_body:
             st.write("### Answer")
-            st.write(response_body['generations'][0]['text'])
+            st.info(response_body['generations'][0]['text'])
 
 
 with code:

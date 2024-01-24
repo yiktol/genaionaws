@@ -80,7 +80,7 @@ with text:
 
         print(response)
         st.write("### Answer")
-        st.write(response)
+        st.info(response)
   
 
 with code:
