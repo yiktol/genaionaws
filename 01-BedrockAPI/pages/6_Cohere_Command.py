@@ -20,7 +20,6 @@ bedrock_runtime = boto3.client(
 )
 
 with st.sidebar:
-    "Parameters:"
     with st.form(key ='Form1'):
         model = st.selectbox('model', get_models('Cohere'), index=1)
         temperature =st.number_input('temperature',min_value = 0.0, max_value = 1.0, value = 0.75, step = 0.1)
@@ -47,18 +46,18 @@ with text:
     modelId = model
     accept = 'application/json'
     contentType = 'application/json'
+    body = {
+        "prompt": prompt_data,
+        "max_tokens": max_tokens_to_sample,
+        "temperature": temperature,
+        "p": top_p,
+        "k": top_k,
+        "stop_sequences": [],
+        "return_likelihoods": "NONE"
+    }
+
 
     if prompt_data and submit:
-        body = {
-            "prompt": prompt_data,
-            "max_tokens": max_tokens_to_sample,
-            "temperature": temperature,
-            "p": top_p,
-            "k": top_k,
-            "stop_sequences": [],
-            "return_likelihoods": "NONE"
-        }
-
         body = json.dumps(body).encode('utf-8')
 
         #Invoke the model
@@ -78,42 +77,33 @@ with text:
 
 with code:
 
-    code = '''
-        import boto3
-        import json
+    code = f'''
+import boto3
+import json
 
-        bedrock_runtime = boto3.client(
-            service_name='bedrock-runtime',
-            region_name='us-east-1', 
-        )
+bedrock_runtime = boto3.client(
+    service_name='bedrock-runtime',
+    region_name='us-east-1', 
+)
 
-        prompt_data = "Write me a poem for my beautiful wife."
+body = {json.dumps(body,indent=4)}
 
-        body = {
-            "prompt": prompt_data,
-            "max_tokens": 400,
-            "temperature": 0.75,
-            "p": 0.01,
-            "k": 0,
-            "stop_sequences": [],
-            "return_likelihoods": "NONE"
-        }
+modelId = '{model}' 
+accept = 'application/json'
+contentType = 'application/json'
 
-        modelId = 'cohere.command-text-v14' 
-        accept = 'application/json'
-        contentType = 'application/json'
+body = json.dumps(body).encode('utf-8')
 
-        body = json.dumps(body).encode('utf-8')
+#Invoke the model
+response = bedrock_runtime.invoke_model(
+    body=body,
+    modelId=modelId, 
+    accept=accept, 
+    contentType=contentType)
 
-        #Invoke the model
-        response = bedrock_runtime.invoke_model(body=body,
-                                        modelId=modelId, 
-                                        accept=accept, 
-                                        contentType=contentType)
+response_body = json.loads(response.get('body').read())
 
-        response_body = json.loads(response.get('body').read())
-
-        print(response_body['generations'][0]['text'])
-        '''
+print(response_body['generations'][0]['text'])
+'''
     
     st.code(code,language="python")

@@ -11,7 +11,7 @@ row1_col1, row1_col2 = st.columns([0.7,0.3])
 row1_col1.title("✈️ Travel Itinerary Generator")
 
 with row1_col2.form(key ='Form1'):
-        provider = st.selectbox('Provider',('Antropic','AI21'),disabled=True)
+        provider = st.selectbox('Provider',('Anthropic','AI21'),disabled=True)
         model_id=st.text_input('model_id',getmodelId(provider))
         temperature =st.number_input('temperature',min_value = 0.0, max_value = 1.0, value = 0.5, step = 0.1)
         top_k=st.number_input('top_k',min_value = 0, max_value = 300, value = 250, step = 1)

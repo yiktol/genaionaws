@@ -15,7 +15,7 @@ def get_index(): #creates and returns an in-memory vector store to be used in th
     
     embeddings = BedrockEmbeddings(client=bedrock_runtime) #create a Titan Embeddings client
     
-    loader = CSVLoader(file_path="/home/ubuntu/GENAI/genaionaws/03-GenAI/bedrock_faqs.csv")
+    loader = CSVLoader(file_path="/home/ubuntu/environment/genaionaws/03-GenAI/bedrock_faqs.csv")
     
     documents = loader.load()
 

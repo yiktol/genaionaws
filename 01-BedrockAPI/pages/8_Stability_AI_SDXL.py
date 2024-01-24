@@ -31,19 +31,18 @@ with text:
             value = "Middle age man walking through times square on a rainy day"
         )
         submit = st.form_submit_button("Submit")
-
-    if prompt_data and submit:
-
-        body = json.dumps({"text_prompts":[{"text":prompt_data}],
+        
+        body = {"text_prompts":[{"text":prompt_data}],
         "cfg_scale":6,
         "seed":10,
-        "steps":50}) 
-
+        "steps":50}
+        
         modelId = 'stability.stable-diffusion-xl'
         accept = 'application/json'
         contentType = 'application/json'
-
-        response = bedrock_runtime.invoke_model(body=body, modelId=modelId, accept=accept, contentType=contentType)
+                
+    if prompt_data and submit:
+        response = bedrock_runtime.invoke_model(body=json.dumps(body), modelId=modelId, accept=accept, contentType=contentType)
         response = json.loads(response.get('body').read())
         images = response.get('artifacts')
 
@@ -87,42 +86,37 @@ with text:
 
 with code:
 
-    code = '''
-    from botocore.config import Config
-    from botocore.exceptions import ClientError
-    import json
-    from PIL import Image
-    from io import BytesIO
-    import base64
-    from base64 import b64encode
-    from base64 import b64decode
-    import boto3
+    code = f'''
+import json
+from PIL import Image
+from io import BytesIO
+import base64
+from base64 import b64encode
+from base64 import b64decode
+import boto3
 
+bedrock_runtime = boto3.client(
+    service_name='bedrock-runtime',
+    region_name='us-east-1', 
+)
 
-    #Create the connection to Bedrock
-    bedrock_runtime = boto3.client(
-        service_name='bedrock-runtime',
-        region_name='us-east-1', 
-    )
+body = {json.dumps(body,indent=4)}
 
-    # Define prompt and model parameters
-    prompt_data = "Middle age man walking through times square on a rainy day"
+modelId = '{modelId}'
+accept = 'application/json'
+contentType = 'application/json'
 
-    body = json.dumps({"text_prompts":[{"text":prompt_data}],
-    "cfg_scale":6,
-    "seed":10,
-    "steps":50}) 
+response = bedrock_runtime.invoke_model(
+    body=body, 
+    modelId=modelId, 
+    accept=accept, 
+    contentType=contentType)
+    
+response = json.loads(response.get('body').read())
 
-    modelId = 'stability.stable-diffusion-xl'
-    accept = 'application/json'
-    contentType = 'application/json'
-
-    response = bedrock_runtime.invoke_model(body=body, modelId=modelId, accept=accept, contentType=contentType)
-    response = json.loads(response.get('body').read())
-    images = response.get('artifacts')
-
-    image = Image.open(BytesIO(b64decode(images[0].get('base64'))))
-    image.save("generated_image.png")
-    '''
+images = response.get('artifacts')
+image = Image.open(BytesIO(b64decode(images[0].get('base64'))))
+image.save("generated_image.png")
+'''
 
     st.code(code,language="python")

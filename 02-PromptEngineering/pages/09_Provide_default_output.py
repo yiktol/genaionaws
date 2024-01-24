@@ -17,7 +17,7 @@ A default output can help prevent LLMs from returning answers that sound like th
 
 row1_col1.markdown(t)
 with row1_col2.form(key ='Form1'):
-        provider = st.selectbox('Provider',('Amazon','Antropic','AI21'))
+        provider = st.selectbox('Provider',('Amazon','Anthropic','AI21'))
         model_id=st.text_input('model_id',getmodelId(provider))
         submitted1 = st.form_submit_button(label = 'Set Parameters') 
 

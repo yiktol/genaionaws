@@ -18,7 +18,7 @@ For complex reasoning tasks or problems that requires logical thinking, we can a
 
 row1_col1.markdown(t)
 with row1_col2.form(key ='Form1'):
-        provider = st.selectbox('Provider',('Amazon','Antropic'))
+        provider = st.selectbox('Provider',('Amazon','Anthropic'))
         model_id=st.text_input('model_id',getmodelId(provider))
         submitted1 = st.form_submit_button(label = 'Set Parameters') 
 
@@ -29,7 +29,7 @@ Please provide the answer and show the reasoning.\n
 Assistant:
 '''
 st.write(":orange[Template:]")
-if provider == 'Antropic':
+if provider == 'Anthropic':
     template = template2
     st.code(template, language='None')
 else:
@@ -64,7 +64,7 @@ def format_prompt():
     return prompt_query
 
 
-if provider == 'Antropic':
+if provider == 'Anthropic':
     context = "The barber is the \"one who shaves all those, and those only, who do not shave themselves\". Does the barber shave himself? Why is this a paradox?"
 else:
     context = "Which word is the odd one out?\nA. accomplished\nB. good\nC. horrible\nD. outstanding"

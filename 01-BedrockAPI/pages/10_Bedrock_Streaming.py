@@ -1,12 +1,12 @@
 import boto3
 import json
 import streamlit as st
-
+from helpers import get_models, getmodelId, getmodelparams, set_page_config, bedrock_runtime_client
 
 
 with st.sidebar:
-    "Parameters:"
     with st.form(key ='Form1'):
+        model = st.selectbox('model', get_models('Amazon'))
         temperature =st.number_input('temperature',min_value = 0.0, max_value = 1.0, value = 0.7, step = 0.1)
         top_p=st.number_input('top_p',min_value = 0.0, max_value = 1.0, value = 0.9, step = 0.1)
         max_tokens_to_sample=st.number_input('max_tokens_to_sample',min_value = 50, max_value = 4096, value = 1000, step = 1)
@@ -19,7 +19,7 @@ bedrock_runtime = boto3.client(
     
 )
 
-model_id = 'amazon.titan-tg1-large'
+model_id = model
 accept = 'application/json' 
 content_type = 'application/json'
 
@@ -47,17 +47,14 @@ with text:
         )
         submit = st.form_submit_button("Submit")
 
-
-
-    if prompt_data and submit:
-        
         body = json.dumps({
             "inputText": prompt_data,
             "textGenerationConfig": text_gen_config  
         })
 
 
-
+    if prompt_data and submit:
+        
         #invoke the model with a streamed response 
         response = bedrock_runtime.invoke_model_with_response_stream(
             body=body, 
@@ -69,38 +66,35 @@ with text:
         st.write("### Answer")
         for event in response['body']:
             data = json.loads(event['chunk']['bytes'])
-            print(data['outputText'])
+            #print(data['outputText'])
             st.write(data['outputText'])
+            
+
 
 with code:
 
-    code ='''
+    code =f'''
         import boto3
         import json
 
-        #Create the connection to Bedrock
         bedrock_runtime = boto3.client(
             service_name='bedrock-runtime',
-            region_name='us-east-1', 
-            
-        )
+            region_name='us-east-1',          
+            )
 
-        # Define prompt and model parameters
-        prompt_data = "Write an essay about why someone should drink coffee"
-
-        text_gen_config = {
-            "maxTokenCount": 1000,
+        text_gen_config = {{
+            "maxTokenCount": {max_tokens_to_sample},
             "stopSequences": [], 
-            "temperature": 0,
-            "topP": 0.9
-        }
+            "temperature": {temperature},
+            "topP": {top_p}
+            }}
 
-        body = json.dumps({
-            "inputText": prompt_data,
+        body = json.dumps({{
+            "inputText": {prompt_data},
             "textGenerationConfig": text_gen_config  
-        })
+            }})
 
-        model_id = 'amazon.titan-tg1-large'
+        model_id = '{model}'
         accept = 'application/json' 
         content_type = 'application/json'
 
@@ -110,12 +104,11 @@ with code:
             modelId=model_id, 
             accept=accept, 
             contentType=content_type
-        )
+            )
 
         for event in response['body']:
             data = json.loads(event['chunk']['bytes'])
             print(data['outputText'])
-
         '''
     
     st.code(code,language="python")

@@ -2,6 +2,12 @@ import boto3
 import json
 import streamlit as st
 
+#Create the connection to Bedrock
+bedrock = boto3.client(
+    service_name='bedrock',
+    region_name='us-east-1', 
+    
+)
 st.title("Bedrock Models")
 
 
@@ -12,14 +18,7 @@ with st.sidebar:
 
 def get_models(provider):
 
-    #Create the connection to Bedrock
-    bedrock = boto3.client(
-        service_name='bedrock',
-        region_name='us-east-1', 
-        
-    )
-
-    # Let's see all available Amazon Models
+   # Let's see all available Amazon Models
     available_models = bedrock.list_foundation_models()
 
     models = [{}]

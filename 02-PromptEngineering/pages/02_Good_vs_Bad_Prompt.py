@@ -23,7 +23,7 @@ In the **”bad“** example, the choices are not named explicitly as categories
 
 row1_col1.markdown(t)
 with row1_col2.form(key ='Form1'):
-        provider = st.selectbox('Provider',('Amazon','Antropic'))
+        provider = st.selectbox('Provider',('Amazon','Anthropic'))
         model_id=st.text_input('model_id',getmodelId(provider))
         submitted1 = st.form_submit_button(label = 'Set Parameters') 
 

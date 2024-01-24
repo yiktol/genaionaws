@@ -16,7 +16,7 @@ row1_col1.text_area(":orange[Template]",
                     disabled = True,)
 
 with row1_col2.form(key ='Form1'):
-        provider = st.selectbox('Provider',('Antropic','Amazon','AI21'))
+        provider = st.selectbox('Provider',('Anthropic','Amazon','AI21'))
         model_id=st.text_input('model_id',getmodelId(provider))
         submitted1 = st.form_submit_button(label = 'Set Parameters') 
 

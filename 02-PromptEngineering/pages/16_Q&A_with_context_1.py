@@ -17,7 +17,7 @@ In a question-answer prompt with context, an input text followed by a question i
 '''
 row1_col1.markdown(t)
 with row1_col2.form(key ='Form1'):
-        provider = st.selectbox('Provider',('Amazon','AI21','Antropic'))
+        provider = st.selectbox('Provider',('Amazon','AI21','Anthropic'))
         model_id=st.text_input('model_id',getmodelId(provider))
         submitted1 = st.form_submit_button(label = 'Set Parameters') 
 

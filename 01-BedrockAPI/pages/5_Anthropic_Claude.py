@@ -1,8 +1,7 @@
 import boto3
 import json
 import streamlit as st
-from helpers import get_models
-from helpers import getmodelId, getmodelparams, set_page_config, bedrock_runtime_client
+from helpers import get_models, getmodelId, getmodelparams, set_page_config, bedrock_runtime_client
 
 set_page_config()
 
@@ -10,7 +9,6 @@ set_page_config()
 bedrock_runtime = bedrock_runtime_client()
 
 with st.sidebar:
-    "Parameters:"
     with st.form(key ='Form1'):
         model = st.selectbox('model', get_models('Anthropic'), index=6)
         temperature =st.number_input('temperature',min_value = 0.0, max_value = 1.0, value = 0.5, step = 0.1)
@@ -42,9 +40,7 @@ with text:
             value = "Write a python code that list all countries."
         )
         submit = st.form_submit_button("Submit")
-
-    if prompt_data and submit:
-        body = {"prompt": "Human: " + prompt_data + " \\nAssistant:",
+        body = {"prompt": "Human: " + prompt_data + "\n\nAssistant:",
                 "max_tokens_to_sample": max_tokens_to_sample, 
                 "temperature": temperature,
                 "top_k": top_k,
@@ -52,6 +48,7 @@ with text:
                 "stop_sequences": ["\\n\\nHuman:"],
                 "anthropic_version": "bedrock-2023-05-31"}
 
+    if prompt_data and submit:
         body = json.dumps(body) # Encode body as JSON string
 
 
@@ -70,41 +67,31 @@ with text:
 
 with code:
 
-    code = '''
-        import boto3
-        import json
+    code = f'''
+import boto3
+import json
 
-        bedrock_runtime = boto3.client(
-            service_name='bedrock-runtime',
-            region_name='us-east-1',    
-        )
+bedrock_runtime = boto3.client(
+    service_name='bedrock-runtime',
+    region_name='us-east-1',    
+)
 
-        # Define prompt and model parameters
-        prompt_data = "Write a python code that list all countries."
+body = {json.dumps(body,indent=4)}
 
-        body = {"prompt": "Human: " + prompt_data + " \\nAssistant:",
-                "max_tokens_to_sample": 300, 
-                "temperature": 1,
-                "top_k": 250,
-                "top_p": 0.999,
-                "stop_sequences": ["\\n\\nHuman:"],
-                "anthropic_version": "bedrock-2023-05-31"}
+modelId = '{model}' 
+accept = 'application/json'
+contentType = 'application/json'
 
-        body = json.dumps(body) # Encode body as JSON string
+#Invoke the model
+response = bedrock_runtime.invoke_model(
+    body=body.encode('utf-8'),
+    modelId=modelId, 
+    accept=accept, 
+    contentType=contentType)
 
-        modelId = 'anthropic.claude-instant-v1' 
-        accept = 'application/json'
-        contentType = 'application/json'
+response_body = json.loads(response.get('body').read())
 
-        #Invoke the model
-        response = bedrock_runtime.invoke_model(body=body.encode('utf-8'),
-                                        modelId=modelId, 
-                                        accept=accept, 
-                                        contentType=contentType)
-
-        response_body = json.loads(response.get('body').read())
-        print(response_body.get('completion'))
-
-        '''
+print(response_body.get('completion'))
+'''
     
     st.code(code,language="python")

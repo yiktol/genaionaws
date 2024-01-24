@@ -20,7 +20,7 @@ For classification tasks or questions with answer options, you can also separate
 '''
 row1_col1.markdown(t)
 with row1_col2.form(key ='Form1'):
-        provider = st.selectbox('Provider',('Amazon','Antropic'), index=1, disabled=True)
+        provider = st.selectbox('Provider',('Amazon','Anthropic'), index=1, disabled=True)
         model_id=st.text_input('model_id',getmodelId(provider))
         submitted = st.form_submit_button(label = 'Set Parameters') 
 st.write("**:orange[Template:]**")

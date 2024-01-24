@@ -19,9 +19,8 @@ st.set_page_config(
 )
 
 with st.sidebar:
-    "Parameters:"
     with st.form(key ='Form1'):
-        model = st.selectbox('model', get_models('Meta'), index=3)
+        model = st.selectbox('model', get_models('Meta'), index=1)
         temperature =st.number_input('temperature',min_value = 0.0, max_value = 1.0, value = 0.7, step = 0.1)
         top_p=st.number_input('top_p',min_value = 0.0, max_value = 1.0, value = 0.9, step = 0.1)
         max_tokens_to_sample=st.number_input('max_tokens_to_sample',min_value = 50, max_value = 4096, value = 512, step = 1)
@@ -49,17 +48,16 @@ with text:
         )
         submit = st.form_submit_button("Submit")
 
-    if prompt and submit:
-        
-        body = json.dumps({ 
+        body = { 
             'prompt': prompt,
             'max_gen_len': max_tokens_to_sample,
             'top_p': top_p,
             'temperature': temperature
-        })
+        }
 
+    if prompt and submit:
         #Invoke the model
-        response = bedrock_runtime.invoke_model(body=body.encode('utf-8'), # Encode to bytes
+        response = bedrock_runtime.invoke_model(body=json.dumps(body).encode('utf-8'), # Encode to bytes
                                         modelId=modelId, 
                                         accept=accept, 
                                         contentType=contentType)
@@ -92,39 +90,32 @@ with text:
         
 with code:
 
-    code = '''
-    import boto3
-    import json
+    code = f'''
+import boto3
+import json
 
-    bedrock_runtime = boto3.client(
-        service_name='bedrock-runtime',
-        region_name='us-west-2', 
+bedrock_runtime = boto3.client(
+    service_name='bedrock-runtime',
+    region_name='us-east-1', 
     )
 
-    # Define prompt and model parameters
-    prompt = "Describe the plot of the TV show Breaking Bad." 
+body = {json.dumps(body,indent=4)}
 
-    body = json.dumps({ 
-        'prompt': prompt,
-        'max_gen_len': 512,
-        'top_p': 0.9,
-        'temperature': 0.2
-    })
+modelId = '{model}'
+accept = 'application/json'
+contentType = 'application/json'
 
-    modelId = 'meta.llama2-13b-chat-v1'
-    accept = 'application/json'
-    contentType = 'application/json'
+#Invoke the model
+response = bedrock_runtime.invoke_model(
+    body=body.encode('utf-8'),
+    modelId=modelId, 
+    accept=accept, 
+    contentType=contentType)
 
-    #Invoke the model
-    response = bedrock_runtime.invoke_model(body=body.encode('utf-8'), # Encode to bytes
-                                    modelId=modelId, 
-                                    accept=accept, 
-                                    contentType=contentType)
+response_body = json.loads(response.get('body').read().decode('utf-8'))
 
-    response_body = json.loads(response.get('body').read().decode('utf-8'))
-    print(response_body.get('generation'))
-
-    '''
+print(response_body.get('generation'))
+'''
 
     st.code(code,language="python")
         

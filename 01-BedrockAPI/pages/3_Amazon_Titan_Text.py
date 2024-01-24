@@ -1,25 +1,15 @@
 import streamlit as st
 import boto3
 import json
-from helpers import get_models
+from helpers import get_models, getmodelId, getmodelparams, set_page_config, bedrock_runtime_client
 import streamlit as st
 
 #Create the connection to Bedrock
-bedrock_runtime = boto3.client(
-    service_name='bedrock-runtime',
-    region_name='us-east-1', 
-    
-)
+bedrock_runtime = bedrock_runtime_client()
 
-st.set_page_config( 
-    page_title="Amazon Titan",
-    page_icon="🧊",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
+set_page_config()
 
 with st.sidebar:
-    "Parameters:"
     with st.form(key ='Form1'):
         model = st.selectbox('model', get_models('Amazon'))
         temperature =st.number_input('temperature',min_value = 0.0, max_value = 1.0, value = 0.5, step = 0.1)
@@ -39,8 +29,8 @@ with text:
     with st.form("myform"):
         prompt_data = st.text_input(
         "Enter your prompt here:",
-        placeholder="Create a 3 day itinerary for my upcoming visit to Dubai.",
-        value="Create a 3 day itinerary for my upcoming visit to Dubai.")
+        placeholder="Create a 3 day itinerary for my visit to Dubai.",
+        value="Create a 3 day itinerary for my visit to Dubai.")
         submit = st.form_submit_button("Submit")
 
     #The Text Generation Configuration are Titans inference parameters 
@@ -52,12 +42,13 @@ with text:
         "topP": top_p
     }
 
-    if prompt_data and submit:
-        body = json.dumps({
+    payload = {
             "inputText": str(prompt_data),
             "textGenerationConfig": text_gen_config  
-        })
-
+        }
+    
+    if prompt_data and submit:
+        body = json.dumps(payload )
 
         model_id = model
         accept = 'application/json' 
@@ -78,46 +69,31 @@ with text:
             st.write(response_body['results'][0]['outputText'])
 
 with code:
-    code = """
-        import boto3
-        import json
+    code = f"""
+import boto3
+import json
 
-        #Create the connection to Bedrock
-        bedrock_runtime = boto3.client(service_name='bedrock-runtime', region_name='us-east-1')
+bedrock_runtime = boto3.client(
+    service_name='bedrock-runtime', 
+    region_name='us-east-1'
+    )
 
-        # Define prompt and model parameters
-        prompt_data = "Create a 3 day itinerary for my upcoming visit to Dubai."
+body = json.dumps({json.dumps(payload,indent=4)})
 
-        #The Text Generation Configuration are Titans inference parameters 
+model_id = '{model}'
+accept = 'application/json' 
+content_type = 'application/json'
 
-        text_gen_config = {
-            "maxTokenCount": max_tokens_to_sample,
-            "stopSequences": [], 
-            "temperature": temperature,
-            "topP": top_p
-        }
+# Invoke model 
+response = bedrock_runtime.invoke_model(
+    body=body, 
+    modelId=model_id, 
+    accept=accept, 
+    contentType=content_type
+)
 
-        body = json.dumps({
-            "inputText": prompt_data,
-            "textGenerationConfig": text_gen_config
-        })
-
-        model_id = 'amazon.titan-tg1-large'
-        accept = 'application/json' 
-        content_type = 'application/json'
-
-        # Invoke model 
-        response = bedrock_runtime.invoke_model(
-            body=body, 
-            modelId=model_id, 
-            accept=accept, 
-            contentType=content_type
-        )
-
-        # Print response
-        response_body = json.loads(response['body'].read())
-        print(response_body['results'][0]['outputText'])
-
-        """
+response_body = json.loads(response['body'].read())
+print(response_body['results'][0]['outputText'])
+"""
     
     st.code(code,language="python")

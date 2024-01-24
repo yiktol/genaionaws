@@ -35,7 +35,7 @@ def getmodelparams(providername):
             "temperature": 0.5,
             "topP": 0.9
             },
-        "Antropic" : {
+        "Anthropic" : {
             "max_tokens_to_sample": 4096,
             "temperature": 0.9,
             "top_k": 250,
@@ -64,7 +64,7 @@ def getmodelparams(providername):
 def getmodelId(providername):
     model_mapping = {
         "Amazon" : "amazon.titan-tg1-large",
-        "Antropic" : "anthropic.claude-v2:1",
+        "Anthropic" : "anthropic.claude-v2:1",
         "AI21" : "ai21.j2-ultra-v1"
     }
     
