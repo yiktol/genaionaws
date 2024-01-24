@@ -7,6 +7,9 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 import warnings
 import numpy as np
 import nltk
+from helpers import set_page_config
+
+set_page_config()
 nltk.download('punkt')
 warnings.filterwarnings(action='ignore')
 

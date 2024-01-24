@@ -2,7 +2,7 @@ import streamlit as st
 
 st.set_page_config(
     page_title="GenAI Tools",
-    page_icon=":gear:",
+    page_icon="👋",
 )
 
 st.title("Gen AI Tools")

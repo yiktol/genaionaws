@@ -1,6 +1,9 @@
 
 import streamlit as st
 from transformers import BertTokenizer
+from helpers import set_page_config
+
+set_page_config()
 
 st.title("BERT Tokenizer")
 

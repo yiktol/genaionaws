@@ -1,5 +1,8 @@
 import streamlit as st #all streamlit commands will be available through the "st" alias
 import search_lib as glib #reference to local lib script
+from helpers import set_page_config
+
+set_page_config()
 
 st.set_page_config(page_title="Embeddings Search", layout="wide") #HTML title
 st.title("Embeddings Search") #page title

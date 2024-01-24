@@ -1,5 +1,8 @@
 
 import streamlit as st
+from helpers import set_page_config
+
+set_page_config()
 
 st.title("Cloudwatch Dashboard")
 st.write("You can monitor Amazon Bedrock using Amazon CloudWatch, which collects raw data and processes it into readable, near real-time metrics. You can graph the metrics using the CloudWatch console. You can also set alarms that watch for certain thresholds, and send notifications or take actions when values exceed those thresholds.")
