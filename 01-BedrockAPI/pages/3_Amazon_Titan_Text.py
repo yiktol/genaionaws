@@ -1,7 +1,7 @@
 import streamlit as st
 import boto3
 import json
-from helpers import get_models, getmodelId, getmodelparams, set_page_config, bedrock_runtime_client
+from helpers import get_models, titan_generic, getmodelparams, set_page_config, bedrock_runtime_client
 import streamlit as st
 
 #Create the connection to Bedrock
@@ -29,9 +29,8 @@ with text:
     with st.form("myform"):
         prompt_data = st.text_area(
         "Enter your prompt here:",
-        height = 50,
-        placeholder="Create a 3 day itinerary for my visit to Dubai.",
-        value="Create a 3 day itinerary for my visit to Dubai.")
+        height = 100,
+        value=titan_generic("Create a 3 day itinerary for my visit to Dubai."))
         submit = st.form_submit_button("Submit")
 
     #The Text Generation Configuration are Titans inference parameters 
@@ -44,7 +43,7 @@ with text:
     }
 
     payload = {
-            "inputText": str(prompt_data),
+            "inputText": prompt_data,
             "textGenerationConfig": text_gen_config  
         }
     

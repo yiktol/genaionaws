@@ -83,7 +83,7 @@ bedrock_runtime = boto3.client(
 )
 
 body = {{
-    "prompt": {prompt_data},
+    "prompt": "{prompt_data}",
     "max_tokens": {max_tokens_to_sample},
     "temperature": {temperature},
     "p": {top_p},

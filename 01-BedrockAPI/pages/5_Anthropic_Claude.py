@@ -1,7 +1,7 @@
 import boto3
 import json
 import streamlit as st
-from helpers import get_models, getmodelId, getmodelparams, set_page_config, bedrock_runtime_client
+from helpers import get_models, claude_generic, set_page_config, bedrock_runtime_client
 
 set_page_config()
 
@@ -32,16 +32,16 @@ with text:
     contentType = 'application/json'
 
     # Define prompt and model parameters
-
+    prompt_input = "Write a python code that list all countries."
+    
     with st.form("myform"):
         prompt_data = st.text_area(
             "Enter your prompt here:",
-            height = 50,
-            placeholder="Write a python code that list all countries.",
-            value = "Write a python code that list all countries."
+            height = 100,
+            value = claude_generic(prompt_input)
         )
         submit = st.form_submit_button("Submit")
-    body = {"prompt": "Human: " + prompt_data + "\n\nAssistant:",
+    body = {"prompt": prompt_data,
             "max_tokens_to_sample": max_tokens_to_sample, 
             "temperature": temperature,
             "top_k": top_k,

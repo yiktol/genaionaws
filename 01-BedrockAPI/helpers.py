@@ -40,12 +40,7 @@ def titan_generic(input_prompt):
     return prompt
 
 def llama2_generic(input_prompt, system_prompt):
-    prompt = f"""<s>[INST] <<SYS>>
-    {system_prompt}
-    <</SYS>>
-
-    {input_prompt} [/INST]
-    """
+    prompt = f"""<s>[INST] <<SYS>>{system_prompt}<</SYS>>\n\n{input_prompt} [/INST]"""
     return prompt
 
 def getmodelparams(providername):
