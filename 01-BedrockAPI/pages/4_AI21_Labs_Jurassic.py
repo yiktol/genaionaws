@@ -46,23 +46,23 @@ with text:
         value = "Write me an invitation letter for my wedding."
     )
     submit = st.form_submit_button("Submit")
-    body = {
-      "prompt": prompt_data,
-      "maxTokens": max_tokens_to_sample,
-      "temperature": temperature,
-      "topP": top_p,
-      "stopSequences": [],
-      "countPenalty": {
-        "scale": 0
-      },
-      "presencePenalty": {
-        "scale": 0    
-      },
-      "frequencyPenalty": {
-        "scale": 0
-      }
-    }
 
+  body = {
+    "prompt": prompt_data,
+    "maxTokens": max_tokens_to_sample,
+    "temperature": temperature,
+    "topP": top_p,
+    "stopSequences": [],
+    "countPenalty": {
+      "scale": 0
+    },
+    "presencePenalty": {
+      "scale": 0    
+    },
+    "frequencyPenalty": {
+      "scale": 0
+    }
+  }
   if prompt_data and submit:
 
     body = json.dumps(body) # Encode body as JSON string

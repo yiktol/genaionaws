@@ -86,7 +86,15 @@ bedrock_runtime = boto3.client(
     region_name='us-east-1', 
 )
 
-body = {json.dumps(body,indent=4)}
+body = {{
+    "prompt": {prompt_data},
+    "max_tokens": {max_tokens_to_sample},
+    "temperature": {temperature},
+    "p": {top_p},
+    "k": {top_k},
+    "stop_sequences": [],
+    "return_likelihoods": "NONE"
+}}
 
 modelId = '{model}' 
 accept = 'application/json'

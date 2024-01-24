@@ -40,13 +40,13 @@ with text:
             value = "Write a python code that list all countries."
         )
         submit = st.form_submit_button("Submit")
-        body = {"prompt": "Human: " + prompt_data + "\n\nAssistant:",
-                "max_tokens_to_sample": max_tokens_to_sample, 
-                "temperature": temperature,
-                "top_k": top_k,
-                "top_p": top_p,
-                "stop_sequences": ["\\n\\nHuman:"],
-                "anthropic_version": "bedrock-2023-05-31"}
+    body = {"prompt": "Human: " + prompt_data + "\n\nAssistant:",
+            "max_tokens_to_sample": max_tokens_to_sample, 
+            "temperature": temperature,
+            "top_k": top_k,
+            "top_p": top_p,
+            "stop_sequences": ["\\n\\nHuman:"],
+            "anthropic_version": "bedrock-2023-05-31"}
 
     if prompt_data and submit:
         body = json.dumps(body) # Encode body as JSON string
