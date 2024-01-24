@@ -4,7 +4,6 @@ from helpers import set_page_config
 
 set_page_config()
 
-st.set_page_config(page_title="Embeddings Search", layout="wide") #HTML title
 st.title("Embeddings Search") #page title
 st.write("Facebook AI Similarity Search (Faiss), a library that allows us to quickly search for multimedia documents that are similar to each other — a challenge where traditional query search engines fall short. ")
 

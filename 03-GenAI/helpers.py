@@ -73,7 +73,7 @@ def getmodelId(providername):
 def set_page_config():
     import streamlit as st
     st.set_page_config( 
-    page_title="Prompt Engineering",  
+    page_title="GenAI Tools",  
     page_icon=":gear:",
     layout="wide",
     initial_sidebar_state="expanded",
