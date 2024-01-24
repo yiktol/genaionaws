@@ -1,21 +1,16 @@
 import boto3
 import json
 import streamlit as st
-from helpers import get_models
+from helpers import get_models, set_page_config
+
+
+set_page_config()
 
 
 #Create the connection to Bedrock
 bedrock_runtime = boto3.client(
     service_name='bedrock-runtime',
     region_name='us-east-1', 
-)
-
-
-st.set_page_config( 
-    page_title="Meta",
-    page_icon=":robot",
-    layout="wide",
-    initial_sidebar_state="expanded",
 )
 
 with st.sidebar:

@@ -1,6 +1,9 @@
 import boto3
 import json
 import streamlit as st
+from helpers import set_page_config
+
+set_page_config()
 
 #Create the connection to Bedrock
 bedrock = boto3.client(

@@ -3,6 +3,7 @@ import json
 import streamlit as st
 from helpers import get_models, getmodelId, getmodelparams, set_page_config, bedrock_runtime_client
 
+set_page_config()
 
 with st.sidebar:
     with st.form(key ='Form1'):

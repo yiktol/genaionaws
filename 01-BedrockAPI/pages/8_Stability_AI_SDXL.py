@@ -8,6 +8,10 @@ from base64 import b64encode
 from base64 import b64decode
 import boto3
 import streamlit as st
+from helpers import get_models, set_page_config
+
+
+set_page_config()
 
 #Create the connection to Bedrock
 bedrock_runtime = boto3.client(

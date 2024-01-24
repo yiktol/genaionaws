@@ -1,15 +1,10 @@
 import boto3
 import json
 import streamlit as st
-from helpers import get_models
+from helpers import get_models, set_page_config
 
 
-st.set_page_config( 
-    page_title="Cohere",
-    page_icon=":robot",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
+set_page_config()
 
 
 #Create the connection to Bedrock

@@ -1,14 +1,9 @@
 import boto3
 import json
-from helpers import get_models
+from helpers import get_models, set_page_config
 import streamlit as st
 
-st.set_page_config( 
-    page_title="AI21",  
-    page_icon="🧊",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
+set_page_config()
 
 with st.sidebar:
     with st.form(key ='Form1'):

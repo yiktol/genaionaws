@@ -12,12 +12,7 @@ bedrock_runtime = boto3.client(
     region_name='us-east-1',   
     )
 
-st.set_page_config( 
-    page_title="Langchain",  
-    page_icon="🧊",
-    layout="wide",
-    initial_sidebar_state="expanded",
-    )
+set_page_config()
 
 with st.sidebar:
     with st.form(key ='Form1'):
