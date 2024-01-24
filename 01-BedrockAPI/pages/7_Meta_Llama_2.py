@@ -36,8 +36,9 @@ with text:
 
     # Define prompt and model parameters
     with st.form("myform"):
-        prompt = st.text_input(
-            "Ask something:",
+        prompt = st.text_area(
+            "Enter your prompt here:",
+            height = 50,
             placeholder="Describe the plot of the TV show Breaking Bad.",
             value = "Describe the plot of the TV show Breaking Bad."  # Default value is 'Hello'
         )

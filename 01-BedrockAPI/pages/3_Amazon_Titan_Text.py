@@ -27,8 +27,9 @@ with text:
 
     # Define prompt and model parameters
     with st.form("myform"):
-        prompt_data = st.text_input(
+        prompt_data = st.text_area(
         "Enter your prompt here:",
+        height = 50,
         placeholder="Create a 3 day itinerary for my visit to Dubai.",
         value="Create a 3 day itinerary for my visit to Dubai.")
         submit = st.form_submit_button("Submit")

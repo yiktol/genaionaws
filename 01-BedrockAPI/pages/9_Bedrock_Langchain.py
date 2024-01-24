@@ -68,7 +68,7 @@ with text:
 
     with st.form("myform"):
         prompt_data = st.text_area(
-            "Ask something:",
+            "Enter your prompt here:",
             height = 150,
             value = format_prompt()
             )

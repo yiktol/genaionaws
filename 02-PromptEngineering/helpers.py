@@ -56,6 +56,19 @@ def getmodelparams(providername):
             "frequencyPenalty": {
             "scale": 0
             }
+        },
+        "Cohere": {
+            "max_tokens": 4096,
+            "temperature": 0.5,
+            "p": 0.9,
+            "k": 0,
+            "stop_sequences": [],
+            "return_likelihoods": "NONE"
+        },
+        "Meta":{ 
+            'max_gen_len': 1024,
+            'top_p': 0.9,
+            'temperature': 0.8
         }
     }
     
@@ -65,7 +78,9 @@ def getmodelId(providername):
     model_mapping = {
         "Amazon" : "amazon.titan-tg1-large",
         "Anthropic" : "anthropic.claude-v2:1",
-        "AI21" : "ai21.j2-ultra-v1"
+        "AI21" : "ai21.j2-ultra-v1",
+        'Cohere': "cohere.command-text-v14",
+        'Meta': "meta.llama2-13b-chat-v1"
     }
     
     return model_mapping[providername]

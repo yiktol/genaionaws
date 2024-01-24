@@ -31,8 +31,9 @@ with text:
     st.write('Cohere models are text generation models for business use cases. Cohere models are trained on data that supports reliable business applications, like text generation, summarization, copywriting, dialogue, extraction, and question answering.')
 
     with st.form("myform"):
-        prompt_data = st.text_input(
+        prompt_data = st.text_area(
             "Enter your prompt here:",
+            height = 50,
             placeholder="Write me a poem for my beautiful wife.",
             value = "Write me a poem for my beautiful wife.",
         )

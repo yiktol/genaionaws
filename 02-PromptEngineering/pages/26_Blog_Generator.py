@@ -16,7 +16,7 @@ row1_col1.text_area(":orange[Template]",
                     disabled = True,)
 
 with row1_col2.form(key ='Form1'):
-        provider = st.selectbox('Provider',('Anthropic','Amazon','AI21'))
+        provider = st.selectbox('Provider',('Meta','Amazon','Anthropic','AI21','Cohere'))
         model_id=st.text_input('model_id',getmodelId(provider))
         submitted1 = st.form_submit_button(label = 'Set Parameters') 
 
@@ -41,7 +41,7 @@ def blog_outline(topic):
 
 
 with row1_col1.form("myform"):
-    topic_text = st.text_input("Enter a topic:", "")
+    topic_text = st.text_input("Enter a topic:", value="Generative AI")
     submitted = st.form_submit_button("Submit")
 if topic_text and submitted:
     blog_outline(topic_text)

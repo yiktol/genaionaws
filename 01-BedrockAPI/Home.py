@@ -18,7 +18,7 @@ To connect programmatically to an AWS service, you use an endpoint. Refer to the
 
 Amazon Bedrock provides the following service endpoints.
 
-- :orange[bedrock]:  Contains control plane APIs for managing, training, and deploying models. For more information
+- :orange[bedrock]:  Contains control plane APIs for managing, training, and deploying models. 
 - :orange[bedrock-runtime]: Contains runtime plane APIs for making inference requests for models hosted in Amazon Bedrock.
 - :orange[bedrock-agent]: Contains control plane APIs for creating and managing agents and knowledge bases.
 - :orange[bedrock-agent-runtime]: Contains control plane APIs for managing, training, and deploying models.
