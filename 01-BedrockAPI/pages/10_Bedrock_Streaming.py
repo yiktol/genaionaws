@@ -92,7 +92,7 @@ with code:
             }}
 
         body = json.dumps({{
-            "inputText": {prompt_data},
+            "inputText": "{prompt_data}",
             "textGenerationConfig": text_gen_config  
             }})
 

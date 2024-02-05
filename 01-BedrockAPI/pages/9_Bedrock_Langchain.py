@@ -95,11 +95,8 @@ bedrock_runtime = boto3.client(
     region_name='us-east-1', 
     )
 
-template = 'Human: {{task}}\\n\\nAssistant:'
-task = """Write an email from Bob, Customer Service Manager,
-        to the customer \"John Doe\" that provided negative
-        feedback on the service provided by our customer 
-        support engineer."""
+template = "{template}"
+task = "{task}"
 
 inference_modifier = {json.dumps(inference_modifier,indent=4)}
 
