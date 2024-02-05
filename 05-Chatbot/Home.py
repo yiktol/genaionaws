@@ -53,7 +53,4 @@ In this architecture:
 3. The embedded text is then input to the FM for contextual search and including the chat history
 4. The FM model then gives you the results based on the context.
 
-
-
-
 """)

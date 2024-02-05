@@ -73,8 +73,8 @@ def getmodelId(providername):
 def set_page_config():
     import streamlit as st
     st.set_page_config( 
-    page_title="GenAI Tools",  
-    page_icon=":gear:",
+    page_title="Chatbot",  
+    page_icon=":robot_face:",
     layout="wide",
     initial_sidebar_state="expanded",
 )
