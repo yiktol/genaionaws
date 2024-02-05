@@ -51,7 +51,7 @@ titan_llm.model_kwargs = {'temperature': 0.1, "maxTokenCount": 700}
 
 @st.cache_data()
 def load_csv(data):
-    loader = CSVLoader(bytes_data) # --- > 219 docs with 400 chars
+    loader = CSVLoader(data) # --- > 219 docs with 400 chars
     documents_aws = loader.load() #
     return documents_aws
 
