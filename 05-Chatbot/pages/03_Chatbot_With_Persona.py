@@ -1,7 +1,4 @@
 import streamlit as st
-import json
-import os
-import sys
 import boto3
 from langchain.chains import ConversationChain
 from langchain.llms.bedrock import Bedrock
@@ -28,19 +25,19 @@ with st.form(key ='Form1'):
 memory = ConversationBufferMemory()
 memory.chat_memory.add_user_message(user_message)
 memory.chat_memory.add_ai_message(ai_message)
-# memory.human_prefix = "User"
-# memory.ai_prefix = "Bot"
+memory.human_prefix = "User"
+memory.ai_prefix = "assistant"
 
 conversation = ConversationChain(
     llm=titan_llm, verbose=False, memory=memory
 )
-#conversation.prompt.template = """System: The following is a friendly conversation between a knowledgeable helpful assistant and a customer. The assistant is talkative and provides lots of specific details from it's context.\n\nCurrent conversation:\n{history}\nUser: {input}\nBot:"""
+conversation.prompt.template = """System: The following is a friendly conversation between a knowledgeable helpful career coach and a customer. The career coach is talkative and provides lots of specific details from it's context.\n\nCurrent conversation:\n{history}\nUser: {input}\nBot:"""
 
 
 def form_callback():
     st.session_state.messages = []
 
-st.sidebar.button(label='Clear Messages', on_click=form_callback)
+st.sidebar.button(label='Clear Chat Messages', on_click=form_callback)
 
 # Initialize chat history
 if "messages" not in st.session_state:
@@ -54,7 +51,7 @@ for message in st.session_state.messages:
 # Accept user input
 if prompt := st.chat_input("What is up?"):
     # Add user message to chat history
-    #st.session_state.messages.append({"role": "User", "content": prompt})
+    st.session_state.messages.append({"role": "User", "content": prompt})
     # Display user message in chat message container
     with st.chat_message("User"):
         st.markdown(prompt)
