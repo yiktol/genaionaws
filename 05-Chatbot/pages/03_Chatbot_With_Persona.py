@@ -6,6 +6,8 @@ from langchain.memory import ConversationBufferMemory
 from langchain.prompts import PromptTemplate
 
 st.title("Titan Chatbot with Persona")
+st.write("AI assistant will play the role of a career coach. Role Play Dialogue requires user message to be set in before starting the chat. ConversationBufferMemory is used to pre-populate the dialog.")
+
 bedrock_runtime = boto3.client(
 service_name='bedrock-runtime',
 region_name='us-east-1', 
@@ -13,7 +15,7 @@ region_name='us-east-1',
 
 modelId = "amazon.titan-tg1-large"
 titan_llm = Bedrock(model_id=modelId, client=bedrock_runtime)
-titan_llm.model_kwargs = {'temperature': 0.0, "maxTokenCount": 700}
+titan_llm.model_kwargs = {'temperature': 0, "maxTokenCount": 700}
 
 
 with st.form(key ='Form1'):
@@ -21,21 +23,28 @@ with st.form(key ='Form1'):
     ai_message= st.text_input('AI Message:', value='I am career coach and give career advice')
     submitted = st.form_submit_button(label = 'Set Personality') 
             
+if "memory" not in st.session_state:
+     st.session_state.memory = ConversationBufferMemory(return_messages=True)
+     st.session_state.memory.chat_memory.add_user_message(user_message)
+     st.session_state.memory.chat_memory.add_ai_message(ai_message)
+     st.session_state.memory.human_prefix = "User"
+     st.session_state.memory.ai_prefix = "assistant"
 
-memory = ConversationBufferMemory()
-memory.chat_memory.add_user_message(user_message)
-memory.chat_memory.add_ai_message(ai_message)
-memory.human_prefix = "User"
-memory.ai_prefix = "assistant"
+# memory = ConversationBufferMemory()
+# memory.chat_memory.add_user_message(user_message)
+# memory.chat_memory.add_ai_message(ai_message)
+# memory.human_prefix = "User"
+# memory.ai_prefix = "assistant"
 
 conversation = ConversationChain(
-    llm=titan_llm, verbose=False, memory=memory
+    llm=titan_llm, verbose=False, memory=st.session_state.memory
 )
 conversation.prompt.template = """System: The following is a friendly conversation between a knowledgeable helpful career coach and a customer. The career coach is talkative and provides lots of specific details from it's context.\n\nCurrent conversation:\n{history}\nUser: {input}\nBot:"""
 
 
 def form_callback():
     st.session_state.messages = []
+    del st.session_state.memory
 
 st.sidebar.button(label='Clear Chat Messages', on_click=form_callback)
 

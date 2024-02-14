@@ -22,9 +22,13 @@ from helpers import set_page_config
 set_page_config()
 
 st.title("Titan Chatbot with Context")
+st.write("""In this use case we will ask the Chatbot to answer question from the context that it was passed. \
+We will take a csv file and use Titan embeddings Model to create the vector. \
+This vector is stored in FAISS. When chatbot is asked a question we pass this vector and retrieve the answer.""")
 
 def form_callback():
     st.session_state.messages = []
+    # del st.session_state.memory
 
 st.sidebar.button(label='Clear Messages', on_click=form_callback)
 
