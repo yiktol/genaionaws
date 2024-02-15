@@ -76,4 +76,5 @@ with text:
             top_p=top_p,
             max_tokens=max_tokens_to_sample)
         #print(output)
+        st.write("Answer:")
         st.info(output)

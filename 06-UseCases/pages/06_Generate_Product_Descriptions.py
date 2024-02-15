@@ -71,6 +71,7 @@ with text:
     if submit:
         output = invoke_model(client=bedrock_runtime_client(), prompt=prompt, model=modelId)
         #print(output)
+        st.write("Answer:")
         st.info(output)
     
 with code:

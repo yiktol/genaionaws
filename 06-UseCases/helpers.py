@@ -2,6 +2,7 @@ import streamlit as st
 import json
 import boto3
 import math
+import numpy as np
 from numpy import dot
 from numpy.linalg import norm
 
@@ -39,13 +40,7 @@ def search(dataset, v):
     dataset.sort(key=lambda x: x['distance'])
     return [dataset[0]['text'],distance_array]
 
-def set_page_config():
-    st.set_page_config( 
-    page_title="Use Cases",  
-    page_icon=":rock:",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
+
 
 def classify(classes, v):
     distance_array=[]
@@ -54,13 +49,60 @@ def classify(classes, v):
         distance_array.append(item['distance'])
     classes.sort(key=lambda x: x['distance'])
     return [classes[0]['name'],distance_array]
-    
-def bedrock_runtime_client():
-    bedrock_runtime = boto3.client(
-    service_name='bedrock-runtime',
-    region_name='us-east-1', 
-    )
-    return bedrock_runtime
+  
+def find_outliers_by_count(dataset, count):
+    # find the center of mass
+    embeddings = []
+    for item in dataset:
+        embeddings.append(item['embedding'])
+    center = np.mean(embeddings, axis=0)
+    # calculate distance from center
+    distances=[]
+    for item in dataset:
+        item['distance'] = calculate_distance(item['embedding'], center)
+        distances.append(item['distance'])
+    sd = np.std(embeddings)
+    # sort the distances in reverse order
+    dataset.sort(key=lambda x: x['distance'], reverse=True)
+    # return N outliers
+    return [dataset[0:count],distances]
+
+def find_outliers_by_percentage(dataset, percent):
+    # find the center of mass
+    embeddings = []
+    for item in dataset:
+        embeddings.append(item['embedding'])
+    center = np.mean(embeddings, axis=0)
+    # calculate distance from center
+    for item in dataset:
+        item['distance'] = calculate_distance(item['embedding'], center)
+    # sort the distances in reverse order
+    dataset.sort(key=lambda x: x['distance'], reverse=True)
+    # return top x% outliers
+    total = len(dataset)
+    count = math.floor(percent * total / 100)
+    return dataset[0:count]  
+
+def find_outliers_by_distance(dataset, percent):
+    # find the center of mass
+    embeddings = []
+    for item in dataset:
+        embeddings.append(item['embedding'])
+    center = np.mean(embeddings, axis=0)
+    # calculate distance from center
+    for item in dataset:
+        item['distance'] = calculate_distance(item['embedding'], center)
+    # sort the distances in reverse order
+    dataset.sort(key=lambda x: x['distance'], reverse=True)
+    # return outliers beyond x% of max distance
+    max_distance = dataset[0]['distance']
+    min_distance = percent * max_distance / 100
+    outliers = []
+    for item in dataset:
+        if item['distance'] >= min_distance:
+            outliers.append(item)
+    return outliers  
+  
 
 def invoke_model(client, prompt, model, 
     accept = 'application/json', content_type = 'application/json',
@@ -146,3 +188,19 @@ def invoke_model(client, prompt, model,
         output = response_body['generation']
     # return
     return output
+
+
+def set_page_config():
+    st.set_page_config( 
+    page_title="Use Cases",  
+    page_icon=":rock:",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+    
+def bedrock_runtime_client():
+    bedrock_runtime = boto3.client(
+    service_name='bedrock-runtime',
+    region_name='us-east-1', 
+    )
+    return bedrock_runtime
