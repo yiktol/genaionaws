@@ -1,7 +1,6 @@
 
 import streamlit as st
-import json
-import boto3
+import textwrap
 from helpers import bedrock_runtime_client, set_page_config, invoke_model
 
 
@@ -49,7 +48,7 @@ modelId = 'amazon.titan-text-lite-v1'
 accept = 'application/json'
 contentType = 'application/json'
 
-prompt= \"""{prompt}\"""
+prompt= \"{textwrap.shorten(prompt,width=50,placeholder='...')}\"
 
 input = {{
         'inputText': prompt,
@@ -60,10 +59,17 @@ input = {{
             'topP': {top_p}
         }}
     }}
-body=json.dumps(input)
-response = bedrock.invoke_model(body=body, modelId=modelId, accept=accept,contentType=contentType)
+    
+response = bedrock.invoke_model(
+    body=json.dumps(input),
+    modelId=modelId, 
+    accept=accept,
+    contentType=contentType
+    )
+    
 response_body = json.loads(response.get('body').read())
 results = response_body['results']
+
 for result in results:
     print(result['outputText'])
         """

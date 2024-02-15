@@ -1,4 +1,4 @@
-
+import textwrap
 import streamlit as st
 from helpers import bedrock_runtime_client, set_page_config, invoke_model
 
@@ -39,7 +39,7 @@ modelId = 'anthropic.claude-v2'
 accept = 'application/json'
 contentType = 'application/json'
 
-prompt= \"""{prompt}\"""
+prompt= \"{textwrap.shorten(prompt,width=50,placeholder='...')}\"
 
 input = {{
     'prompt': prompt,

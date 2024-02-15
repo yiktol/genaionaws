@@ -1,7 +1,6 @@
 
 import streamlit as st
-import json
-import boto3
+import textwrap
 from helpers import bedrock_runtime_client, set_page_config, invoke_model
 
 
@@ -42,7 +41,7 @@ modelId = 'ai21.j2-ultra'
 accept = 'application/json'
 contentType = 'application/json'
 
-prompt= \"""{prompt}\"""
+prompt= \"{textwrap.shorten(prompt,width=50,placeholder='...')}\"
 
 input = {{
     'prompt':prompt, 
@@ -54,10 +53,17 @@ input = {{
     'presencePenalty': {{'scale': 0}},
     'frequencyPenalty': {{'scale': 0}}
         }}
-body=json.dumps(input)
-response = bedrock.invoke_model(body=body, modelId=modelId, accept=accept,contentType=contentType)
+        
+response = bedrock.invoke_model(
+    body=json.dumps(input),
+    modelId=modelId, 
+    accept=accept,
+    contentType=contentType
+    )
+    
 response_body = json.loads(response.get('body').read())
 completions = response_body['completions']
+
 for part in completions:
     print(part['data']['text'])
 
@@ -69,7 +75,7 @@ with text:
     st.header("Article Summarization")
     st.write("In this example, we want to create a summary of this very long article with 5 bullet points:")
     with st.form('form1'):
-        prompt = st.text_area(":orange[Article]", prompt, height=870)
+        prompt = st.text_area(":orange[Article]", prompt, height=500)
         submit = st.form_submit_button("Summarize",type='primary')
         
     if submit:

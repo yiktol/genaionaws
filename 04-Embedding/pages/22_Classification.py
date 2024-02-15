@@ -66,7 +66,7 @@ Here is the sample code to classify students into athletics, musician, or magici
         v = get_embedding(bedrock, query)      
         if submit:         
             result = classify(classes, v)
-            print(result)
+            #print(result)
             st.write("Answer:")
             st.info(result[0])
             df = pd.DataFrame({'Class':["class1","class2"], 'Distance':result[1]})

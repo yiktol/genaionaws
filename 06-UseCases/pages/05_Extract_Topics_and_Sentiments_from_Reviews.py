@@ -1,7 +1,6 @@
 
 import streamlit as st
-import json
-import boto3
+import textwrap
 from helpers import bedrock_runtime_client, set_page_config, invoke_model
 
 
@@ -56,7 +55,18 @@ The stay was very nice would stay again. The pool closes at 7 pm and doesn't ope
 Extracted sentiment:
 """
 
-code_data = f"""import json
+
+
+with code:
+    
+    
+    with st.form(key ='form2'):
+        temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.5, step = 0.1)
+        topP=st.slider('topP',min_value = 0.0, max_value = 1.0, value = 1.0, step = 0.1)
+        maxTokens=st.number_input('maxTokens',min_value = 50, max_value = 4096, value = 4096, step = 1)
+        submitted1 = st.form_submit_button(label = 'Tune Parameters')    
+
+    code_data = f"""import json
 import boto3
 
 bedrock = boto3.client(
@@ -68,26 +78,36 @@ modelId = 'ai21.j2-mid'
 accept = 'application/json'
 contentType = 'application/json'
 
-prompt= \"""{prompt}\"""
+prompt= \"{textwrap.shorten(prompt,width=50,placeholder='...')}\"
 
 input = {{
     'prompt':prompt, 
-    'maxTokens': 200,
-    'temperature': 0.3,
-    'topP': 1.0,
+    'maxTokens': {maxTokens},
+    'temperature': {temperature},
+    'topP': {topP},
     'stopSequences': [],
     'countPenalty': {{'scale': 0}},
     'presencePenalty': {{'scale': 0}},
     'frequencyPenalty': {{'scale': 0}}
         }}
-body=json.dumps(input)
-response = bedrock.invoke_model(body=body, modelId=modelId, accept=accept,contentType=contentType)
+        
+response = bedrock.invoke_model(
+    body=json.dumps(input),
+    modelId=modelId, 
+    accept=accept,
+    contentType=contentType
+    )
+    
 response_body = json.loads(response.get('body').read())
 completions = response_body['completions']
+
 for part in completions:
     print(part['data']['text'])
 
 """
+
+    st.code(code_data, language="python")
+
 
 with text:
 
@@ -99,13 +119,13 @@ with text:
         submit = st.form_submit_button("Extract Topics and Sentiments",type='primary')
         
     if submit:
-        output = invoke_model(client=bedrock_runtime_client(), prompt=prompt, model=modelId)
+        output = invoke_model(client=bedrock_runtime_client(), 
+                              prompt=prompt, 
+                              model=modelId,
+                              temperature=temperature,
+                              top_p=topP,
+                              max_tokens=maxTokens,)
         #print(output)
         st.write("Answer:")
         st.info(output)
     
-with code:
-    
-
-    st.code(code_data, language="python")
-

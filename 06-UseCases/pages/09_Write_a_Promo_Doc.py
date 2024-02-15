@@ -1,4 +1,4 @@
-
+import textwrap
 import streamlit as st
 from helpers import bedrock_runtime_client, set_page_config, invoke_model
 
@@ -9,7 +9,7 @@ set_page_config()
 text, code = st.columns(2)
 
 
-modelId = 'amazon.titan-text-lite-v1'
+modelId = 'amazon.titan-text-express-v1'
 prompt = """Bob has been at the company for 3.5 years and is up for promotion for senior manager.\n  
 Bob has the following accomplishments: 
 - led the delivery of a new software product for productivity. 
@@ -39,11 +39,11 @@ bedrock = boto3.client(
     region_name='us-east-1'
     )
 
-modelId = 'amazon.titan-text-lite-v1'
+modelId = 'amazon.titan-text-express-v1'
 accept = 'application/json'
 contentType = 'application/json'
 
-prompt= \"""{prompt}\"""
+prompt= \"{textwrap.shorten(prompt,width=50,placeholder='...')}\"
 
 input = {{
         'inputText': prompt,
@@ -54,10 +54,17 @@ input = {{
             'topP': {top_p}
         }}
     }}
-body=json.dumps(input)
-response = bedrock.invoke_model(body=body, modelId=modelId, accept=accept,contentType=contentType)
+    
+response = bedrock.invoke_model(
+    body=json.dumps(input),
+    modelId=modelId, 
+    accept=accept,
+    contentType=contentType
+    )
+    
 response_body = json.loads(response.get('body').read())
 results = response_body['results']
+
 for result in results:
     print(result['outputText'])
         """

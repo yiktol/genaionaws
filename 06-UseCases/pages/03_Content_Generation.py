@@ -1,7 +1,6 @@
 
 import streamlit as st
-import json
-import boto3
+import textwrap
 from helpers import bedrock_runtime_client, set_page_config, invoke_model
 
 
@@ -40,7 +39,7 @@ modelId = 'anthropic.claude-v2'
 accept = 'application/json'
 contentType = 'application/json'
 
-prompt= \"""{prompt}\"""
+prompt= \"{textwrap.shorten(prompt,width=50,placeholder='...')}\"
 
 input = {{
     'prompt': prompt,
@@ -50,8 +49,14 @@ input = {{
     'top_p': {top_p},
     'stop_sequences': []
 }}
-body=json.dumps(input)
-response = bedrock.invoke_model(body=body, modelId=modelId, accept=accept,contentType=contentType)
+
+response = bedrock.invoke_model(
+    body=json.dumps(input),
+    modelId=modelId, 
+    accept=accept,
+    contentType=contentType
+    )
+    
 response_body = json.loads(response.get('body').read())
 completion = response_body['completion']
 print(completion)
@@ -66,7 +71,7 @@ with text:
 
     # st.title("Extract Action Items")
     st.header("Content Generation")
-    st.write("In this example, we want to rewrite the following paragraph with the explicit instruction that the generated content should be \":orange[understandable to a 5th grader]\". Also, we want the output to be in a specific formation.")
+    st.write("In this example, we want to rewrite the following paragraph with the explicit instruction that the generated content should be :orange[understandable to a 5th grader]. Also, we want the output to be in a specific formation.")
     with st.form('form1'):
         prompt = st.text_area(":orange[Prompt]", prompt, height=270)
         submit = st.form_submit_button("Generate Content",type='primary')

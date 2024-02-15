@@ -7,7 +7,7 @@ set_page_config()
     
 row1_col1, row1_col2 = st.columns([0.7,0.3])
 
-row1_col1.title("🦜🔗 Blog Outline Generator")
+row1_col1.title("Blog Outline Generator")
 
 template = "As an experienced data scientist and technical writer, generate an outline for a blog about {topic}."
 row1_col1.text_area(":orange[Template]",
@@ -18,7 +18,7 @@ row1_col1.text_area(":orange[Template]",
 with row1_col2.form(key ='Form1'):
         provider = st.selectbox('Provider',('Meta','Amazon','Anthropic','AI21','Cohere'))
         model_id=st.text_input('model_id',getmodelId(provider))
-        submitted1 = st.form_submit_button(label = 'Set Parameters') 
+        submitted1 = st.form_submit_button(label = 'Tune Parameters') 
 
 #Create the connection to Bedrock
 bedrock_runtime = bedrock_runtime_client()

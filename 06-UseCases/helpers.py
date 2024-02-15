@@ -104,6 +104,65 @@ def find_outliers_by_distance(dataset, percent):
     return outliers  
   
 
+def getmodelId(providername):
+    model_mapping = {
+        "Amazon" : "amazon.titan-tg1-large",
+        "Anthropic" : "anthropic.claude-v2:1",
+        "AI21" : "ai21.j2-ultra-v1",
+        'Cohere': "cohere.command-text-v14",
+        'Meta': "meta.llama2-13b-chat-v1"
+    }
+    
+    return model_mapping[providername]
+
+def getmodelparams(providername):
+    model_mapping = {
+        "Amazon" : {
+            "maxTokenCount": 4096,
+            "stopSequences": [], 
+            "temperature": 0.5,
+            "topP": 0.9
+            },
+        "Anthropic" : {
+            "max_tokens_to_sample": 4096,
+            "temperature": 0.9,
+            "top_k": 250,
+            "top_p": 0.9,
+            "stop_sequences": ["\n\nHuman"],
+            },
+        "AI21" : {
+            "maxTokens": 4096,
+            "temperature": 0.5,
+            "topP": 0.9,
+            "stopSequences": [],
+            "countPenalty": {
+            "scale": 0
+            },
+            "presencePenalty": {
+            "scale": 0    
+            },
+            "frequencyPenalty": {
+            "scale": 0
+            }
+        },
+        "Cohere": {
+            "max_tokens": 4096,
+            "temperature": 0.5,
+            "p": 0.9,
+            "k": 0,
+            "stop_sequences": [],
+            "return_likelihoods": "NONE"
+        },
+        "Meta":{ 
+            'max_gen_len': 1024,
+            'top_p': 0.9,
+            'temperature': 0.8
+        }
+    }
+    
+    return model_mapping[providername]
+
+
 def invoke_model(client, prompt, model, 
     accept = 'application/json', content_type = 'application/json',
     max_tokens  = 512, temperature = 1.0, top_p = 1.0, top_k = 250, stop_sequences = [],

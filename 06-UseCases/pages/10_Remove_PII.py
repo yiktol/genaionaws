@@ -1,4 +1,4 @@
-
+import textwrap
 import streamlit as st
 from helpers import bedrock_runtime_client, set_page_config, invoke_model
 
@@ -46,7 +46,7 @@ modelId = 'anthropic.claude-v2'
 accept = 'application/json'
 contentType = 'application/json'
 
-prompt= \"""{prompt}\"""
+prompt= \"{textwrap.shorten(prompt,width=50,placeholder='...')}\"
 
 input = {{
     'prompt': prompt,
@@ -56,8 +56,14 @@ input = {{
     'top_p': {top_p},
     'stop_sequences': []
 }}
-body=json.dumps(input)
-response = bedrock.invoke_model(body=body, modelId=modelId, accept=accept,contentType=contentType)
+
+response = bedrock.invoke_model(
+    body=json.dumps(input),
+    modelId=modelId, 
+    accept=accept,
+    contentType=contentType
+    )
+    
 response_body = json.loads(response.get('body').read())
 completion = response_body['completion']
 print(completion)
