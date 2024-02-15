@@ -29,7 +29,16 @@ The company targets food brands because they design the recipes and select their
 
 Summarize the above text in 5 bullets."""
 
-code_data = f"""import json
+   
+with code:
+    
+    with st.form(key ='form2'):
+        temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.5, step = 0.1)
+        topP=st.slider('topP',min_value = 0.0, max_value = 1.0, value = 1.0, step = 0.1)
+        maxTokens=st.number_input('maxTokens',min_value = 50, max_value = 4096, value = 4096, step = 1)
+        submitted1 = st.form_submit_button(label = 'Tune Parameters')    
+
+    code_data = f"""import json
 import boto3
 
 bedrock = boto3.client(
@@ -45,9 +54,9 @@ prompt= \"{textwrap.shorten(prompt,width=50,placeholder='...')}\"
 
 input = {{
     'prompt':prompt, 
-    'maxTokens': 200,
-    'temperature': 0.3,
-    'topP': 1.0,
+    'maxTokens': {maxTokens},
+    'temperature': {temperature},
+    'topP': {topP},
     'stopSequences': [],
     'countPenalty': {{'scale': 0}},
     'presencePenalty': {{'scale': 0}},
@@ -68,6 +77,8 @@ for part in completions:
     print(part['data']['text'])
 
 """
+        
+    st.code(code_data, language="python")
 
 with text:
 
@@ -79,11 +90,11 @@ with text:
         submit = st.form_submit_button("Summarize",type='primary')
         
     if submit:
-        output = invoke_model(client=bedrock_runtime_client(), prompt=prompt, model=modelId)
-        #print(output)
+        output = invoke_model(client=bedrock_runtime_client(), 
+                              prompt=prompt, 
+                              model=modelId,
+                              temperature=temperature,
+                              top_p=topP,
+                              max_tokens=maxTokens,)
         st.write("Answer:")
         st.info(output)
-    
-with code:
-    st.code(code_data, language="python")
-
