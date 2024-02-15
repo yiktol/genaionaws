@@ -50,6 +50,7 @@ container.code(template, language="markdown")
 
 def form_callback():
 	st.session_state.messages = []
+	st.session_state.memory.clear()
 	del st.session_state.memory
 
 st.sidebar.button(label='Clear Chat History', on_click=form_callback)

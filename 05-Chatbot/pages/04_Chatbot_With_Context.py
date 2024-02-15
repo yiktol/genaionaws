@@ -28,7 +28,7 @@ This vector is stored in FAISS. When chatbot is asked a question we pass this ve
 
 def form_callback():
     st.session_state.messages = []
-    # del st.session_state.memory
+    #del st.session_state.memory
 
 st.sidebar.button(label='Clear Messages', on_click=form_callback)
 
