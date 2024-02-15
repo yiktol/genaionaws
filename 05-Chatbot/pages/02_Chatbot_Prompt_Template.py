@@ -76,6 +76,6 @@ if prompt := st.chat_input("What is up?"):
 	with st.chat_message("Assistant"):
 		with st.spinner("Thinking..."):
 			response = conversation.invoke({'input': prompt})
-			print(response)
+			#print(response)
 			st.write(response['response'])
 		st.session_state.messages.append({"role": "Assistant", "content": response['response']})
