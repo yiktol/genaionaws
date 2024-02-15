@@ -39,7 +39,7 @@ Here is the sample code to place the above-mentioned names into two groups:""")
         embeddings = []
         for name in names[0]:
             embeddings.append(get_embedding(bedrock, name))
-            print(name)
+            #print(name)
         # clustering
         df = pd.DataFrame(data={'names': names[0], 'embeddings': embeddings})
         matrix = np.vstack(df.embeddings.values)
