@@ -66,7 +66,7 @@ Here is the sample code to identify two outliers from a name list:""")
         entries = find_outliers_by_percentage(dataset, outlier_by_percent)
         outlier_names = []
         for item in entries:
-            print(item['name'])
+            #print(item['name'])
             outlier_names.append(item['name'])
         df = pd.DataFrame({'Outliers':outlier_names})
         st.write("Answer:")
@@ -79,7 +79,7 @@ Here is the sample code to identify two outliers from a name list:""")
         entries = find_outliers_by_distance(dataset, outlier_by_distance)
         outlier_names = []
         for item in entries:
-            print(item['name'])
+            #print(item['name'])
             outlier_names.append(item['name'])
         df = pd.DataFrame({'Outliers':outlier_names})
         st.write("Answer:")
