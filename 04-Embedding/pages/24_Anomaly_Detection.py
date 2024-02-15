@@ -37,11 +37,11 @@ Here is the sample code to identify two outliers from a name list:""")
          'Marie Curie', 'Ernest Rutherford', 'Michael Faraday', 
          'Richard Feynman', 'Lady Gaga', 'Erwin Schrödinger', 
          'Max Planck', 'Enrico Fermi', 'Taylor Swift', 'Lord Kelvin']),
-        outlier_by_number = st.number_input("Outlier by Number", min_value=1, max_value=10, value=2)
+        outlier_by_number = st.slider("Outlier by Number", min_value=1, max_value=10, value=2,step = 1)
         submit = st.form_submit_button("Get Outliers by Number",type="secondary")
-        outlier_by_percent=st.number_input("Outlier by Percent", min_value=1, max_value=100, value=10)
+        outlier_by_percent=st.slider("Outlier by Percent", min_value=1, max_value=100, value=10,step = 1)
         submit2 = st.form_submit_button("Get Outliers by Percent",type="secondary")
-        outlier_by_distance=st.number_input("Outlier by Distance", min_value=1, max_value=100, value=60)
+        outlier_by_distance=st.slider("Outlier by Distance", min_value=1, max_value=100, value=60,step = 1)
         submit3 = st.form_submit_button("Get Outliers by Distance",type="secondary")
         
     if outlier_by_number and submit:
