@@ -6,8 +6,11 @@ set_page_config()
 
 from langchain_community.llms import Bedrock
 from langchain.memory import ConversationBufferMemory
-from langchain.chains import ConversationChain
-from langchain.prompts import PromptTemplate
+from langchain.chains import ConversationChain, LLMChain
+from langchain.prompts import (ChatPromptTemplate, 
+                               SystemMessagePromptTemplate, 
+                               HumanMessagePromptTemplate, 
+                               MessagesPlaceholder,)
 
 st.title("Titan ChatAssistant with Prompt Template")
 st.write("""PromptTemplate is responsible for the construction of this input. \
@@ -21,19 +24,16 @@ region_name='us-east-1',
 
 modelId = "amazon.titan-tg1-large"
 titan_llm = Bedrock(model_id=modelId, client=bedrock_runtime)
-titan_llm.model_kwargs = {'temperature': 0.1, "maxTokenCount": 700}
+titan_llm.model_kwargs = {'temperature': 0.5, "maxTokenCount": 4096}
 
 
 if "memory" not in st.session_state:
      st.session_state.memory = ConversationBufferMemory(return_messages=True)
-     st.session_state.memory.human_prefix = "User"
-     st.session_state.memory.ai_prefix = "assistant"
+     st.session_state.memory.human_prefix = "Human"
+     st.session_state.memory.ai_prefix = "AI"
      st.session_state.memory.memory_key = "history"
 
-conversation = ConversationChain(
-    llm=titan_llm, verbose=False, memory=st.session_state.memory)
-
-template ="""System: The following is a friendly conversation between a knowledgeable helpful Assistant and a customer. \
+template ="""The following is a friendly conversation between a knowledgeable helpful Assistant and a customer. \
 The Assistant is talkative and provides lots of specific details from it's context.
 
 Current conversation:
@@ -41,7 +41,19 @@ Current conversation:
 User: {input}
 Assistant: """
 
-conversation.prompt.template = template
+
+prompt_template = ChatPromptTemplate(
+    messages=[
+		SystemMessagePromptTemplate.from_template("The following is a friendly conversation between a knowledgeable helpful AI and a customer."),
+		MessagesPlaceholder(variable_name="history"),
+		HumanMessagePromptTemplate.from_template("{input}"),
+		]
+	)
+
+conversation = LLMChain(
+    llm=titan_llm, verbose=True, memory=st.session_state.memory, prompt=prompt_template)
+
+#conversation.prompt.template = template
 
 container = st.container(border=True)
 container.write(":orange[Template]")
@@ -58,7 +70,7 @@ st.sidebar.button(label='Clear Chat History', on_click=form_callback)
 
 # Initialize chat history
 if "messages" not in st.session_state.keys():
-	st.session_state.messages = [{"role": "Assistant", "content": "How may I assist you today?"}]
+	st.session_state.messages = [{"role": "AI", "content": "How may I assist you today?"}]
 
 # Display chat messages from history on app rerun
 for message in st.session_state.messages:
@@ -68,15 +80,15 @@ for message in st.session_state.messages:
 # Accept user input
 if prompt := st.chat_input("What is up?"):
 	# Add user message to chat history
-	st.session_state.messages.append({"role": "User", "content": prompt})
+	st.session_state.messages.append({"role": "Human", "content": prompt})
 	# Display user message in chat message container
-	with st.chat_message("User"):
+	with st.chat_message("Human"):
 		st.write(prompt)
 	
 	# Display Assistant response in chat message container
-	with st.chat_message("Assistant"):
+	with st.chat_message("AI"):
 		with st.spinner("Thinking..."):
-			response = conversation.invoke({'input': prompt})
+			response = conversation({'input': prompt})
 			#print(response)
-			st.write(response['response'])
-		st.session_state.messages.append({"role": "Assistant", "content": response['response']})
+			st.write(response['text'])
+		st.session_state.messages.append({"role": "AI", "content": response['text']})

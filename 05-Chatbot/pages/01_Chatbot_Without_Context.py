@@ -25,7 +25,7 @@ if "memory" not in st.session_state:
      st.session_state.memory.memory_key = "history"
 
 conversation = ConversationChain(
-    llm=titan_llm, verbose=False, memory=st.session_state.memory
+    llm=titan_llm, verbose=True, memory=st.session_state.memory
 )
 conversation.prompt.template = """System: The following is a friendly conversation between a knowledgeable helpful career coach and a customer. \
 The career coach is talkative and provides lots of specific details from it's context.\
