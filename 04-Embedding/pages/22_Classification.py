@@ -34,12 +34,15 @@ Here is the sample code to classify students into athletics, musician, or magici
             {'name': 'musician', 'description': 'all students with a talent in music'}, 
             {'name': 'magician', 'description': 'all students with a talent in witch craft'}
         ]
-        for item in classes:
-            item['embedding'] = get_embedding(bedrock, item['description'])
-        # perform a classification
-        query = prompt[0]
-        v = get_embedding(bedrock, query)      
+  
+        
         if submit:         
+            for item in classes:
+                item['embedding'] = get_embedding(bedrock, item['description'])
+            # perform a classification
+            query = prompt[0]
+            v = get_embedding(bedrock, query)    
+                
             result = classify(classes, v)
             #print(result)
             st.write("Answer:")
@@ -59,12 +62,14 @@ Here is the sample code to classify students into athletics, musician, or magici
             {'name': 'positive', 'description': 'customer demonstrated positive sentiment in the response.'}, 
             {'name': 'negative', 'description': 'customer demonstrated negative sentiment in the response.'}
         ]
-        for item in classes:
-            item['embedding'] = get_embedding(bedrock, item['description'])
-        # perform a classification
-        query = prompt[0]
-        v = get_embedding(bedrock, query)      
-        if submit:         
+ 
+        if submit:      
+            for item in classes:
+                item['embedding'] = get_embedding(bedrock, item['description'])
+            # perform a classification
+            query = prompt[0]
+            v = get_embedding(bedrock, query)  
+                              
             result = classify(classes, v)
             #print(result)
             st.write("Answer:")

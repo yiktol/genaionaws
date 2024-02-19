@@ -9,7 +9,7 @@ set_page_config()
 
 bedrock = bedrock_runtime_client()
 
-st.title("Similarity Metrics")
+st.header("Similarity Metrics")
 
 left_co, cent_co,last_co = st.columns([0.3,0.3,0.4])
 with left_co:

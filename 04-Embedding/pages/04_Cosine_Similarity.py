@@ -12,7 +12,7 @@ bedrock = bedrock_runtime_client()
 text, code = st.columns(2)
 
 with text:
-    st.title("Cosine Similarity")
+    st.header("Cosine Similarity")
     st.image("dot-product-a-cos.svg")
     st.latex(r'\cos \theta = \frac{a.b}  {|a| x |b|}') 
 

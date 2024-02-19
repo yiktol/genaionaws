@@ -1,6 +1,7 @@
 
 import streamlit as st
 import pandas as pd
+import textwrap
 from helpers import bedrock_runtime_client, set_page_config, invoke_model, search, get_embedding
 
 set_page_config()
@@ -32,17 +33,19 @@ Here is the sample code to perform search and recommendation:""")
         t5=st.text_input('Text5',value="The electromagnetic spectrum is the range of frequencies (the spectrum) of electromagnetic radiation and their respective wavelengths and photon energies."),
         submit = st.form_submit_button("Search and Recommend",type="primary")
 
-    dataset = [
+
+    if submit:         
+        dataset = [
         {'text': t1, 'embedding': get_embedding(bedrock, t1[0])}, 
         {'text': t2, 'embedding': get_embedding(bedrock, t2[0])}, 
         {'text': t3, 'embedding': get_embedding(bedrock, t3[0])}, 
         {'text': t4, 'embedding': get_embedding(bedrock, t4[0])}, 
         {'text': t5, 'embedding': get_embedding(bedrock, t5[0])}
-]
-    v = get_embedding(bedrock, prompt[0])  
-    if submit:            
+        ]    
+        
+        v = get_embedding(bedrock, prompt[0]) 
         result = search(dataset, v)
-        #print(result)
+
         st.write("Answer:")
         st.info(result[0][0])
         df = pd.DataFrame({'Text':["t1","t2","t3","t4","t5"], 'Distance':result[1]})
@@ -50,7 +53,7 @@ Here is the sample code to perform search and recommendation:""")
 
 with code:
 
-    code_data = """import json
+    code_data = f"""import json
 import boto3
 import math
 
@@ -58,12 +61,17 @@ def get_embedding(bedrock, text):
     modelId = 'amazon.titan-embed-text-v1'
     accept = 'application/json'
     contentType = 'application/json'
-    input = {
+    input = {{
             'inputText': text
-        }
-    body=json.dumps(input)
+        }}
+
     response = bedrock.invoke_model(
-        body=body, modelId=modelId, accept=accept,contentType=contentType)
+        body=json.dumps(input), 
+        modelId=modelId, 
+        accept=accept,
+        contentType=contentType
+        )
+        
     response_body = json.loads(response.get('body').read())
     embedding = response_body['embedding']
     return embedding
@@ -82,32 +90,25 @@ def search(dataset, v):
 bedrock = boto3.client(
     service_name='bedrock-runtime',
     region_name='us-east-1'
-)
+    )
+    
 # the data set
-t1 = \"""
-The theory of general relativity says that the observed gravitational effect between masses results from their warping of spacetime. 
-\"""
-t2 = \"""
-Quantum mechanics allows the calculation of properties and behaviour of physical systems. It is typically applied to microscopic systems: molecules, atoms and sub-atomic particles. 
-\"""
-t3 = \"""
-Wavelet theory is essentially the continuous-time theory that corresponds to dyadic subband transforms — i.e., those where the L (LL) subband is recursively split over and over.
-\"""
-t4 = \"""
-Every particle attracts every other particle in the universe with a force that is proportional to the product of their masses and inversely proportional to the square of the distance between their centers.
-\"""
-t5 = \"""
-The electromagnetic spectrum is the range of frequencies (the spectrum) of electromagnetic radiation and their respective wavelengths and photon energies. 
-\"""
+t1 = \"{textwrap.shorten(t1[0],width=50,placeholder='...')}\"
+t2 = \"{textwrap.shorten(t2[0],width=50,placeholder='...')}\"
+t3 = \"{textwrap.shorten(t3[0],width=50,placeholder='...')}\"
+t4 = \"{textwrap.shorten(t4[0],width=50,placeholder='...')}\"
+t5 = \"{textwrap.shorten(t5[0],width=50,placeholder='...')}\"
+
 dataset = [
-    {'text': t1, 'embedding': get_embedding(bedrock, t1)}, 
-    {'text': t2, 'embedding': get_embedding(bedrock, t2)}, 
-    {'text': t3, 'embedding': get_embedding(bedrock, t3)}, 
-    {'text': t4, 'embedding': get_embedding(bedrock, t4)}, 
-    {'text': t5, 'embedding': get_embedding(bedrock, t5)}
-]
+    {{'text': t1, 'embedding': get_embedding(bedrock, t1)}}, 
+    {{'text': t2, 'embedding': get_embedding(bedrock, t2)}}, 
+    {{'text': t3, 'embedding': get_embedding(bedrock, t3)}}, 
+    {{'text': t4, 'embedding': get_embedding(bedrock, t4)}}, 
+    {{'text': t5, 'embedding': get_embedding(bedrock, t5)}}
+    ]
+    
 # perform a search for Albert Einstein
-query = 'Isaac Newton'
+query = \"{prompt[0]}\"
 v = get_embedding(bedrock, query)              
 result = search(dataset, v)
 print(result)

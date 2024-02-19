@@ -12,7 +12,7 @@ bedrock = bedrock_runtime_client()
 text, code = st.columns(2)
 
 with text:
-    st.title("Dot Product")
+    st.header("Dot Product")
     st.image("dot-product.svg")
     st.latex(r'a.b = |a|  x  |b|  x  \cos \theta') 
 

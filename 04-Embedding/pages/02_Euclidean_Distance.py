@@ -11,8 +11,8 @@ text, code = st.columns(2)
 
 
 with text:
-    st.title("Euclidean Distance")
-    st.image("dist-2-points-3d.svg")
+    st.header("Euclidean Distance")
+    st.image("dist-2-points-a.svg")
     st.latex(r'd(p,q) = \sqrt{(p_1 - q_1)^2 + (p_2 - q_2)^2 + ... + (p_n - q_n)^2}')
 
     st.write("""When you use vectors to represent text, you can calculate the Euclidean distance between two pieces of text. \
