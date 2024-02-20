@@ -57,6 +57,6 @@ if uploaded_file and question:
                                     contentType=contentType)
     
     response_body = json.loads(response.get('body').read())
-    print(response_body.get('completion'))
+    #print(response_body.get('completion'))
     st.write("### Answer")
     st.write(response_body.get('completion'))

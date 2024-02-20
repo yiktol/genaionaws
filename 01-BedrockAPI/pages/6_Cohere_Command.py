@@ -64,7 +64,7 @@ with text:
 
         response_body = json.loads(response.get('body').read())
 
-        print(response_body['generations'][0]['text'])
+        #print(response_body['generations'][0]['text'])
 
         if response_body:
             st.write("### Answer")

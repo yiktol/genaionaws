@@ -65,7 +65,7 @@ with text:
     response = bedrock_runtime.invoke_model(body=json.dumps(body), modelId=modelId, accept=accept, contentType=contentType)
     response_body = json.loads(response.get('body').read())
 
-    print(response_body.get('completions')[0].get('data').get('text'))
+    #print(response_body.get('completions')[0].get('data').get('text'))
 
     st.write("### Answer")
     st.info(response_body.get('completions')[0].get('data').get('text'))

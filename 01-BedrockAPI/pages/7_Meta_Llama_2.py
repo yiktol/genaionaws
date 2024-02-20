@@ -64,7 +64,7 @@ with text:
                                         contentType=contentType)
 
         response_body = json.loads(response.get('body').read().decode('utf-8'))
-        print(response_body.get('generation'))
+        #print(response_body.get('generation'))
 
         st.write("### Answer")
         st.info(response_body.get('generation'))

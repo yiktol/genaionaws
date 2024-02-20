@@ -78,7 +78,7 @@ with text:
 
         response = call_llm()
 
-        print(response)
+        #print(response)
         st.write("### Answer")
         st.info(response)
   
