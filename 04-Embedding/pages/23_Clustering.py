@@ -33,7 +33,7 @@ Here is the sample code to place the above-mentioned names into two groups:""")
          'Isaac Newton', 'Michael Jackson', 'Niels Bohr', 
          'Taylor Swift', 'Hank Williams', 'Werner Heisenberg', 
          'Stevie Wonder', 'Marie Curie', 'Ernest Rutherford']),
-        submit = st.form_submit_button("Find Cluter",type="primary")
+        submit = st.form_submit_button("Find Cluster",type="primary")
 
     if submit:
         embeddings = []
