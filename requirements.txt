@@ -15,3 +15,6 @@ pandas
 seaborn
 pypdf
 wikipedia
+langchain_openai
+google-search-results
+langchainhub

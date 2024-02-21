@@ -51,11 +51,11 @@ with st.form("form1"):
     submit = st.form_submit_button("Submit",type="primary")
 
     if submit:
-
-        chain = prompt | model
-        response = chain.invoke({"topic": topic})
-        st.write("Answer:")
-        st.info(response)
+        with st.spinner(f"Running..."):
+            chain = prompt | model
+            response = chain.invoke({"topic": topic})
+            st.write("Answer:")
+            st.info(response)
         
 st.subheader(":orange[Multiple chains]")
 st.markdown("""Runnables can easily be used to string together multiple Chains""")
@@ -108,18 +108,18 @@ with st.form("form2"):
     submit = st.form_submit_button("Submit",type="primary")
 
     if submit:
+        with st.spinner(f"Running..."):
+            chain1 = prompt1 | model | StrOutputParser()
+            chain2 = (
+                {"city": chain1, "language": itemgetter("language")}
+                | prompt2
+                | model
+                | StrOutputParser()
+            )
 
-        chain1 = prompt1 | model | StrOutputParser()
-        chain2 = (
-            {"city": chain1, "language": itemgetter("language")}
-            | prompt2
-            | model
-            | StrOutputParser()
-        )
-
-        response = chain2.invoke({"person": person , "language": language})
-        st.write("Answer:")
-        st.info(response)
+            response = chain2.invoke({"person": person , "language": language})
+            st.write("Answer:")
+            st.info(response)
 
 
 
