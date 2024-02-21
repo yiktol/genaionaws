@@ -203,3 +203,16 @@ def bedrock_runtime_client():
     region_name='us-east-1', 
     )
     return bedrock_runtime
+
+def get_secret(secret_name):
+    # Create a Secrets Manager client
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name='us-east-1'
+    )
+
+    get_secret_value_response = client.get_secret_value(
+        SecretId=secret_name
+    )
+    return get_secret_value_response['SecretString']
