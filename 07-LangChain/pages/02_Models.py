@@ -1,6 +1,7 @@
 import streamlit as st
 from langchain_community.chat_models import BedrockChat
-from langchain.schema import HumanMessage, SystemMessage
+from langchain_community.embeddings import BedrockEmbeddings
+from langchain.schema import HumanMessage, SystemMessage, AIMessage
 from langchain_community.llms import Bedrock
 from helpers import bedrock_runtime_client, set_page_config
 
@@ -56,11 +57,6 @@ messages = [
 ]
 chat(messages)""",language="python")
 
-
-
-from langchain_community.chat_models import BedrockChat
-from langchain.schema import HumanMessage, SystemMessage, AIMessage
-
 chat = BedrockChat(client=bedrock,model_id="anthropic.claude-v2", model_kwargs={"temperature": 0.1})
 
 
@@ -95,7 +91,7 @@ embeddings.embed_query("This is a content of the document")
 """,language="python")
 
 
-from langchain_community.embeddings import BedrockEmbeddings
+
 
 embeddings = BedrockEmbeddings(
     client=bedrock, region_name="us-east-1"

@@ -18,7 +18,7 @@ A Document is a piece of text and associated metadata. For example, there are do
 
 st.subheader(":orange[TXT]")
 st.markdown("The simplest loader reads in a file as text and places it all into one document. \
-[Sample csv file](https://training.yikyakyuk.com/genai/docs/alice.txt)")
+[Sample TXT file](https://training.yikyakyuk.com/genai/docs/alice.txt)")
 
 expander = st.expander("See code")
 expander.code("""from langchain_community.document_loaders import TextLoader
@@ -49,7 +49,7 @@ with st.form("form3"):
 
 st.subheader(":orange[CSV]")
 st.markdown("A comma-separated values (CSV) file is a delimited text file that uses a comma to separate values. Each line of the file is a data record.\
-Each record consists of one or more fields, separated by commas. [Sample csv file](https://training.yikyakyuk.com/genai/docs/bedrock_faqs.csv)")
+Each record consists of one or more fields, separated by commas. [Sample CSV file](https://training.yikyakyuk.com/genai/docs/bedrock_faqs.csv)")
 
 expander = st.expander("See code")
 expander.code("""from langchain_community.document_loaders.csv_loader import CSVLoader
@@ -86,7 +86,7 @@ with st.form("form1"):
 st.subheader(":orange[PDF]")
 st.markdown("Portable Document Format (PDF), standardized as ISO 32000, is a file format developed by Adobe in 1992 to present documents, \
 including text formatting and images, in a manner independent of application software, hardware, and operating systems. \
-[Sample pdf file](https://training.yikyakyuk.com/genai/docs/AMZN-2022-Shareholder-Letter.pdf)")
+[Sample PDF file](https://training.yikyakyuk.com/genai/docs/AMZN-2022-Shareholder-Letter.pdf)")
 
 expander = st.expander("See code")
 expander.code("""from langchain_community.document_loaders import PyPDFLoader

@@ -8,13 +8,6 @@ from helpers import bedrock_runtime_client, set_page_config
 bedrock = bedrock_runtime_client()
 set_page_config()
 
-def form_callback():
-    st.session_state.messages = []
-    st.session_state.memory.clear()
-    del st.session_state.memory
-
-st.sidebar.button(label='Clear Chat Messages', on_click=form_callback)
-
 st.header("Chains")
 st.markdown("""Chains refer to sequences of calls - whether to an LLM, a tool, or a data preprocessing step. \
 The primary supported way to do this is with LCEL.
