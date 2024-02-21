@@ -4,7 +4,7 @@ st.session_state.messages = []
 
 st.set_page_config(
     page_title="LangChain",
-    page_icon=":robot_face:",
+    page_icon=":chains:",
     layout="wide",
     initial_sidebar_state="expanded",
 )

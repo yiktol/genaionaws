@@ -1,46 +1,57 @@
 import streamlit as st
 import boto3
-from langchain.chains import ConversationChain
-from langchain.llms.bedrock import Bedrock
+from helpers import set_page_config, bedrock_runtime_client
+from langchain.chains import LLMChain
+from langchain_community.chat_models import BedrockChat
 from langchain.memory import ConversationBufferMemory
-from langchain.prompts import PromptTemplate
+from langchain.schema import SystemMessage, AIMessage
+from langchain.prompts import (
+    ChatPromptTemplate,
+    HumanMessagePromptTemplate,
+    MessagesPlaceholder,
+)
 
-st.title("Titan Chatbot with Persona")
+
+set_page_config()
+
+st.title("Chatbot with Persona")
 st.write("AI assistant will play the role of a career coach. Role Play Dialogue requires user message to be set in before starting the chat. ConversationBufferMemory is used to pre-populate the dialog.")
 
-bedrock_runtime = boto3.client(
-service_name='bedrock-runtime',
-region_name='us-east-1', 
-)
+bedrock = bedrock_runtime_client()
 
-modelId = "amazon.titan-tg1-large"
-titan_llm = Bedrock(model_id=modelId, client=bedrock_runtime)
-titan_llm.model_kwargs = {'temperature': 0, "maxTokenCount": 700}
-
+modelId = "meta.llama2-13b-chat-v1"
+llm = BedrockChat(model_id=modelId, client=bedrock)
 
 with st.form(key ='Form1'):
-    user_message= st.text_input('User Message:',value='You will be acting as a career coach. Your goal is to give career advice to users')
-    ai_message= st.text_input('AI Message:', value='I am career coach and give career advice')
-    submitted = st.form_submit_button(label = 'Set Personality') 
+    user_message= st.text_input(':orange[User Message:]',value='You will be acting as a career coach. Your goal is to give career advice to users. You say \'I don\'t know\' if the message is not related to career questions.')
+    ai_message= st.text_input(':orange[AI Message:]', value='I am career coach and give career advice.')
+    submitted = st.form_submit_button(label = 'Set Persona', type='primary') 
             
 if "memory" not in st.session_state:
-     st.session_state.memory = ConversationBufferMemory(return_messages=True)
-     st.session_state.memory.chat_memory.add_user_message(user_message)
-     st.session_state.memory.chat_memory.add_ai_message(ai_message)
-     st.session_state.memory.human_prefix = "User"
-     st.session_state.memory.ai_prefix = "assistant"
+     st.session_state.memory = ConversationBufferMemory(memory_key="history", return_messages=True)
 
-# memory = ConversationBufferMemory()
-# memory.chat_memory.add_user_message(user_message)
-# memory.chat_memory.add_ai_message(ai_message)
-# memory.human_prefix = "User"
-# memory.ai_prefix = "assistant"
 
-conversation = ConversationChain(
-    llm=titan_llm, verbose=False, memory=st.session_state.memory
+prompt_template = ChatPromptTemplate.from_messages(
+    [
+        SystemMessage(
+            content=user_message
+        ), 
+        AIMessage(content=ai_message),
+        MessagesPlaceholder(
+            variable_name="history"
+        ),  # Where the memory will be stored.
+        HumanMessagePromptTemplate.from_template(
+            "{human_input}"
+        ),  # Where the human input will injected
+    ]
 )
-conversation.prompt.template = """System: The following is a friendly conversation between a knowledgeable helpful career coach and a customer. The career coach is talkative and provides lots of specific details from it's context.\n\nCurrent conversation:\n{history}\nUser: {input}\nBot:"""
 
+chat_llm_chain = LLMChain(
+    llm=llm,
+    prompt=prompt_template,
+    verbose=True,
+    memory=st.session_state.memory,
+)
 
 def form_callback():
     st.session_state.messages = []
@@ -69,8 +80,8 @@ if prompt := st.chat_input("What is up?"):
  # Display assistant response in chat message container
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
-            stream = conversation.invoke({'input': prompt})
-            st.markdown(stream['response'])
+            stream = chat_llm_chain.predict(human_input=prompt)
+            st.markdown(stream)
         #response = st.write_stream(stream)
-    st.session_state.messages.append({"role": "assistant", "content": stream['response']})
+    st.session_state.messages.append({"role": "assistant", "content": stream})
 

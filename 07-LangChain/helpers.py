@@ -192,7 +192,7 @@ def invoke_model(client, prompt, model,
 def set_page_config():
     st.set_page_config( 
     page_title="LangChain",  
-    page_icon=":rock:",
+    page_icon=":chains:",
     layout="wide",
     initial_sidebar_state="expanded",
 )

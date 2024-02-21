@@ -1,30 +1,24 @@
 import streamlit as st
 import boto3
-from helpers import set_page_config
-
-set_page_config()
-
+from helpers import set_page_config, bedrock_runtime_client
 from langchain_community.llms import Bedrock
+from langchain_community.chat_models import BedrockChat
 from langchain.memory import ConversationBufferMemory
-from langchain.chains import ConversationChain, LLMChain
+from langchain.chains import LLMChain
 from langchain.prompts import (ChatPromptTemplate, 
                                SystemMessagePromptTemplate, 
                                HumanMessagePromptTemplate, 
                                MessagesPlaceholder,)
-
-st.title("Titan ChatAssistant with Prompt Template")
+set_page_config()
+st.title("Chat with Prompt Template")
 st.write("""PromptTemplate is responsible for the construction of this input. \
 LangChain provides several classes and functions to make constructing and working with prompts easy. \
 We will use the default PromptTemplate here.""")
 
-bedrock_runtime = boto3.client(
-service_name='bedrock-runtime',
-region_name='us-east-1', 
-)
+bedrock = bedrock_runtime_client()
 
-modelId = "amazon.titan-tg1-large"
-titan_llm = Bedrock(model_id=modelId, client=bedrock_runtime)
-titan_llm.model_kwargs = {'temperature': 0.5, "maxTokenCount": 4096}
+modelId = "meta.llama2-13b-chat-v1"
+llm = BedrockChat(model_id=modelId, client=bedrock)
 
 
 if "memory" not in st.session_state:
@@ -33,13 +27,16 @@ if "memory" not in st.session_state:
      st.session_state.memory.ai_prefix = "AI"
      st.session_state.memory.memory_key = "history"
 
-template ="""The following is a friendly conversation between a knowledgeable helpful Assistant and a customer. \
-The Assistant is talkative and provides lots of specific details from it's context.
+template ="""_System: The following is a friendly conversation between a knowledgeable helpful Assistant and a customer. \
+The Assistant is talkative and provides lots of specific details from it's context._
 
-Current conversation:
-{history}
-User: {input}
-Assistant: """
+_Current conversation:_
+
+_:blue[{history}]_
+
+_Human: :blue[{input}]_
+
+_AI:_ """
 
 
 prompt_template = ChatPromptTemplate(
@@ -51,13 +48,13 @@ prompt_template = ChatPromptTemplate(
 	)
 
 conversation = LLMChain(
-    llm=titan_llm, verbose=True, memory=st.session_state.memory, prompt=prompt_template)
+    llm=llm, verbose=True, memory=st.session_state.memory, prompt=prompt_template)
 
 #conversation.prompt.template = template
 
 container = st.container(border=True)
 container.write(":orange[Template]")
-container.code(template, language="markdown")
+container.markdown(template)
 
 
 def form_callback():
