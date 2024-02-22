@@ -1,6 +1,6 @@
 import streamlit as st
 from langchain_community.chat_models import BedrockChat
-from langchain.schema import HumanMessage, SystemMessage
+from langchain.schema import HumanMessage, SystemMessage, AIMessage
 from helpers import bedrock_runtime_client, set_page_config
 
 set_page_config()
@@ -29,32 +29,34 @@ st.markdown("""Like text, but specified with a message type (System, Human, AI)\
 
 expander = st.expander("See code")
 
-expander.code("""from langchain.schema import HumanMessage
+expander.code("""from langchain.schema import HumanMessage, SystemMessage, AIMessage
 from langchain_community.chat_models import BedrockChat
+
 chat = BedrockChat(model_id="anthropic.claude-v2", model_kwargs={"temperature": 0.1})           
 
 messages = [
-    SystemMessage(content="You are a nice AI bot that translate English to French language"),
-    HumanMessage(content="Translate this sentence from English to French. I love programming.")
+    SystemMessage(content="You are a nice AI bot that translate English to Spanish language"),
+    HumanMessage(content="I love programming."),
+    AIMessage(content="I am an AI bot that translate English to Spanish language")
 ]
 chat(messages)""")
 
 with st.form("form2"):
-    prompt2 = st.text_input("Prompt:", value="Translate this sentence from English to French. I love programming.")
+    prompt2 = st.text_input("Prompt:", value="I love programming")
     submit2 = st.form_submit_button("Submit",type="primary")
 
     chat = BedrockChat(client=bedrock,model_id="anthropic.claude-v2", model_kwargs={"temperature": 0.1})
 
     messages = [
-        SystemMessage(content="You are a nice AI bot that translate English to French language"),
-        HumanMessage(content=prompt2
-        )
+        SystemMessage(content="You are a nice AI bot that translate English to Spanish language"),
+        HumanMessage(content=prompt2),
+        AIMessage(content="I am an AI bot that translate English to Spanish language")
     ]
     if submit2:
-        response = chat(messages)
-        #print(response)
+        response = chat.invoke(messages)
+        print(response)
         st.write("Answer:")
-        st.info(f"AIMessage({response})")
+        st.info(f"{response.content}")
     
     
 st.subheader(":orange[Documents]")
@@ -64,6 +66,13 @@ expander2 = st.expander("See code")
 
 expander2.code("""from langchain_community.document_loaders.csv_loader import CSVLoader
 loader = CSVLoader(file_path="bedrock_faqs.csv")
+
+Schema = Document(page_content="This is my document.",
+         metadata={
+             'my_document_id' : 234234,
+             'my_document_source' : "The LangChain Papers",
+             'my_document_create_time' : 1680013019
+         })
 
 document = loader.load()     
 print(document)""",language="python")
@@ -78,4 +87,4 @@ with st.form("form3"):
         loader = CSVLoader(file_path="bedrock_faqs.csv")
         data = loader.load()
         st.write("Answer:")
-        st.info(data)
+        st.write(data[:5])

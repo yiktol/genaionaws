@@ -35,9 +35,10 @@ with st.form("form1"):
     )
 
     if submit:
-        output = llm.invoke(prompt)
-        #print(output)
-        st.info(output)
+        with st.spinner("AI Thinking..."):
+            output = llm.invoke(prompt)
+            st.write("Answer:")
+            st.info(output)
 
 
 st.subheader(":orange[Chat Model]")
@@ -103,6 +104,8 @@ with st.form("form3"):
     submit2 = st.form_submit_button("Submit",type="primary")
 
     if submit2:
-        embedding_value = embeddings.embed_query(prompt2)
-        st.info(embedding_value[:10])
-        st.info(f"Embedding Dimension: {len(embedding_value)}")
+        with st.spinner("AI Thinking..."):
+            embedding_value = embeddings.embed_query(prompt2)
+            st.write("Answer:")
+            st.info(embedding_value[:10])
+            st.info(f"Embedding Dimension: {len(embedding_value)}")

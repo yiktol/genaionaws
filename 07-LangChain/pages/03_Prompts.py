@@ -127,7 +127,7 @@ with st.form("form3"):
     if submit3:
         messages = chat_template.format_messages(text=prompt)
         st.write("Prompt:")
-        st.info(messages)
+        st.write(messages)
         st.write("Answer:")
         with st.spinner("Bot Thinking..."):
             st.success(llm.invoke(messages))
