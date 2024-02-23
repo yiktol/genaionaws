@@ -36,7 +36,8 @@ def get_image_response(prompt_content): #text-to-text client function
    
     request_body = json.dumps({"text_prompts": 
                                [ {"text": prompt_content } ], #prompts to use
-                               "cfg_scale": 9, #how closely the model tries to match the prompt
+                               "seed": 121245125, #seed for the random number generator
+                               "cfg_scale": 8.0, #how closely the model tries to match the prompt
                                "steps": 50, }) #number of diffusion steps to perform
     
     response = bedrock.invoke_model(body=request_body, modelId=bedrock_model_id) #call the Bedrock endpoint

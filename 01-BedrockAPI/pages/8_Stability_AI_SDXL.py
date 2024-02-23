@@ -3,8 +3,6 @@ from botocore.exceptions import ClientError
 import json
 from PIL import Image
 from io import BytesIO
-import base64
-from base64 import b64encode
 from base64 import b64decode
 import boto3
 import streamlit as st

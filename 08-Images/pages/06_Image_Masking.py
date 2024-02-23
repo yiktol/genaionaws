@@ -41,9 +41,9 @@ with col2:
 with col3:
     st.subheader("Result")
     
-    prompt_text = st.text_area("Prompt text:", height=100, help="The prompt text")
+    prompt_text = st.text_area("Prompt text:", height=100, value='replace the table',help="The prompt text")
 
-    painting_mode = st.radio("Painting mode:", ["INPAINTING", "OUTPAINTING"])
+    painting_mode = st.radio("Painting mode:", ["INPAINTING", "OUTPAINTING"], index=1)
     
     generate_button = st.button("Generate", type="primary")
 

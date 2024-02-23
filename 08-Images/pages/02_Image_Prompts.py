@@ -4,7 +4,7 @@ import image.image_prompts_lib as glib
 
 st.set_page_config(layout="wide", page_title="Image Generation")
 
-st.title("Image Generation")
+st.title("Image Prompts")
 
 col1, col2 = st.columns(2)
 

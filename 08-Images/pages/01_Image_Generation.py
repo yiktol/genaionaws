@@ -10,13 +10,13 @@ st.title("Image Generation") #page title
 
 col1, col2 = st.columns(2) #create 2 columns
 
-
+prompt_text = "rocket ship launching from forest with flower garden under a blue sky, masterful, ghibli" #initialize prompt text
 
 with col1: #everything in this with block will be placed in column 1
     st.subheader("Prompt:") #subhead for this column
     
     with st.form("form1"):
-        prompt_text = st.text_area("Prompt", height=200, label_visibility="collapsed") #display a multiline text box with no label
+        prompt_text = st.text_area("Prompt", prompt_text, height=200, label_visibility="collapsed") #display a multiline text box with no label
         process_button = st.form_submit_button("Run", type="primary") #display a primary button
 
 

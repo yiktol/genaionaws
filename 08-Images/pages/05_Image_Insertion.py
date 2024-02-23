@@ -36,6 +36,7 @@ with col2:
     with st.form("form1"):
         placement_area = st.radio("Placement area:", 
             placement_options,
+            index=1
         )
         
         with st.expander("Custom:", expanded=False):
@@ -47,7 +48,7 @@ with col2:
             mask_width = st.number_input("Mask width", value=mask_dimensions[2])
             mask_height = st.number_input("Mask height", value=mask_dimensions[3])
         
-        prompt_text = st.text_area("Object to add:", height=100, help="The prompt text")
+        prompt_text = st.text_area("Object to add:", height=100, value="1980\'s computer", help="The prompt text")
         
         generate_button = st.form_submit_button("Generate", type="primary")
     

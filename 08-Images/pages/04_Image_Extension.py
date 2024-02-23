@@ -38,7 +38,7 @@ with col1:
 with col2:
 	st.subheader("Extension parameters")
 	with st.form("form1"):
-		prompt_text = st.text_area("What should be seen in the extended image:", height=100, help="The prompt text")
+		prompt_text = st.text_area("What should be seen in the extended image:", height=100, value="Christmas tree", help="The prompt text")
 		negative_prompt = st.text_input("What should not be in the extended area:", help="The negative prompt")
 		
 		horizontal_alignment_selection = st.select_slider("Original image horizontal placement:", options=horizontal_alignment_options, value="Center")
