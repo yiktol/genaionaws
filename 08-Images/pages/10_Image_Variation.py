@@ -1,8 +1,8 @@
 import streamlit as st
 import image.image_variation_lib as glib
+from helpers import set_page_config
 
-
-st.set_page_config(layout="wide", page_title="Image Variation")
+set_page_config()
 
 st.title("Image Variation")
 

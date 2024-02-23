@@ -1,9 +1,8 @@
 import streamlit as st
 import image.image_to_image_lib as glib
+from helpers import set_page_config
 
-#
-
-st.set_page_config(layout="wide", page_title="Image to Image")
+set_page_config()
 
 st.title("Image to Image")
 

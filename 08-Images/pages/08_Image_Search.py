@@ -2,8 +2,9 @@ import streamlit as st #all streamlit commands will be available through the "st
 import image.image_search_lib as glib #reference to local lib script
 from io import BytesIO
 import PIL.Image as Image
+from helpers import set_page_config
 
-st.set_page_config(page_title="Image Search", layout="wide") #HTML title
+set_page_config()
 st.title("Image Search") #page title
 
 

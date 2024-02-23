@@ -1,10 +1,8 @@
 import streamlit as st #all streamlit commands will be available through the "st" alias
 import image.image_lib as glib #reference to local lib script
+from helpers import set_page_config
 
-
-
-
-st.set_page_config(layout="wide", page_title="Image Generation") #set the page width wider to accommodate columns
+set_page_config() #set the page width wider to accommodate columns
 
 st.title("Image Generation") #page title
 
