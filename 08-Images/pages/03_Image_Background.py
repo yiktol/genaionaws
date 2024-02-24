@@ -59,20 +59,15 @@ with col1:
         st.subheader('Prompt Examples:')
         tab1, tab2, tab3, tab4, tab5 = st.tabs(["Prompt1", "Prompt2", "Prompt3", "Prompt4", "Prompt5"])
         with tab1:
-            item_num=0
-            load_options(item_num)
+            load_options(item_num=0)
         with tab2:
-            item_num=1
-            load_options(item_num)
+            load_options(item_num=1)
         with tab3:
-            item_num=2
-            load_options(item_num)
+            load_options(item_num=2)
         with tab4:
-            item_num=3
-            load_options(item_num)
+            load_options(item_num=3)
         with tab5:
-            item_num=4
-            load_options(item_num)
+            load_options(item_num=4)
 
 with col2:
     st.subheader("Image parameters")

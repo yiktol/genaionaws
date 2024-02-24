@@ -8,8 +8,6 @@ st.title("Image Insertion")
 
 col1, col2, col3 = st.columns(3)
 
-
-
 placement_options_dict = { #Configure mask areas for image insertion
     "Wall behind desk": (3, 3, 506, 137), #x, y, width, height
     "On top of desk": (78, 60, 359, 115),
@@ -24,34 +22,23 @@ if "area" not in st.session_state:
 if "prompt" not in st.session_state:
     st.session_state.prompt = ""
 
-prompt_options = [{"pa": "Wall behind desk",
-    "prompt": "A painting of a Spanish galleon in rough seas"},
-                  {
-    "pa": "Wall behind desk",
-    "prompt": "Framed family photographs"},
-                  {
-    "pa": "On top of desk",
-    "prompt": "writing instruments"},
-                  {
-    "pa": "On top of desk",
-    "prompt": "A hutch" },
-    {
-    "pa": "On top of desk",
-    "prompt": "A pile of papers"          
-    },
-    {
-    "pa": "Beneath desk",
-    "prompt": "a stool"          
-    },
-    {
-    "pa": "Beneath desk",
-    "prompt": "A sleeping cat"          
-    }
-]
+options = [{"pa": "Wall behind desk","prompt": "A painting of a Spanish galleon in rough seas"},
+                  {"pa": "Wall behind desk","prompt": "Framed family photographs"},
+                  {"pa": "On top of desk","prompt": "writing instruments"},
+                  {"pa": "On top of desk","prompt": "A hutch" },
+                  {"pa": "On top of desk","prompt": "A pile of papers"},
+                  {"pa": "Beneath desk","prompt": "a stool"},
+                  {"pa": "Beneath desk","prompt": "A sleeping cat"}
+                ]
 
 def update_options(**kwargs):
     st.session_state.area = placement_options.index(kwargs['area'])
     st.session_state.prompt = kwargs['p']
+
+def load_options(item_num):
+    st.write("Placement Area:", options[item_num]["pa"])
+    st.write("Prompt:", options[item_num]["prompt"])
+    st.button("Load Prompt", key=item_num, on_click=update_options, kwargs=dict(area=options[item_num]["pa"],p=options[item_num]["prompt"]) ) 
 
 with col1:
     st.subheader("Initial image")
@@ -69,35 +56,19 @@ with col1:
         st.subheader('Prompt Examples:')
         tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["P1", "P2", "P3", "P4", "P5", "P6", "P7"])
         with tab1:
-            st.write("Placement Area:", prompt_options[0]["pa"])
-            st.write("Prompt:", prompt_options[0]["prompt"])
-            st.button("Load Prompt", key=0, on_click=update_options, kwargs=dict(area=prompt_options[0]["pa"],p=prompt_options[0]["prompt"]) )     
+            load_options(item_num=0) 
         with tab2:
-            st.write("Placement Area:", prompt_options[1]["pa"])
-            st.write("Prompt:", prompt_options[1]["prompt"])
-            st.button("Load Prompt", key=1, on_click=update_options, kwargs=dict(area=prompt_options[1]["pa"],p=prompt_options[1]["prompt"]) )    
+            load_options(item_num=1)
         with tab3:
-            st.write("Placement Area:", prompt_options[2]["pa"])
-            st.write("Prompt:", prompt_options[2]["prompt"])
-            st.button("Load Prompt", key=2, on_click=update_options, kwargs=dict(area=prompt_options[2]["pa"],p=prompt_options[2]["prompt"]) )   
+            load_options(item_num=2)
         with tab4:
-            st.write("Placement Area:", prompt_options[3]["pa"])
-            st.write("Prompt:", prompt_options[3]["prompt"])
-            st.button("Load Prompt", key=3, on_click=update_options, kwargs=dict(area=prompt_options[3]["pa"],p=prompt_options[3]["prompt"]) )  
+            load_options(item_num=3) 
         with tab5:
-            st.write("Placement Area:", prompt_options[4]["pa"])
-            st.write("Prompt:", prompt_options[4]["prompt"])
-            st.button("Load Prompt", key=4, on_click=update_options, kwargs=dict(area=prompt_options[4]["pa"],p=prompt_options[4]["prompt"]) )    
+            load_options(item_num=4)
         with tab6:
-            st.write("Placement Area:", prompt_options[5]["pa"])
-            st.write("Prompt:", prompt_options[5]["prompt"])
-            st.button("Load Prompt", key=5, on_click=update_options, kwargs=dict(area=prompt_options[5]["pa"],p=prompt_options[5]["prompt"]) )    
+            load_options(item_num=5)
         with tab7:
-            st.write("Placement Area:", prompt_options[6]["pa"])
-            st.write("Prompt:", prompt_options[6]["prompt"])
-            st.button("Load Prompt", key=6, on_click=update_options, kwargs=dict(area=prompt_options[6]["pa"],p=prompt_options[6]["prompt"]) )    
-
-
+            load_options(item_num=6)
 
 
 with col2:
