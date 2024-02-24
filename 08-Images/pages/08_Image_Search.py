@@ -26,7 +26,13 @@ def on_toys_click():
     st.session_state.query = 'toys'
 def on_animal_click():
     st.session_state.query = 'animals'
-    
+def on_tacos_click():
+    st.session_state.query = 'tacos'
+def on_car_click():
+    st.session_state.query = 'car'
+def on_food_click():
+    st.session_state.query = 'food'
+            
 ct = st.container(border=False)
 
 with search_images_tab:
@@ -34,17 +40,23 @@ with search_images_tab:
     search_col_1, search_col_2 = st.columns(2)
     
     col1, col2, col3, col4 = search_col_1.columns(4)
-    
-    with search_col_1:
+    container = st.container(border=True)
+        
+    with container:
         with col1:
             st.write(":orange[Load Search:]")
+            st.button('food', on_click=on_food_click)
         with col2:
             st.button('house', on_click=on_house_click)
             st.button('animals', on_click=on_animal_click)
         with col3:
             st.button('woman', on_click=on_woman_click)
+            st.button('tacos', on_click=on_tacos_click)
         with col4:
             st.button('toys', on_click=on_toys_click)
+            st.button('car', on_click=on_car_click)
+            
+    with search_col_1:
         with st.form("search_form"): #create a form with a unique name (search_form)
             input_text = st.text_input("Search for:", key="query") #display a multiline text box with no label
             search_button = st.form_submit_button("Search", type="primary") #display a primary button
