@@ -13,29 +13,36 @@ if "masking_mode" not in st.session_state:
     st.session_state.masking_mode = 0
 if "painting_mode" not in st.session_state:
     st.session_state.painting_mode = 0
+if "mask_prompt" not in st.session_state:
+    st.session_state.mask_prompt = ""
 if "prompt_text" not in st.session_state:
     st.session_state.prompt_text = "Framed photographs over a desk, with a stool under the desk"
 
-def on_1_click():
-    st.session_state.masking_mode = 0
-    st.session_state.painting_mode = 0
-    st.session_state.mask_prompt = ""
-    st.session_state.prompt_text = "Framed photographs over a desk, with a stool under the desk"
-def on_2_click():
-    st.session_state.masking_mode = 0
-    st.session_state.painting_mode = 1
-    st.session_state.mask_prompt = ""
-    st.session_state.prompt_text = "A cozy living room"
-def on_3_click():
-    st.session_state.masking_mode = 1
-    st.session_state.painting_mode = 0
-    st.session_state.mask_prompt = "painting"
-    st.session_state.prompt_text = "embedded fireplace"
-def on_4_click():
-    st.session_state.masking_mode = 1
-    st.session_state.painting_mode = 1
-    st.session_state.mask_prompt = "painting"
-    st.session_state.prompt_text = "living room"
+options = [{"masking_mode": 0, "painting_mode": 0, "mask_prompt": "", "prompt_text": "Framed photographs over a desk, with a stool under the desk"},
+           {"masking_mode": 0, "painting_mode": 1, "mask_prompt": "", "prompt_text": "A cozy living room"},
+           {"masking_mode": 1, "painting_mode": 0, "mask_prompt": "painting", "prompt_text": "embedded fireplace"},
+           {"masking_mode": 1, "painting_mode": 1, "mask_prompt": "painting", "prompt_text": "living room"}]
+    
+def load_options(item_num):
+    if options[item_num]["masking_mode"] == 0:
+        st.write("Masking Mode: Image")
+    else:
+        st.write("Masking Mode: Prompt")
+    st.write("Mask Prompt:", options[item_num]["mask_prompt"])
+    if options[item_num]["painting_mode"] == 0:
+        st.write("Painting Mode: INPAINTING")
+    else:
+        st.write("Painting Mode: OUTPAINTING")
+    st.write("Prompt:", options[item_num]["prompt_text"])
+    st.button("Load Prompt", key=item_num, on_click=update_options, args=(item_num,))
+
+    
+def update_options(item_num):
+    st.session_state.masking_mode = options[item_num]["masking_mode"]
+    st.session_state.painting_mode = options[item_num]["painting_mode"]
+    st.session_state.mask_prompt = options[item_num]["mask_prompt"]
+    st.session_state.prompt_text = options[item_num]["prompt_text"]
+
 
 with col1:
     st.subheader("Image")
@@ -54,29 +61,13 @@ with col1:
         st.subheader('Prompt Examples:')
         tab1, tab2, tab3, tab4 = st.tabs(["Prompt1", "Prompt2", "Prompt3", "Prompt4"])
         with tab1:
-            st.write("Mask Mode:",":blue[Image]")
-            st.write("Mask Prompt:",":blue[None]")
-            st.write("Painting Mode:", ":blue[INPAINTING]")
-            st.write("Prompt:",":blue[Framed photographs over a desk, with a stool under the desk]")
-            st.button("Load Prompt 1", on_click=on_1_click)    
+            load_options(item_num=0)  
         with tab2:
-            st.write("Mask Mode:",":blue[Image]")
-            st.write("Mask Prompt:",":blue[None]")
-            st.write("Painting Mode:", ":blue[OUTPAINTING]")
-            st.write("Prompt:",":blue[A cozy living room]")
-            st.button("Load Prompt 2", on_click=on_2_click)   
+            load_options(item_num=1)  
         with tab3:
-            st.write("Mask Mode:",":blue[Prompt]")
-            st.write("Mask Prompt:",":blue[painting]")
-            st.write("Painting Mode:", ":blue[INPAINTING]")
-            st.write("Prompt:",":blue[embedded fireplace]")
-            st.button("Load Prompt 3", on_click=on_3_click)   
+            load_options(item_num=2) 
         with tab4:
-            st.write("Mask Mode:",":blue[Prompt]")
-            st.write("Mask Prompt:",":blue[painting]")
-            st.write("Painting Mode:", ":blue[OUTPAINTING]")
-            st.write("Prompt:",":blue[living room]")
-            st.button("Load Prompt 4", on_click=on_4_click)   
+            load_options(item_num=3) 
             
 with col2:
     st.subheader("Mask")
@@ -93,7 +84,7 @@ with col2:
                 uploaded_mask_preview = glib.get_bytesio_from_bytes(uploaded_mask_file.getvalue())
                 st.image(uploaded_mask_preview)
             else:
-                st.image("images/mask1.png")
+                st.image("samples/mask1.png")
         else:
             mask_prompt = st.text_input("Item to mask:", key="mask_prompt", help="The item to replace (if inpainting), or keep (if outpainting).")
         
@@ -122,7 +113,7 @@ with col3:
                     if uploaded_mask_file:
                         mask_bytes = uploaded_mask_file.getvalue()
                     else:
-                        mask_bytes = glib.get_bytes_from_file("images/mask1.png")
+                        mask_bytes = glib.get_bytes_from_file("samples/mask1.png")
                     
                     generated_image = glib.get_image_from_model(
                         prompt_content=prompt_text, 

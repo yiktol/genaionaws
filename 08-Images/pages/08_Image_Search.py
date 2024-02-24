@@ -18,20 +18,13 @@ search_images_tab, find_similar_images_tab = st.tabs(["Image search", "Find simi
 if 'query' not in st.session_state:
     st.session_state.query = ''
 
-def on_house_click():
-    st.session_state.query = 'house'
-def on_woman_click():
-    st.session_state.query = 'woman'
-def on_toys_click():
-    st.session_state.query = 'toys'
-def on_animal_click():
-    st.session_state.query = 'animals'
-def on_tacos_click():
-    st.session_state.query = 'tacos'
-def on_car_click():
-    st.session_state.query = 'car'
-def on_food_click():
-    st.session_state.query = 'food'
+options = ['food', 'house', 'woman', 'toys', 'animals', 'tacos', 'car']
+
+def update_options(item_num):
+    st.session_state.query = options[item_num]
+
+def load_options(item_num):
+    st.button(f'{options[item_num]}', on_click=update_options, args=(item_num,))
             
 ct = st.container(border=False)
 
@@ -45,16 +38,16 @@ with search_images_tab:
     with container:
         with col1:
             st.write(":orange[Load Search:]")
-            st.button('food', on_click=on_food_click)
+            load_options(item_num=0)
         with col2:
-            st.button('house', on_click=on_house_click)
-            st.button('animals', on_click=on_animal_click)
+            load_options(item_num=1)
+            load_options(item_num=2)
         with col3:
-            st.button('woman', on_click=on_woman_click)
-            st.button('tacos', on_click=on_tacos_click)
+            load_options(item_num=3)
+            load_options(item_num=4)
         with col4:
-            st.button('toys', on_click=on_toys_click)
-            st.button('car', on_click=on_car_click)
+            load_options(item_num=5)
+            load_options(item_num=6)
             
     with search_col_1:
         with st.form("search_form"): #create a form with a unique name (search_form)

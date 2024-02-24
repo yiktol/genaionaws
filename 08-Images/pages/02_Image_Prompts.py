@@ -8,32 +8,32 @@ st.title("Image Prompts")
 
 col1, col2 = st.columns(2)
 
-def on_1_click():
+if "element" not in st.session_state:
+    st.session_state.element = "Subject"
+if "prompt" not in st.session_state:
     st.session_state.prompt = "Doctor"
-    st.session_state.negative_prompt  = ""
-def on_2_click():
-    st.session_state.prompt  = 'Painting of a doctor'
-    st.session_state.negative_prompt  = ""
-def on_3_click():
-    st.session_state.prompt  = 'Painting of a doctor, Impressionist style'
-    st.session_state.negative_prompt  = ""
-def on_4_click():
-    st.session_state.prompt  = 'Painting of a doctor, Impressionist style, low-angle shot'
-    st.session_state.negative_prompt  = ""
-def on_5_click():
-    st.session_state.prompt  = "Painting of a doctor, Impressionist style, low-angle shot, dim lighting"
-    st.session_state.negative_prompt  = ""
-def on_6_click():
-    st.session_state.prompt  = "Painting of a doctor, Impressionist style, low-angle shot, dim lighting, blue and purple color scheme"
-    st.session_state.negative_prompt  = ""
-def on_7_click():
-    st.session_state.prompt  = "Painting of a doctor, Impressionist style, low-angle shot, dim lighting, blue and purple color scheme"
-    st.session_state.negative_prompt  = "Stethoscope"
-def on_8_click():
-    st.session_state.prompt  = "Painting of a doctor, Impressionist style, low-angle shot, dim lighting, blue and purple color scheme, sign reading \"The Doctor is in\""   
-    st.session_state.negative_prompt  = "Stethoscope" 
-    
+if "negative_prompt" not in st.session_state:
+    st.session_state.negative_prompt = ""
 
+options = [{"element":"Subject","prompt": "Doctor", "negative_prompt": ""},
+           {"element":"Medium","prompt": 'Painting of a doctor', "negative_prompt": ""},
+           {"element":"Style","prompt": 'Painting of a doctor, Impressionist style', "negative_prompt": ""},
+           {"element":"Shot type/angle","prompt": 'Painting of a doctor, Impressionist style, low-angle shot', "negative_prompt": ""},
+           {"element":"Light","prompt": "Painting of a doctor, Impressionist style, low-angle shot, dim lighting", "negative_prompt": ""},
+           {"element":"Color scheme","prompt": "Painting of a doctor, Impressionist style, low-angle shot, dim lighting, blue and purple color scheme", "negative_prompt": ""},
+           {"element":"Negative prompt","prompt": "Painting of a doctor, Impressionist style, low-angle shot, dim lighting, blue and purple color scheme", "negative_prompt": "Stethoscope"},
+           {"element":"Text","prompt": "Painting of a doctor, Impressionist style, low-angle shot, dim lighting, blue and purple color scheme, sign reading \"The Doctor is in\"", "negative_prompt": "Stethoscope"},
+]
+
+def update_options(item_num):
+    st.session_state.prompt = options[item_num]["prompt"]
+    st.session_state.negative_prompt  = options[item_num]["negative_prompt"]
+
+def load_options(item_num):
+    st.write("Element added:", options[item_num]["element"])
+    st.write("Prompt:", options[item_num]["prompt"])
+    st.write("Negative Prompt:", options[item_num]["negative_prompt"])
+    st.button("Load Prompt", key=item_num, on_click=update_options, args=(item_num,))
     
 with col1:
     st.subheader("Image parameters")
@@ -43,42 +43,26 @@ with col1:
         negative_prompt = st.text_input("What shoud not be in the image:",key="negative_prompt", help="The negative prompt")
         generate_button = st.form_submit_button("Generate", type="primary")
 
-    st.subheader('Prompt Examples:')
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(["Prompt1", "Prompt2", "Prompt3", "Prompt4", "Prompt5", "Prompt6", "Prompt7", "Prompt8"])
-    with tab1:
-        st.write("Element added:",":orange[Subject]")
-        st.write("Prompt:",":blue[Doctor]")
-        st.button("Load Prompt 1", on_click=on_1_click)
-    with tab2:
-        st.write("Element added:",":orange[Medium]")
-        st.write("Prompt:",":blue[Painting of a doctor]")
-        st.button("Load Prompt 2", on_click=on_2_click)
-    with tab3:
-        st.write("Element added:",":orange[Style]")
-        st.write("Prompt:",":blue[Painting of a doctor, Impressionist style]")
-        st.button("Load Prompt 3", on_click=on_3_click)
-    with tab4:
-        st.write("Element added:",":orange[Shot type/angle]")
-        st.write("Prompt:",":blue[Painting of a doctor, Impressionist style, low-angle shot]")
-        st.button("Load Prompt 4", on_click=on_4_click)
-    with tab5:
-        st.write("Element added:",":orange[Light]")
-        st.write("Prompt:",":blue[Painting of a doctor, Impressionist style, low-angle shot, dim lighting]")
-        st.button("Load Prompt 5", on_click=on_5_click)
-    with tab6:
-        st.write("Element added:",":orange[Color scheme]")
-        st.write("Prompt:",":blue[Painting of a doctor, Impressionist style, low-angle shot, dim lighting, blue and purple color scheme]")
-        st.button("Load Prompt 6", on_click=on_6_click)
-    with tab7:
-        st.write("Element added:",":orange[Negative prompt]")
-        st.write("Prompt:",":blue[Painting of a doctor, Impressionist style, low-angle shot, dim lighting, blue and purple color scheme]")
-        st.write("Negative Prompt:", "Stethoscope")
-        st.button("Load Prompt 7", on_click=on_7_click)
-    with tab8:
-        st.write("Element added:",":orange[Text]")
-        st.write("Prompt:",":blue[Painting of a doctor, Impressionist style, low-angle shot, dim lighting, blue and purple color scheme, sign reading \"The Doctor is in\"]")
-        st.write("Negative Prompt:", "Stethoscope")
-        st.button("Load Prompt 8", on_click=on_8_click)
+    container2 = st.container(border=True)    
+    with container2:
+        st.subheader('Prompt Examples:')
+        tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(["Prompt1", "Prompt2", "Prompt3", "Prompt4", "Prompt5", "Prompt6", "Prompt7", "Prompt8"])
+        with tab1:
+            load_options(item_num=0)
+        with tab2:
+            load_options(item_num=1)
+        with tab3:
+            load_options(item_num=2)
+        with tab4:
+            load_options(item_num=3)
+        with tab5:
+            load_options(item_num=4)
+        with tab6:
+            load_options(item_num=5)
+        with tab7:
+            load_options(item_num=6)
+        with tab8:
+            load_options(item_num=7)
 
 with col2:
     st.subheader("Result")

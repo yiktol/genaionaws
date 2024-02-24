@@ -15,23 +15,23 @@ if "mask_prompt" not in st.session_state:
 if "prompt_text" not in st.session_state:
     st.session_state.prompt_text = "Green curtains"
 
+options = [{"image": "images/example3.jpg","mask_prompt": "Pink curtains","prompt_text": "Green curtains"},
+           {"image": "images/example3.jpg","mask_prompt": "Table","prompt_text": ""},
+           {"image": "images/z1034.jpg","mask_prompt": "Toy house","prompt_text": "Log cabin"},
+           {"image": "images/desk1.jpg","mask_prompt": "Stool","prompt_text": ""}
+    ]
 
-def on_1_click():
-    st.session_state.image = "images/example3.jpg"
-    st.session_state.mask_prompt = "Pink curtains"
-    st.session_state.prompt_text = "Green curtains"
-def on_2_click():
-    st.session_state.image = "images/example3.jpg"
-    st.session_state.mask_prompt = "Table"
-    st.session_state.prompt_text = ""
-def on_3_click():
-    st.session_state.image = "images/z1034.jpg"
-    st.session_state.mask_prompt = "Toy house"
-    st.session_state.prompt_text = "Log cabin"
-def on_4_click():
-    st.session_state.image = "images/desk1.jpg"
-    st.session_state.mask_prompt = "Stool"
-    st.session_state.prompt_text = ""
+
+def update_options(item_num):
+    st.session_state.image = options[item_num]["image"]
+    st.session_state.mask_prompt = options[item_num]["mask_prompt"]
+    st.session_state.prompt_text = options[item_num]["prompt_text"]
+
+def load_options(item_num):
+    st.write("Image:",options[item_num]["image"])
+    st.write("Mask Prompt:",options[item_num]["mask_prompt"])
+    st.write("Prompt:",options[item_num]["prompt_text"])
+    st.button("Load Prompt", key=item_num, on_click=update_options, args=(item_num,))
     
 with col1:
     st.subheader("Image parameters")
@@ -49,25 +49,13 @@ with col1:
         st.subheader('Prompt Examples:')
         tab1, tab2, tab3, tab4 = st.tabs(["Prompt1", "Prompt2", "Prompt3", "Prompt4"])
         with tab1:
-            st.write("Image:",":blue[images/example3.jpg]")
-            st.write("Mask Prompt:",":blue[Pink curtains]")
-            st.write("Prompt:",":blue[Green curtains]")
-            st.button("Load Prompt 1", on_click=on_1_click)          
+            load_options(item_num=0)       
         with tab2:
-            st.write("Image:",":blue[images/example3.jpg]")
-            st.write("Mask Prompt:",":blue[Table]")
-            st.write("Prompt:",":blue[None]")
-            st.button("Load Prompt 2", on_click=on_2_click)        
+            load_options(item_num=1)            
         with tab3:
-            st.write("Image:",":blue[images/z1034.jpg]")
-            st.write("Mask Prompt:",":blue[Toy house]")
-            st.write("Prompt:",":blue[Log cabin]")
-            st.button("Load Prompt 3", on_click=on_3_click)                 
+            load_options(item_num=2)                      
         with tab4:
-            st.write("Image:",":blue[images/desk1.jpg]")
-            st.write("Mask Prompt:",":blue[Stool]")
-            st.write("Prompt:",":blue[None]")
-            st.button("Load Prompt 4", on_click=on_4_click)                 
+            load_options(item_num=3)                      
            
             
 with col2:
