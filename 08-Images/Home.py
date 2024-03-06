@@ -1,6 +1,8 @@
 import streamlit as st
 
-st.session_state.messages = []
+# Delete all the items in Session state
+for key in st.session_state.keys():
+    del st.session_state[key]
 
 st.set_page_config(
     page_title="Images",
