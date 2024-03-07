@@ -120,7 +120,7 @@ if prompt := st.chat_input("Say something"):
 # Display assistant response in chat message container
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
-            stream = st.session_state.retrieval_chain.invoke({"input": prompt})
+            stream = st.session_state.retrieval_chain.predict({"input": prompt})
             st.write(stream["answer"])
         #response = st.write_stream(stream)
     st.session_state.messages.append({"role": "assistant", "content": stream["answer"]})

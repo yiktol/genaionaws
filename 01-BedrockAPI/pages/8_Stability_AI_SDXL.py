@@ -33,7 +33,7 @@ with text:
             placeholder="Middle age man walking through times square on a rainy day",
             value = "Middle age man walking through times square on a rainy day"
         )
-        submit = st.form_submit_button("Submit")
+        submit = st.form_submit_button("Submit", type='primary')
         
         body = {"text_prompts":[{"text":prompt_data}],
         "cfg_scale":6,
