@@ -4,6 +4,12 @@ from helpers import getmodelId, getmodelparams, set_page_config, bedrock_runtime
 
 set_page_config()
 
+def form_callback():
+    for key in st.session_state.keys():
+        del st.session_state[key]
+        
+st.sidebar.button(label='Clear Session Data', on_click=form_callback)
+
 row1_col1, row1_col2 = st.columns([0.7,0.3])
 row2_col1 = st.columns(1)
 
@@ -25,7 +31,7 @@ with row1_col2.form(key ='Form1'):
 #Create the connection to Bedrock
 bedrock_runtime = bedrock_runtime_client()
 
-textgen_llm = Bedrock(
+llm = Bedrock(
     model_id=model_id,
     client=bedrock_runtime,
     model_kwargs=getmodelparams(provider),
@@ -44,10 +50,10 @@ with st.form("myform1"):
 
 
 if prompt_data and submit:
+    with st.spinner("Thinking..."):
+        response = llm(prompt_data)
 
-    response = textgen_llm(prompt_data)
-
-    print(response)
-    st.write("### Answer")
-    st.info(response)
-  
+        print(response)
+        st.write("### Answer")
+        st.info(response)
+    

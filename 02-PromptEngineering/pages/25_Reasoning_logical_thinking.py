@@ -5,6 +5,12 @@ from helpers import getmodelId, getmodelparams, set_page_config, bedrock_runtime
 
 set_page_config()
 
+def form_callback():
+    for key in st.session_state.keys():
+        del st.session_state[key]
+        
+st.sidebar.button(label='Clear Session Data', on_click=form_callback)
+
 row1_col1, row1_col2 = st.columns([0.7,0.3])
 row2_col1 = st.columns(1)
 

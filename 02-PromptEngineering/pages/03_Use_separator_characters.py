@@ -4,6 +4,12 @@ from helpers import getmodelId, getmodelparams, set_page_config, bedrock_runtime
 
 set_page_config()
 
+def form_callback():
+    for key in st.session_state.keys():
+        del st.session_state[key]
+        
+st.sidebar.button(label='Clear Session Data', on_click=form_callback)
+
 
 
 row1_col1, row1_col2 = st.columns([0.7,0.3])
@@ -25,15 +31,15 @@ with row1_col2.form(key ='Form1'):
         submitted = st.form_submit_button(label = 'Set Parameters') 
 st.write("**:orange[Template:]**")
 template = '''
-\\n\\nHuman: {Text}\\n
+Human: {Text}\\n
 
 {Question}\\n
 
-{Choice1}\\n
-{Choice2}\\n
+{Choice1}
+{Choice2}
 {Choice3}\\n
 
-\\n\\nAssistant:
+Assistant:
 '''
 
 st.code(template, language='None')
@@ -50,7 +56,7 @@ inference_modifier = {
     "stop_sequences": ["\n\nHuman"],
 }
 
-textgen_llm = Bedrock(
+llm = Bedrock(
     model_id="anthropic.claude-v2",
     client=bedrock_runtime,
     model_kwargs=inference_modifier,
@@ -65,12 +71,12 @@ with st.form("myform1"):
     height = 250,
     value = prompt
     )
-    submit = st.form_submit_button("Submit")
+    submit = st.form_submit_button("Submit", type="primary")
 
 
 if prompt_data and submit:
 
-    response = textgen_llm(prompt_data)
+    response = llm(prompt_data)
 
     print(response)
     st.write("### Answer")

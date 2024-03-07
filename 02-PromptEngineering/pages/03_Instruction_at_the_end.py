@@ -4,6 +4,11 @@ from helpers import getmodelId, getmodelparams, set_page_config, bedrock_runtime
 
 set_page_config()
 
+def form_callback():
+    for key in st.session_state.keys():
+        del st.session_state[key]
+        
+st.sidebar.button(label='Clear Session Data', on_click=form_callback)
 
 
 row1_col1, row1_col2 = st.columns([0.7,0.3])
@@ -29,7 +34,7 @@ with row1_col2.form(key ='Form1'):
 bedrock_runtime = bedrock_runtime_client()
 
 
-textgen_llm = Bedrock(
+llm = Bedrock(
     model_id=model_id,
     client=bedrock_runtime,
     model_kwargs=getmodelparams(provider),
@@ -45,15 +50,15 @@ prepared to handle.\n\nWhich country captured ports?'''
 with st.form("myform1"):
     prompt_data = st.text_area(
     ":orange[User Prompt:]",
-    height = 270,
+    height = 290,
     value = prompt
     )
-    submit = st.form_submit_button("Submit")
+    submit = st.form_submit_button("Submit", type="primary")
 
 
 if prompt_data and submit:
 
-    response = textgen_llm(prompt_data)
+    response = llm(prompt_data)
 
     print(response)
     st.write("### Answer")
