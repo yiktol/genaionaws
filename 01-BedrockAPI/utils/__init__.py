@@ -1,9 +1,11 @@
 import boto3
+import streamlit as st
 
-def get_bedrock_client():
+
+def bedrock_client(region='us-east-1'):
   return boto3.client(
     service_name='bedrock',
-    region_name='us-east-1'
+    region_name=region
   )
 
 def list_available_models(bedrock_client):
@@ -24,8 +26,8 @@ def filter_active_models(all_models):
       active_models.append(model)
   return active_models
 
-def get_models(provider):
-  bedrock = get_bedrock_client()
+def get_models(provider,region='us-east-1'):
+  bedrock = bedrock_client(region=region)
   all_models = list_available_models(bedrock) 
   models = filter_models_by_provider(all_models, provider)
   return models 
@@ -42,6 +44,11 @@ def titan_generic(input_prompt):
 def llama2_generic(input_prompt, system_prompt):
     prompt = f"""<s>[INST] <<SYS>>{system_prompt}<</SYS>>\n\n{input_prompt} [/INST]"""
     return prompt
+
+def mistral_generic(input_prompt):
+    prompt = f"""<s>[INST] {input_prompt} [/INST]"""
+    return prompt
+
 
 def getmodelparams(providername):
     model_mapping = {
@@ -81,13 +88,15 @@ def getmodelId(providername):
     model_mapping = {
         "Amazon" : "amazon.titan-tg1-large",
         "Anthropic" : "anthropic.claude-v2:1",
-        "AI21" : "ai21.j2-ultra-v1"
+        "AI21" : "ai21.j2-ultra-v1",
+        "Cohere": "cohere.command-text-v14",
+        "Meta": "meta.llama2-13b-chat-v1"
+
     }
     
     return model_mapping[providername]
 
 def set_page_config():
-    import streamlit as st
     st.set_page_config( 
     page_title="Amazon Bedrock API",  
     page_icon=":rock:",
@@ -95,9 +104,9 @@ def set_page_config():
     initial_sidebar_state="expanded",
 )
     
-def bedrock_runtime_client():
+def bedrock_runtime_client(region='us-east-1'):
     bedrock_runtime = boto3.client(
     service_name='bedrock-runtime',
-    region_name='us-east-1', 
+    region_name=region, 
     )
     return bedrock_runtime

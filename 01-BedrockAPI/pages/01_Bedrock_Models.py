@@ -1,7 +1,5 @@
-import boto3
-import json
 import streamlit as st
-from helpers import set_page_config
+from utils import set_page_config, bedrock_client
 
 set_page_config()
 
@@ -18,19 +16,11 @@ and you can securely integrate and deploy generative AI capabilities into your a
 you are already familiar with.""")
 
 with st.sidebar:
-    provider = st.selectbox(
-    'Provider',
-    ('Amazon', 'Stability', 'AI21', 'Anthropic','Cohere','Meta'),)
-    Region = st.selectbox(
-    'Region',
-    ('us-east-1', 'us-west-2', 'ap-southeast-1','ap-northeast-1','eu-central-1',))
+    provider = st.selectbox('Provider', ('Amazon', 'Stability', 'AI21', 'Anthropic','Cohere','Meta','Mistral'),)
+    Region = st.selectbox('Region', ('us-east-1', 'us-west-2', 'ap-southeast-1','ap-northeast-1','eu-central-1',))
 
 #Create the connection to Bedrock
-bedrock = boto3.client(
-    service_name='bedrock',
-    region_name=Region, 
-    
-)
+bedrock = bedrock_client(region=Region)
 
 def get_models(provider):
 

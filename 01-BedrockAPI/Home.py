@@ -1,6 +1,7 @@
 import streamlit as st
-import os, sys
-from helpers import getmodelId, getmodelparams, set_page_config, bedrock_runtime_client
+
+for key in st.session_state.keys():
+    del st.session_state[key]
 
 st.title("Amazon Bedrock API")
 

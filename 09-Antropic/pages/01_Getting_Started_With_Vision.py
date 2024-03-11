@@ -72,10 +72,11 @@ with col1:
             height = 100,
             value=st.session_state.prompt)
         submit = st.form_submit_button("Submit", type="primary")
-
-    container2 = st.container(border=True)    
+   
+    st.subheader('Prompt Examples:')
+    container2 = st.container(border=True) 
     with container2:
-        st.subheader('Prompt Examples:')
+        
         tab1, tab2 = st.tabs(["Prompt1", "Prompt2"])
         with tab1:
             load_options(item_num=0)
@@ -114,8 +115,8 @@ with col1:
             response_body = json.loads(response.get('body').read())
             # print(response_body.get('content'))
             
-            col2.write("### Answer")
-            col2.info(response_body.get('content')[0]['text'])
+            st.write("### Answer")
+            st.info(response_body.get('content')[0]['text'])
 
 
 

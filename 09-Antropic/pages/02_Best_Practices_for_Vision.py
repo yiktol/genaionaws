@@ -95,13 +95,10 @@ with col1:
         submit = st.form_submit_button("Submit", type="primary")
     
  
-
-
-
-    
-    container2 = st.container(border=True)    
+    st.subheader('Prompt Examples:')   
+    container2 = st.container(border=True) 
     with container2:
-        st.subheader('Prompt Examples:')
+        # st.subheader('Prompt Examples:')
         tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs(["Prompt1", "Prompt2", "Prompt3", "Prompt4", "Prompt5", "Prompt6", "Prompt7", "Prompt8", "Prompt9"])
         with tab1:
             load_options(0)
