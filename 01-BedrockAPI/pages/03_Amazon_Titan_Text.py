@@ -9,11 +9,9 @@ bedrock_runtime = bedrock_runtime_client()
 
 set_page_config()
 
-
 def form_callback():
     for key in st.session_state.keys():
         del st.session_state[key]
-
 
 st.sidebar.button(label='Reset Session', on_click=form_callback)
 

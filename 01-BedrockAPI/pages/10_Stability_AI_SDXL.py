@@ -39,22 +39,18 @@ bedrock_runtime = boto3.client(
     region_name='us-east-1', 
 )
 
-body = {{"text_prompts":[
-            {{"text":\"{st.session_state["prompt"]}\"}}
-            ],
+body = json.dumps({{"text_prompts":[{{"text":\"{st.session_state["prompt"]}\"}}],
         "cfg_scale":{st.session_state['cfg_scale']},
         "seed":{st.session_state['seed']},
-        "steps":{st.session_state['steps']}}}
-
-modelId = '{st.session_state["model"]}'
-accept = 'application/json'
-contentType = 'application/json'
+        "steps":{st.session_state['steps']}
+        }})
 
 response = bedrock_runtime.invoke_model(
-    body=json.dumps(body), 
-    modelId=modelId, 
-    accept=accept, 
-    contentType=contentType)
+    body=body, 
+        modelId='{st.session_state["model"]}', 
+        accept='application/json', 
+        contentType='application/json'
+    )
     
 response = json.loads(response.get('body').read())
 
