@@ -48,16 +48,12 @@ body = json.dumps({{
     'temperature': {st.session_state['temperature']},
 }})
 
-modelId = \'{st.session_state['model']}\''
-accept = 'application/json'
-contentType = 'application/json'
-
 #Invoke the model
-#- Response comes back as 'outputs' with a list
-response = bedrock_runtime.invoke_model(body=body.encode('utf-8'), # Encode to bytes
-            modelId=modelId, 
-            accept=accept, 
-            contentType=contentType)
+response = bedrock_runtime.invoke_model(
+    body=body,
+    modelId='{st.session_state['model']}', 
+    accept='application/json', 
+    contentType='application/json')
 
 response_body = json.loads(response.get('body').read().decode('utf-8'))
 print(response_body.get('outputs')[0].get('text'))

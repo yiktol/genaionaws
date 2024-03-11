@@ -25,8 +25,7 @@ Please ensure that your responses are socially unbiased and positive in nature. 
 If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. \
 If you don't know the answer to a question, please don't share false information."""
 
-xcode = f'''
-import boto3
+xcode = f'''import boto3
 import json
 
 bedrock_runtime = boto3.client(
@@ -35,27 +34,21 @@ bedrock_runtime = boto3.client(
     )
     
 default_system_prompt = \"{default_system_prompt}\"
-input_prompt = \"{st.session_state['prompt']}\"
 
-body = {{'prompt': prompt,
+body = json.dumps({{'prompt': \"{st.session_state['prompt']}\",
         'max_gen_len': {st.session_state['max_tokens']},
         'top_p': {st.session_state['top_p']},
         'temperature': {st.session_state['temperature']}
-    }}
-
-modelId = '{st.session_state['model']}'
-accept = 'application/json'
-contentType = 'application/json'
+    }})
 
 #Invoke the model
 response = bedrock_runtime.invoke_model(
-    body=json.dumps(body.encode('utf-8')),
-    modelId=modelId, 
-    accept=accept, 
-    contentType=contentType)
+    body=body,
+    modelId='{st.session_state['model']}', 
+    accept='application/json', 
+    contentType='application/json')
 
 response_body = json.loads(response.get('body').read().decode('utf-8'))
-
 print(response_body.get('generation'))
 '''
 

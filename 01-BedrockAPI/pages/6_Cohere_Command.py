@@ -1,4 +1,3 @@
-import boto3
 import json
 import streamlit as st
 from utils import get_models, set_page_config, bedrock_runtime_client
@@ -27,31 +26,24 @@ bedrock_runtime = boto3.client(
     region_name='us-east-1', 
 )
 
-body = {{
-    "prompt": "{st.session_state['prompt']}",
-    "max_tokens": {st.session_state['max_tokens']},
-    "temperature": {st.session_state['temperature']},
-    "p": {st.session_state['top_p']},
-    "k": {st.session_state['top_k']},
-    "stop_sequences": [],
-    "return_likelihoods": "NONE"
-}}
-
-modelId = '{st.session_state['model']}' 
-accept = 'application/json'
-contentType = 'application/json'
-
-body = json.dumps(body).encode('utf-8')
+body = json.dumps({{
+        "prompt": "{st.session_state['prompt']}",
+        "max_tokens": {st.session_state['max_tokens']},
+        "temperature": {st.session_state['temperature']},
+        "p": {st.session_state['top_p']},
+        "k": {st.session_state['top_k']},
+        "stop_sequences": [],
+        "return_likelihoods": "NONE"
+    }})
 
 #Invoke the model
 response = bedrock_runtime.invoke_model(
     body=body,
-    modelId=modelId, 
-    accept=accept, 
-    contentType=contentType)
+    modelId='{st.session_state['model']}', 
+    accept='application/json', 
+    contentType='application/json')
 
 response_body = json.loads(response.get('body').read())
-
 print(response_body['generations'][0]['text'])
 '''
 

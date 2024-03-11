@@ -28,24 +28,22 @@ bedrock_runtime = boto3.client(
     region_name='us-east-1'
     )
 
-payload = {{
-        "inputText": \"{st.session_state["prompt"]}\"
-        "maxTokenCount": {st.session_state['max_tokens']},
-        "stopSequences": [], 
-        "temperature": {st.session_state['temperature']},
-        "topP": {st.session_state['top_p']}
-        }}
-
-model_id = '{st.session_state['model']}'
-accept = 'application/json' 
-content_type = 'application/json'
+body = json.dumps({{
+        "inputText": \"{st.session_state["prompt"]}\",
+        'textGenerationConfig': {{
+            "maxTokenCount": {st.session_state['max_tokens']},
+            "stopSequences": [], 
+            "temperature": {st.session_state['temperature']},
+            "topP": {st.session_state['top_p']}
+            }}
+        }})
 
 # Invoke model 
 response = bedrock_runtime.invoke_model(
-    body=json.dumps(json.dumps(payload),
-    modelId=model_id, 
-    accept=accept, 
-    contentType=content_type
+    body=body,
+    modelId='{st.session_state['model']}', 
+    accept='application/json' , 
+    contentType='application/json'
 )
 
 response_body = json.loads(response['body'].read())

@@ -11,16 +11,19 @@ and Amazon via a single API, along with a broad set of capabilities you need to 
 applications with security, privacy, and responsible AI. Using Amazon Bedrock, you can easily experiment \
 with and evaluate top FMs for your use case, privately customize them with your data using techniques such \
 as fine-tuning and Retrieval Augmented Generation (RAG), and build agents that execute tasks using your enterprise \
-systems and data sources. Since Amazon Bedrock is serverless, you don’t have to manage any infrastructure, \
+systems and data sources. Since Amazon Bedrock is serverless, you don't have to manage any infrastructure, \
 and you can securely integrate and deploy generative AI capabilities into your applications using the AWS services \
 you are already familiar with.""")
 
 with st.sidebar:
-    provider = st.selectbox('Provider', ('Amazon', 'Stability', 'AI21', 'Anthropic','Cohere','Meta','Mistral'),)
-    Region = st.selectbox('Region', ('us-east-1', 'us-west-2', 'ap-southeast-1','ap-northeast-1','eu-central-1',))
+    provider = st.selectbox('Provider', ('Amazon', 'Stability',
+                            'AI21', 'Anthropic', 'Cohere', 'Meta', 'Mistral'),)
+    Region = st.selectbox('Region', ('us-east-1', 'us-west-2',
+                          'ap-southeast-1', 'ap-northeast-1', 'eu-central-1',))
 
-#Create the connection to Bedrock
+# Create the connection to Bedrock
 bedrock = bedrock_client(region=Region)
+
 
 def get_models(provider):
 
@@ -28,7 +31,6 @@ def get_models(provider):
     available_models = bedrock.list_foundation_models()
 
     models = [{}]
-
 
     for each_model in available_models['modelSummaries']:
         if provider in each_model['providerName']:
@@ -42,6 +44,7 @@ def get_models(provider):
     models.pop(0)
 
     return models
+
 
 code = f"""
 import boto3
@@ -57,6 +60,6 @@ for model in available_models['modelSummaries']:
 
 """
 
-st.code(code,language="python")
+st.code(code, language="python")
 
 st.table(get_models(provider))

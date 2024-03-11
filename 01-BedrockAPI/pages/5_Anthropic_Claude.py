@@ -28,27 +28,23 @@ bedrock_runtime = boto3.client(
     region_name='us-east-1',    
 )
 
-body = {{"prompt": \"{st.session_state['prompt']}\",
+body = json.dumps({{"prompt": \"{st.session_state['prompt']}\",
         "max_tokens_to_sample": {st.session_state['max_tokens']}, 
         "temperature": {st.session_state['temperature']},
         "top_k": {st.session_state['top_k']},
         "top_p": {st.session_state['top_p']},
         "stop_sequences": ["\\n\\nHuman:"],
-        "anthropic_version": "bedrock-2023-05-31"}}
-
-modelId = '{st.session_state['model']}' 
-accept = 'application/json'
-contentType = 'application/json'
+        "anthropic_version": "bedrock-2023-05-31"
+        }})
 
 #Invoke the model
 response = bedrock_runtime.invoke_model(
-    body=json.dumps(body.encode('utf-8')),
-    modelId=modelId, 
-    accept=accept, 
-    contentType=contentType)
+    body=body,
+    modelId='{st.session_state['model']}', 
+    accept='application/json', 
+    contentType='application/json')
 
 response_body = json.loads(response.get('body').read())
-
 print(response_body.get('completion'))
 '''
 
