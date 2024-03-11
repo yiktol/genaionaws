@@ -10,7 +10,7 @@ def form_callback():
     for key in st.session_state.keys():
         del st.session_state[key]
 
-st.sidebar.button(label='Clear Session', on_click=form_callback)
+st.sidebar.button(label='Reset Session', on_click=form_callback)
 
 bedrock_runtime = bedrock_runtime_client()
 

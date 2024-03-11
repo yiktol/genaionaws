@@ -15,7 +15,7 @@ def form_callback():
         del st.session_state[key]
 
 
-st.sidebar.button(label='Clear Session', on_click=form_callback)
+st.sidebar.button(label='Reset Session', on_click=form_callback)
 
 dataset = helpers.load_jsonl('utils/titan_text.jsonl')
 

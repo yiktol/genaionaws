@@ -12,7 +12,7 @@ def form_callback():
         del st.session_state[key]
 
 
-st.sidebar.button(label='Clear Session', on_click=form_callback)
+st.sidebar.button(label='Reset Session', on_click=form_callback)
 
 dataset = helpers.load_jsonl('utils/jurassic.jsonl')
 
@@ -31,7 +31,7 @@ bedrock_runtime = boto3.client(
 )
 
 body = json.dumps({{
-    "prompt": \"Human: {textwrap.shorten(st.session_state["prompt"],width=50,placeholder='...')}\n\nAssistant:\",
+    "prompt": \""Human: {textwrap.shorten(st.session_state["prompt"],width=50,placeholder='...')}\n\nAssistant:\"",
     "maxTokens": {st.session_state['max_tokens']},
     "temperature": {st.session_state['temperature']},
     "topP": {st.session_state['top_p']},
