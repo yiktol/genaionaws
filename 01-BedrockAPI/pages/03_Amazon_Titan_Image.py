@@ -84,7 +84,7 @@ It can also generate variations of an image.""")
     
     with st.form("form1"):
         prompt_text = st.text_area("What you want to see in the image:",  height = st.session_state['ta_height'], key = "prompt", help="The prompt text")
-        negative_prompt = st.text_input("What shoud not be in the image:",key="negative_prompt", help="The negative prompt")
+        negative_prompt = st.text_area("What shoud not be in the image:", height = st.session_state['ta_height'], key="negative_prompt", help="The negative prompt")
         generate_button = st.form_submit_button("Generate", type="primary")
 
     if generate_button:

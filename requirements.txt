@@ -20,3 +20,4 @@ google-search-results
 langchainhub
 ipython
 jsonlines
+stability_sdk
