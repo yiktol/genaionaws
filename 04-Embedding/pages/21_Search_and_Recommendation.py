@@ -2,12 +2,12 @@
 import streamlit as st
 import pandas as pd
 import textwrap
-from helpers import bedrock_runtime_client, set_page_config, invoke_model, search, get_embedding
+import utils.helpers as helpers
 
-set_page_config()
-bedrock = bedrock_runtime_client()
+helpers.set_page_config()
+bedrock = helpers.bedrock_runtime_client()
 
-text, code = st.columns(2)
+text, code = st.columns([0.6, 0.4])
 
 
 modelId = 'amazon.titan-text-lite-v1'
@@ -26,30 +26,32 @@ Here is the sample code to perform search and recommendation:""")
 
     with st.form("myform"):
         prompt = st.text_area(":orange[Enter your query here:]", height = 50, value='Isaac Newton'),
-        t1=st.text_input('Text1',value="The theory of general relativity says that the observed gravitational effect between masses results from their warping of spacetime."),
-        t2=st.text_input('Text2',value="Quantum mechanics allows the calculation of properties and behaviour of physical systems. It is typically applied to microscopic systems: molecules, atoms and sub-atomic particles."),
-        t3=st.text_input('Text3',value="Wavelet theory is essentially the continuous-time theory that corresponds to dyadic subband transforms — i.e., those where the L (LL) subband is recursively split over and over."),
-        t4=st.text_input('Text4',value="Every particle attracts every other particle in the universe with a force that is proportional to the product of their masses and inversely proportional to the square of the distance between their centers."),
-        t5=st.text_input('Text5',value="The electromagnetic spectrum is the range of frequencies (the spectrum) of electromagnetic radiation and their respective wavelengths and photon energies."),
+        t1=st.text_area('Text1',value="The theory of general relativity says that the observed gravitational effect between masses results from their warping of spacetime."),
+        t2=st.text_area('Text2',value="Quantum mechanics allows the calculation of properties and behaviour of physical systems. It is typically applied to microscopic systems: molecules, atoms and sub-atomic particles."),
+        t3=st.text_area('Text3',value="Wavelet theory is essentially the continuous-time theory that corresponds to dyadic subband transforms — i.e., those where the L (LL) subband is recursively split over and over."),
+        t4=st.text_area('Text4',value="Every particle attracts every other particle in the universe with a force that is proportional to the product of their masses and inversely proportional to the square of the distance between their centers."),
+        t5=st.text_area('Text5',value="The electromagnetic spectrum is the range of frequencies (the spectrum) of electromagnetic radiation and their respective wavelengths and photon energies."),
         submit = st.form_submit_button("Search and Recommend",type="primary")
 
 
     if submit:         
-        dataset = [
-        {'text': t1, 'embedding': get_embedding(bedrock, t1[0])}, 
-        {'text': t2, 'embedding': get_embedding(bedrock, t2[0])}, 
-        {'text': t3, 'embedding': get_embedding(bedrock, t3[0])}, 
-        {'text': t4, 'embedding': get_embedding(bedrock, t4[0])}, 
-        {'text': t5, 'embedding': get_embedding(bedrock, t5[0])}
-        ]    
-        
-        v = get_embedding(bedrock, prompt[0]) 
-        result = search(dataset, v)
+        with st.spinner("Searching..."):
+            dataset = [
+            {'text': t1, 'embedding': helpers.get_embedding(bedrock, t1[0])}, 
+            {'text': t2, 'embedding': helpers.get_embedding(bedrock, t2[0])}, 
+            {'text': t3, 'embedding': helpers.get_embedding(bedrock, t3[0])}, 
+            {'text': t4, 'embedding': helpers.get_embedding(bedrock, t4[0])}, 
+            {'text': t5, 'embedding': helpers.get_embedding(bedrock, t5[0])}
+            ]    
+            
+            v = helpers.get_embedding(bedrock, prompt[0]) 
+            result = helpers.search(dataset, v)
 
-        st.write("Answer:")
-        st.info(result[0][0])
-        df = pd.DataFrame({'Text':["t1","t2","t3","t4","t5"], 'Distance':result[1]})
-        st.table(df)
+            st.write("Answer:")
+            st.info(result[0][0])
+            df = pd.DataFrame({'Text':["Text1","Text2","Text3","Text4","Text5"], 'Distance':result[1]})
+            st.subheader("Distance between :orange[Prompt] and :orange[Text]")
+            st.table(df)
 
 with code:
 
@@ -113,7 +115,7 @@ v = get_embedding(bedrock, query)
 result = search(dataset, v)
 print(result)
         """
-
+    st.subheader("Code")
     st.code(code_data, language="python")
 
 

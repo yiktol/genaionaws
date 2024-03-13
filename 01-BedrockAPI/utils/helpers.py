@@ -5,7 +5,8 @@ import utils
 import base64
 from io import BytesIO
 from random import randint
-from utils import bedrock_runtime_client, getmodelId
+from jinja2 import Environment, FileSystemLoader
+from utils import bedrock_runtime_client
 
 def load_jsonl(file_path):
     d = []
@@ -24,9 +25,9 @@ def initsessionkeys(dataset):
 
 def update_options(dataset,item_num):
     for key in dataset[item_num]:
-        # if key in ["model","temperature","top_p","top_k","max_tokens"]:
-        #     continue
-        # else:
+        if key in ["model","temperature","top_p","top_k","max_tokens"]:
+            continue
+        else:
             st.session_state[key] = dataset[item_num][key]
         # print(key, dataset[item_num][key])
 
@@ -156,15 +157,15 @@ def tune_parameters(provider, index=0,region='us-east-1'):
 
     with st.form(key ='Form1'):
         models = utils.get_models(provider,region=region)
-        st.session_state['model']  = st.selectbox('model', models,index=index)
-        st.session_state['temperature'] =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = st.session_state['temperature'], step = 0.1)
-        st.session_state['top_p']=st.slider('top_p',min_value = 0.0, max_value = 1.0, value = st.session_state['top_p'], step = 0.1)
-        st.session_state['max_tokens']=st.number_input('max_tokens',min_value = 50, max_value = 4096, value = st.session_state['max_tokens'], step = 1)
+        model  = st.selectbox('model', models,index=index)
+        temperature = st.slider('temperature',min_value = 0.0, max_value = 1.0, value = st.session_state['temperature'], step = 0.1)
+        top_p = st.slider('top_p',min_value = 0.0, max_value = 1.0, value = st.session_state['top_p'], step = 0.1)
+        max_tokens = st.number_input('max_tokens',min_value = 50, max_value = 4096, value = st.session_state['max_tokens'], step = 1)
         if provider in ['Anthropic','Cohere']:
-            st.session_state['top_k'] =st.slider('top_k',min_value = 0, max_value = 300, value = st.session_state['top_k'], step = 1)
-            params = {"model":st.session_state['model'] , "temperature":st.session_state['temperature'], "top_p":st.session_state['top_p'], "top_k":st.session_state['top_k'] ,"max_tokens":st.session_state['max_tokens']}
+            top_k = st.slider('top_k',min_value = 0, max_value = 300, value = st.session_state['top_k'], step = 1)
+            params = {"model":model , "temperature":temperature, "top_p":top_p, "top_k":top_k ,"max_tokens":max_tokens}
         else:
-            params = {"model":st.session_state['model'] , "temperature":st.session_state['temperature'], "top_p":st.session_state['top_p'],"max_tokens":st.session_state['max_tokens']}
+            params = {"model":model , "temperature":temperature, "top_p":top_p,"max_tokens":max_tokens}
         st.form_submit_button(label = 'Tune Parameters', on_click=update_parameters, kwargs=(params)) 
 
 
@@ -284,6 +285,7 @@ def get_titan_image_generation_request_body(prompt, negative_prompt,numberOfImag
         "taskType": "TEXT_IMAGE",
         "textToImageParams": {
             "text": prompt,
+            "negativeText": negative_prompt
         },
         "imageGenerationConfig": {
             "numberOfImages": numberOfImages,  # Number of images to generate
@@ -291,12 +293,12 @@ def get_titan_image_generation_request_body(prompt, negative_prompt,numberOfImag
             "height": height,
             "width": width,
             "cfgScale": cfgScale,
-            "seed": seed,  # Use a random seed
-        },
+            "seed": seed
+        }
     }
     
-    if negative_prompt:
-        body['textToImageParams']['negativeText'] = negative_prompt
+    # if negative_prompt:
+    #     body['textToImageParams']['negativeText'] = negative_prompt
     
     return json.dumps(body)
 
@@ -314,14 +316,95 @@ def get_titan_response_image(response):
 
 
 #generate an image using Amazon Titan Image Generator
-def get_image_from_model(prompt_content, negative_prompt=None, numberOfImages = 1,quality = "premium", height = 512, width=512, cfgScale = 8.0, seed= randint(0, 100000)):
+def get_image_from_model(prompt_content, negative_prompt, numberOfImages, quality, height, width, cfgScale, seed):
 
     bedrock = bedrock_runtime_client()
     
-    body = get_titan_image_generation_request_body(prompt=prompt_content, negative_prompt=negative_prompt,numberOfImages = numberOfImages,quality =quality, height = height, width=width,cfgScale=cfgScale,seed=seed)
+    body = get_titan_image_generation_request_body(prompt=prompt_content, negative_prompt=negative_prompt,numberOfImages=numberOfImages,quality=quality, height=height, width=width,cfgScale=cfgScale,seed=seed)
     
     response = bedrock.invoke_model(body=body, modelId="amazon.titan-image-generator-v1", contentType="application/json", accept="application/json")
     
     output = get_titan_response_image(response)
     
+    return output
+
+
+def reset_session():
+    def form_callback():
+        for key in st.session_state.keys():
+            del st.session_state[key]
+
+
+    st.sidebar.button(label='Reset Session', on_click=form_callback)
+
+
+def render_titan_code(templatePath):
+    env = Environment(loader=FileSystemLoader('templates'))
+    template = env.get_template(templatePath)
+    output = template.render(
+        prompt=st.session_state['prompt'], max_tokens=st.session_state['max_tokens'], 
+        temperature=st.session_state['temperature'], top_p=st.session_state['top_p'],
+        model = st.session_state['model'])
+    return output
+
+def render_titan_image_code(templatePath):
+    env = Environment(loader=FileSystemLoader('templates'))
+    template = env.get_template(templatePath)
+    output = template.render(
+        prompt=st.session_state['prompt'], quality=st.session_state['quality'], 
+        height=st.session_state['height'], width=st.session_state['width'],
+        cfgScale=st.session_state['cfg_scale'], seed=st.session_state['seed'],
+        negative_prompt=st.session_state['negative_prompt'], numberOfImages=st.session_state['numberOfImages'],
+        model = st.session_state['model'])
+    return output
+
+def render_claude_code(templatePath):
+    env = Environment(loader=FileSystemLoader('templates'))
+    template = env.get_template(templatePath)
+    output = template.render(
+        prompt=st.session_state['prompt'], 
+        max_tokens=st.session_state['max_tokens'], 
+        temperature=st.session_state['temperature'], 
+        top_p=st.session_state['top_p'],
+        top_k = st.session_state['top_k'],
+        model = st.session_state['model'])
+    return output
+
+def render_cohere_code(templatePath):
+    env = Environment(loader=FileSystemLoader('templates'))
+    template = env.get_template(templatePath)
+    output = template.render(
+        prompt=st.session_state['prompt'], 
+        max_tokens=st.session_state['max_tokens'], 
+        temperature=st.session_state['temperature'], 
+        top_p=st.session_state['top_p'],
+        top_k = st.session_state['top_k'],
+        model = st.session_state['model'])
+    return output
+
+def render_meta_code(templatePath):
+    env = Environment(loader=FileSystemLoader('templates'))
+    template = env.get_template(templatePath)
+    output = template.render(
+        prompt=st.session_state['prompt'], max_tokens=st.session_state['max_tokens'], 
+        temperature=st.session_state['temperature'], top_p=st.session_state['top_p'],
+        model = st.session_state['model'])
+    return output
+
+def render_mistral_code(templatePath):
+    env = Environment(loader=FileSystemLoader('templates'))
+    template = env.get_template(templatePath)
+    output = template.render(
+        prompt=st.session_state['prompt'], max_tokens=st.session_state['max_tokens'], 
+        temperature=st.session_state['temperature'], top_p=st.session_state['top_p'],
+        model = st.session_state['model'])
+    return output
+
+def render_stabilityai_code(templatePath):
+    env = Environment(loader=FileSystemLoader('templates'))
+    template = env.get_template(templatePath)
+    output = template.render(
+        prompt=st.session_state['prompt'], cfg_scale=st.session_state['cfg_scale'], 
+        seed=st.session_state['seed'], steps=st.session_state['steps'],
+        model = st.session_state['model'])
     return output

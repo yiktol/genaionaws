@@ -66,27 +66,25 @@ Note: The model outputs are non-deterministic""")
 if "messages" not in st.session_state.keys():
     st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
  
-c1 = st.container(height=600)
-c2 = st.container(height=110)
    
-with c1:  
-    # Display chat messages from history on app rerun
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+
+# Display chat messages from history on app rerun
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
 
 # Accept user input
-c2.write('Say something')
-if prompt := c2.chat_input("What is up?"):
+# st.write('Say something')
+if prompt := st.chat_input("Say something"):
     # Add user message to chat history
     st.session_state.messages.append({"role": "User", "content": prompt})
     # Display user message in chat message container
-    with c1.chat_message("User"):
+    with st.chat_message("User"):
         st.markdown(prompt)
 
 # Display assistant response in chat message container
-    with c1.chat_message("assistant"):
+    with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
             stream = chat_llm_chain.predict(human_input=prompt)
             st.markdown(stream)

@@ -7,12 +7,12 @@ from sklearn.cluster import KMeans
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
-from helpers import bedrock_runtime_client, set_page_config, classify, search, get_embedding
+import utils.helpers as helpers
 
-set_page_config()
-bedrock = bedrock_runtime_client()
+helpers.set_page_config()
+bedrock = helpers.bedrock_runtime_client()
 
-text, code = st.columns(2)
+text, code = st.columns([0.6, 0.4])
 
 with text:
 
@@ -36,38 +36,39 @@ Here is the sample code to place the above-mentioned names into two groups:""")
         submit = st.form_submit_button("Find Cluster",type="primary")
 
     if submit:
-        embeddings = []
-        for name in names[0]:
-            embeddings.append(get_embedding(bedrock, name))
-            #print(name)
-        # clustering
-        df = pd.DataFrame(data={'names': names[0], 'embeddings': embeddings})
-        matrix = np.vstack(df.embeddings.values)
-        n_clusters = 2
-        kmeans = KMeans(n_clusters = n_clusters, init='k-means++', random_state=42)
-        kmeans.fit(matrix)
-        df['cluster'] = kmeans.labels_
-        #print(df['cluster'] )
-        # result
-        #print(df[['cluster', 'names']])
-        st.table(df[['cluster', 'names']])
+        with st.spinner("Clustering..."):
+            embeddings = []
+            for name in names[0]:
+                embeddings.append(helpers.get_embedding(bedrock, name))
+                #print(name)
+            # clustering
+            df = pd.DataFrame(data={'names': names[0], 'embeddings': embeddings})
+            matrix = np.vstack(df.embeddings.values)
+            n_clusters = 2
+            kmeans = KMeans(n_clusters = n_clusters, init='k-means++', random_state=42)
+            kmeans.fit(matrix)
+            df['cluster'] = kmeans.labels_
+            #print(df['cluster'] )
+            # result
+            #print(df[['cluster', 'names']])
+            st.table(df[['cluster', 'names']])
 
-        # Reduce number of dimensions from 1536 to 2
-        tsne = TSNE(random_state=0, n_iter=1000, perplexity=6)
-        tsne_results = tsne.fit_transform(np.array(df['embeddings'].to_list(), dtype=np.float32))
-        # Add the results to dataframe as a new column
-        df['tsne1'] = tsne_results[:, 0]
-        df['tsne2'] = tsne_results[:, 1]
+            # Reduce number of dimensions from 1536 to 2
+            tsne = TSNE(random_state=0, n_iter=1000, perplexity=6)
+            tsne_results = tsne.fit_transform(np.array(df['embeddings'].to_list(), dtype=np.float32))
+            # Add the results to dataframe as a new column
+            df['tsne1'] = tsne_results[:, 0]
+            df['tsne2'] = tsne_results[:, 1]
 
-        # Plot the data and annotate the result
-        fig, ax = plt.subplots()
-        ax.set_title('Embeddings')
-        sns.scatterplot(data=df, x='tsne1', y='tsne2', hue='cluster', ax=ax)
-        for idx, row in df.iterrows():
-            ax.text(row['tsne1'], row['tsne2'], row['names'], fontsize=6.5, horizontalalignment='center')
+            # Plot the data and annotate the result
+            fig, ax = plt.subplots()
+            ax.set_title('Embeddings')
+            sns.scatterplot(data=df, x='tsne1', y='tsne2', hue='cluster', ax=ax)
+            for idx, row in df.iterrows():
+                ax.text(row['tsne1'], row['tsne2'], row['names'], fontsize=6.5, horizontalalignment='center')
 
-        # plt.show()
-        st.pyplot(fig)
+            # plt.show()
+            st.pyplot(fig)
 
 
 with code:
@@ -134,7 +135,7 @@ for idx, row in df.iterrows():
 
 plt.show()
         """
-
+    st.subheader("Code")
     st.code(code_data, language="python")
 
 

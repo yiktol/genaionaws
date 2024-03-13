@@ -1,18 +1,12 @@
-import json
-import boto3
-import numpy as np
 import pandas as pd
 import streamlit as st
-from sklearn.cluster import KMeans
-import seaborn as sns
-import matplotlib.pyplot as plt
-from sklearn.manifold import TSNE
-from helpers import bedrock_runtime_client, set_page_config, find_outliers_by_count, find_outliers_by_percentage, get_embedding, find_outliers_by_distance
+import utils.helpers as helpers
 
-set_page_config()
-bedrock = bedrock_runtime_client()
 
-text, code = st.columns(2)
+helpers.set_page_config()
+bedrock = helpers.bedrock_runtime_client()
+
+text, code = st.columns([0.6, 0.4])
 
 with text:
 
@@ -45,45 +39,48 @@ Here is the sample code to identify two outliers from a name list:""")
         submit3 = st.form_submit_button("Get Outliers by Distance",type="secondary")
         
     if outlier_by_number and submit:
-        dataset = []
-        for name in names[0]:
-            embedding = get_embedding(bedrock, name)
-            dataset.append({'name': name, 'embedding': embedding})
-        outliers = find_outliers_by_count(dataset, outlier_by_number)
-        #print(outliers)
-        outlier_names = []
-        for item in outliers[0]:
-            #print(item['name'])
-            outlier_names.append(item['name'])
-        df = pd.DataFrame({'Outliers':outlier_names})
-        st.write("Answer:")
-        st.table(df)            
+        with st.spinner("Looking for Outliers..."):
+            dataset = []
+            for name in names[0]:
+                embedding = helpers.get_embedding(bedrock, name)
+                dataset.append({'name': name, 'embedding': embedding})
+            outliers = helpers.find_outliers_by_count(dataset, outlier_by_number)
+            #print(outliers)
+            outlier_names = []
+            for item in outliers[0]:
+                #print(item['name'])
+                outlier_names.append(item['name'])
+            df = pd.DataFrame({'Outliers':outlier_names})
+            st.write("Answer:")
+            st.table(df)            
     if outlier_by_percent and submit2:
-        dataset = []
-        for name in names[0]:
-            embedding = get_embedding(bedrock, name)
-            dataset.append({'name': name, 'embedding': embedding})
-        entries = find_outliers_by_percentage(dataset, outlier_by_percent)
-        outlier_names = []
-        for item in entries:
-            #print(item['name'])
-            outlier_names.append(item['name'])
-        df = pd.DataFrame({'Outliers':outlier_names})
-        st.write("Answer:")
-        st.table(df)  
+        with st.spinner("Looking for Outliers..."):
+            dataset = []
+            for name in names[0]:
+                embedding = helpers.get_embedding(bedrock, name)
+                dataset.append({'name': name, 'embedding': embedding})
+            entries = helpers.find_outliers_by_percentage(dataset, outlier_by_percent)
+            outlier_names = []
+            for item in entries:
+                #print(item['name'])
+                outlier_names.append(item['name'])
+            df = pd.DataFrame({'Outliers':outlier_names})
+            st.write("Answer:")
+            st.table(df)  
     if outlier_by_distance and submit3:
-        dataset = []
-        for name in names[0]:
-            embedding = get_embedding(bedrock, name)
-            dataset.append({'name': name, 'embedding': embedding})
-        entries = find_outliers_by_distance(dataset, outlier_by_distance)
-        outlier_names = []
-        for item in entries:
-            #print(item['name'])
-            outlier_names.append(item['name'])
-        df = pd.DataFrame({'Outliers':outlier_names})
-        st.write("Answer:")
-        st.table(df)          
+        with st.spinner("Looking for Outliers..."):
+            dataset = []
+            for name in names[0]:
+                embedding = helpers.get_embedding(bedrock, name)
+                dataset.append({'name': name, 'embedding': embedding})
+            entries = helpers.find_outliers_by_distance(dataset, outlier_by_distance)
+            outlier_names = []
+            for item in entries:
+                #print(item['name'])
+                outlier_names.append(item['name'])
+            df = pd.DataFrame({'Outliers':outlier_names})
+            st.write("Answer:")
+            st.table(df)          
 
 
 
@@ -144,7 +141,7 @@ outliers = find_outliers_by_count(dataset, 2)
 for item in outliers:
     print(item['name'])
         """
-
+    st.subheader("Code")
     st.code(code_data, language="python")
 
 

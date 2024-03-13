@@ -1,0 +1,28 @@
+import boto3
+import json
+
+bedrock_runtime = boto3.client(
+    service_name='bedrock-runtime',
+    region_name='us-east-1', 
+    )
+    
+default_system_prompt = """You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe. \
+Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. \
+Please ensure that your responses are socially unbiased and positive in nature. \
+If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. \
+If you don't know the answer to a question, please don't share false information."""
+
+body = json.dumps({'prompt': "{{prompt}}",
+        'max_gen_len': {{max_tokens}}, 
+        'top_p': {{top_p}},
+        'temperature': {{temperature}},
+    })
+
+response = bedrock_runtime.invoke_model(
+    body=body,
+    modelId='{{model}}', 
+    accept='application/json', 
+    contentType='application/json')
+
+response_body = json.loads(response.get('body').read().decode('utf-8'))
+print(response_body.get('generation'))

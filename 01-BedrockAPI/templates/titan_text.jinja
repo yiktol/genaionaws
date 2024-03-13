@@ -1,0 +1,26 @@
+import boto3
+import json
+
+bedrock_runtime = boto3.client(
+    service_name='bedrock-runtime', 
+    region_name='us-east-1'
+    )
+
+body = json.dumps({
+        "inputText": "{{prompt}}",
+        'textGenerationConfig': {
+            "maxTokenCount": {{max_tokens}},
+            "stopSequences": {{temperature}},
+            "topP": {{top_p}}
+            }
+        })
+        
+response = bedrock_runtime.invoke_model(
+    body=body,
+    modelId='{{model}}', 
+    accept='application/json' , 
+    contentType='application/json'
+)
+
+response_body = json.loads(response['body'].read())
+print(response_body['results'][0]['outputText'])

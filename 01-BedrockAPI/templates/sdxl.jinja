@@ -1,0 +1,35 @@
+import json
+from PIL import Image
+from io import BytesIO
+import base64
+from base64 import b64encode
+from base64 import b64decode
+import boto3
+
+bedrock_runtime = boto3.client(
+    service_name='bedrock-runtime',
+    region_name='us-east-1', 
+)
+
+body = json.dumps(
+        {"text_prompts":
+            [
+                {"text":\"{{prompt}}\"}
+            ],
+        "cfg_scale":{{cfg_scale}},
+        "seed":{{seed}},
+        "steps":{{steps}}
+        })
+
+response = bedrock_runtime.invoke_model(
+        body=body, 
+        modelId='{{model}}', 
+        accept='application/json', 
+        contentType='application/json'
+    )
+    
+response = json.loads(response.get('body').read())
+
+images = response.get('artifacts')
+image = Image.open(BytesIO(b64decode(images[0].get('base64'))))
+image.save("generated_image.png")

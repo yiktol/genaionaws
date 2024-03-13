@@ -1,66 +1,19 @@
-import boto3
 import json
-from utils import get_models, set_page_config, bedrock_runtime_client, mistral_generic
+from utils import set_page_config, bedrock_runtime_client, mistral_generic
 import utils.helpers as helpers
 import streamlit as st
 
 set_page_config()
 
-def form_callback():
-    for key in st.session_state.keys():
-        del st.session_state[key]
-
-st.sidebar.button(label='Reset Session', on_click=form_callback)
+helpers.reset_session()
 
 bedrock_runtime = bedrock_runtime_client(region='us-west-2')
 
-dataset = helpers.load_jsonl('utils/mistral.jsonl')
+dataset = helpers.load_jsonl('data/mistral.jsonl')
 
 helpers.initsessionkeys(dataset[0])
 
 text, code = st.columns([0.6,0.4])
-
-# code.subheader("Parameters")
-# with code.form(key ='Form1'):
-#     model = st.selectbox('model', get_models('Mistral',region='us-west-2'))
-#     st.session_state['temperature'] =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.2, step = 0.1)
-#     st.session_state['top_p']=st.slider('top_p',min_value = 0.0, max_value = 1.0, value = 0.9, step = 0.1)
-#     st.session_state['max_tokens']=st.number_input('max_tokens',min_value = 50, max_value = 4096, value = 200, step = 1)
-#     submitted1 = st.form_submit_button(label = 'Tune Parameters') 
-
-
-xcode = f"""import boto3
-import json
-
-#Create the connection to Bedrock
-bedrock_runtime = boto3.client(
-    service_name='bedrock-runtime',
-    region_name='us-west-2', 
-)
-
-# Define prompt and model parameters
-prompt = \"""<s>[INST]{st.session_state["prompt"]}[/INST]</s>\"""
-
-body = json.dumps({{ 
-    'prompt': prompt,
-    'max_tokens': {st.session_state['max_tokens']},
-    'top_p': {st.session_state['top_p']},
-    'temperature': {st.session_state['temperature']},
-}})
-
-#Invoke the model
-response = bedrock_runtime.invoke_model(
-    body=body,
-    modelId='{st.session_state['model']}', 
-    accept='application/json', 
-    contentType='application/json')
-
-response_body = json.loads(response.get('body').read().decode('utf-8'))
-print(response_body.get('outputs')[0].get('text'))
-
-"""
-
-
 
 with text:
     st.title('Mistral AI')
@@ -71,7 +24,7 @@ with text:
 
 
     with st.expander("See Code"):
-        st.code(xcode,language="python")
+        st.code(helpers.render_mistral_code('instruct.jinja'),language="python")
 
     # Define prompt and model parameters
     with st.form("myform"):
@@ -81,8 +34,6 @@ with text:
             value = st.session_state["prompt"]
         )
         submit = st.form_submit_button("Submit", type='primary')
-
-
 
     model_id = st.session_state['model']
     accept = 'application/json' 
@@ -95,7 +46,6 @@ with text:
         "top_p": st.session_state['top_p']
     })
 
-
     if prompt_data and submit:
         with st.spinner("Generating..."):
             response = bedrock_runtime.invoke_model(body=body.encode('utf-8'), # Encode to bytes
@@ -107,7 +57,6 @@ with text:
 
             st.write("Answer")
             st.info(f"{response_body.get('outputs')[0].get('text')}")
-
 
 with code:
     helpers.tune_parameters('Mistral', index=0,region='us-west-2')

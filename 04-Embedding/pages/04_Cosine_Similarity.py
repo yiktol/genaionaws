@@ -1,19 +1,17 @@
 import streamlit as st
-import json
-import boto3
-import math
 import pandas as pd
-from helpers import get_embedding, calculate_cosine_similarity, bedrock_runtime_client, set_page_config
+import utils.helpers as helpers
 
-set_page_config()
+helpers.set_page_config()
 
-bedrock = bedrock_runtime_client()
+bedrock = helpers.bedrock_runtime_client()
 
-text, code = st.columns(2)
+text, code = st.columns([0.6, 0.4])
 
 with text:
     st.header("Cosine Similarity")
-    st.image("dot-product-a-cos.svg")
+    col1, col2, col3 = text.columns([0.3, 0.4,0.3])
+    col2.image("dot-product-a-cos.svg")
     st.latex(r'\cos \theta = \frac{a.b}  {|a| x |b|}') 
 
     st.write("""Cosine Similarity is another commonly used method to measure similarity.\
@@ -26,31 +24,34 @@ with text:
 
     with st.form("myform"):
         prompt = st.text_area(":orange[Enter your prompt here:]", height = 50, value="Hello"),
-        text1=st.text_input('Text1',value="Hi"),
-        text2=st.text_input('Text2',value="Good Day"),
-        text3=st.text_input('Text3',value="How are you"),
-        text4=st.text_input('Text4',value="What is general relativity"),
-        text5=st.text_input('Text5',value="She sells sea shells on the sea shore"),
+        text1=st.text_area('Text1',value="Hi"),
+        text2=st.text_area('Text2',value="Good Day"),
+        text3=st.text_area('Text3',value="How are you"),
+        text4=st.text_area('Text4',value="What is general relativity"),
+        text5=st.text_area('Text5',value="She sells sea shells on the sea shore"),
         submit = st.form_submit_button("Check Similarity",type="primary")
 
     txt_array=[]
     distance_array=[]
+    prompt_display = []
 
     #print(text1)
     if prompt and submit:
-        prompt_embedding = get_embedding(bedrock, prompt[0])
-        
-        texts = [text1, text2, text3, text4, text5]
-        for text in texts:
-            embedding = get_embedding(bedrock, text[0])
-            distance = calculate_cosine_similarity(prompt_embedding, embedding)
-            txt_array.append(text[0])
-            distance_array.append(distance)
-            #print(distance)
+        with st.spinner("Calculating Cosine Similarity..."):
+            prompt_embedding = helpers.get_embedding(bedrock, prompt[0])
             
-            
-        df = pd.DataFrame({'Text':txt_array, 'Similarity':distance_array})
-        st.table(df)
+            texts = [text1, text2, text3, text4, text5]
+            for text in texts:
+                embedding = helpers.get_embedding(bedrock, text[0])
+                distance = helpers.calculate_cosine_similarity(prompt_embedding, embedding)
+                txt_array.append(text[0])
+                distance_array.append(distance)
+                prompt_display.append(prompt[0])
+                
+                
+            df = pd.DataFrame({'Prompt':prompt_display,'Text':txt_array, 'Dot Product':distance_array})
+            st.subheader("Cosine Similarity between :orange[Prompt] and :orange[Text]")
+            st.table(df)
 
 with code:
     
@@ -102,4 +103,5 @@ for text in texts:
     distance = calculate_cosine_similarity(hello, embedding)
     print(distance)
     """
+    st.subheader("Code")
     st.code(code_data, language="python")

@@ -3,38 +3,34 @@ import boto3
 import base64
 from io import BytesIO
 from random import randint
-from utils import bedrock_runtime_client, getmodelId
-
 
 bedrock = boto3.client(
     service_name='bedrock-runtime', 
     region_name='us-east-1'
     )
 
-prompt = "Blue backpack on a table."
-negative_prompt = ""
+prompt = "{{prompt}}"
+negative_prompt = "{{negative_prompt}}"
 
-body = { 
+body = json.dumps({ 
     "taskType": "TEXT_IMAGE",
     "textToImageParams": {
         "text": prompt,
+        "negativeText": negative_prompt
     },
     "imageGenerationConfig": {
-        "numberOfImages": 1,
-        "quality": "premium",
-        "height": 512,
-        "width": 512,
-        "cfgScale": 8.0,
-        "seed": randint(0, 100000), 
+        "numberOfImages": {{numberOfImages}},
+        "quality": "{{quality}}",
+        "height": {{height}},
+        "width": {{width}},
+        "cfgScale": {{cfgScale}},
+        "seed": {{seed}}, 
     },
-}
-
-if negative_prompt:
-    body['textToImageParams']['negativeText'] = negative_prompt
+})
 
 response = bedrock.invoke_model(
     body=body, 
-    modelId="amazon.titan-image-generator-v1", 
+    modelId="{{model}}", 
     contentType="application/json", 
     accept="application/json")
 

@@ -3,7 +3,7 @@ import json
 import streamlit as st
 import numpy as np
 import pandas as pd
-from helpers import set_page_config
+from utils.helpers import set_page_config
 
 set_page_config()
 
@@ -14,9 +14,9 @@ bedrock_runtime = boto3.client(
     
 )
 
-text, code = st.columns(2)
+text, code = st.columns([0.6, 0.4])
 
-model_id = 'amazon.titan-embed-g1-text-02' #look for embeddings in the modelID
+model_id = 'amazon.titan-embed-g1-text-02'
 accept = 'application/json' 
 content_type = 'application/json'
 
@@ -29,37 +29,40 @@ with text:
     Titan Embeddings G1 - Text v1.2 also supports long documents, however, for retrieval tasks it is recommended to segment \
     documents into logical segments.""")
 
+
+        
     # Define prompt and model parameters
     with st.form("myform"):
-        prompt_data = st.text_input(
+        prompt_data = st.text_area(
             ":orange[Enter a prompt to vectorize]", 
             placeholder="Write me a poem about apples",
             value="Write me a poem about apples")
         submitted = st.form_submit_button("Vectorize",type="primary")
 
     if prompt_data and submitted:
-        body = json.dumps({
-            "inputText": prompt_data,
-        })
+        with st.spinner("Generating Embedding..."):
+            body = json.dumps({
+                "inputText": prompt_data,
+            })
 
 
-        # Invoke model 
-        response = bedrock_runtime.invoke_model(
-            body=body, 
-            modelId=model_id, 
-            accept=accept, 
-            contentType=content_type
-        )
+            # Invoke model 
+            response = bedrock_runtime.invoke_model(
+                body=body, 
+                modelId=model_id, 
+                accept=accept, 
+                contentType=content_type
+            )
 
-        # Print response
-        response_body = json.loads(response['body'].read())
-        embedding = response_body.get('embedding')
+            # Print response
+            response_body = json.loads(response['body'].read())
+            embedding = response_body.get('embedding')
 
-        numbers = (np.array(embedding).reshape(128,12))
-        df = pd.DataFrame(numbers, columns=("col %d" % i for i in range(12)))
-        st.write("Embedding:")
-        st.dataframe(df,use_container_width=True,height=500)
-        st.success(f"Vector Dimensions: {len(embedding)}")
+            numbers = (np.array(embedding).reshape(128,12))
+            df = pd.DataFrame(numbers, columns=("col %d" % i for i in range(12)))
+            st.write("Embedding:")
+            st.dataframe(df,use_container_width=True,height=500)
+            st.success(f"Vector Dimensions: {len(embedding)}")
         
         
 with code:
@@ -90,4 +93,5 @@ response_body = json.loads(response.get('body').read())
 embedding = response_body['embedding']
 print(embedding)
     """
+    st.subheader("Code")
     st.code(code_data, language="python")

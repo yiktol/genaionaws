@@ -53,9 +53,9 @@ bedrock = bedrock_runtime_client()
 embeddings = BedrockEmbeddings(model_id="amazon.titan-embed-text-v1", client=bedrock)
 
 
-modelId = "anthropic.claude-v2"
+modelId = "anthropic.claude-v2:1"
 llm = BedrockChat(model_id=modelId, client=bedrock)
-llm.model_kwargs = {'temperature': 0.1}
+llm.model_kwargs = {'max_tokens_to_sample':4096,'temperature': 0.1}
 
 @st.cache_data()
 def load_csv(data):

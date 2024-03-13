@@ -1,18 +1,18 @@
 
 import streamlit as st
 import pandas as pd
-from helpers import bedrock_runtime_client, set_page_config, classify, search, get_embedding
+import utils.helpers as helpers
 
-set_page_config()
-bedrock = bedrock_runtime_client()
+helpers.set_page_config()
+bedrock = helpers.bedrock_runtime_client()
 
-text, code = st.columns(2)
+text, code = st.columns([0.6, 0.4])
 
 with text:
 
     # st.title("Extract Action Items")
     st.header("Classification")
-    st.markdown("""Let’s assume that you have a collection of documents (the data set) and you would like to classify them into N classes (labels). Each class has a label name along with a short description. You can achieve this with the following steps:\n
+    st.markdown("""Let's assume that you have a collection of documents (the data set) and you would like to classify them into N classes (labels). Each class has a label name along with a short description. You can achieve this with the following steps:\n
 - Represent each class with the embedding of the label name and description.
 - For a given document, calculate the Euclidean distance between the document and all classes.
 - Classify the document into the class with the shortest distance.\n
@@ -37,18 +37,20 @@ Here is the sample code to classify students into athletics, musician, or magici
   
         
         if submit:         
-            for item in classes:
-                item['embedding'] = get_embedding(bedrock, item['description'])
-            # perform a classification
-            query = prompt[0]
-            v = get_embedding(bedrock, query)    
-                
-            result = classify(classes, v)
-            #print(result)
-            st.write("Answer:")
-            st.info(result[0])
-            df = pd.DataFrame({'Class':["class1","class2","class3"], 'Distance':result[1]})
-            st.table(df)
+            with st.spinner("Classifying..."):
+                for item in classes:
+                    item['embedding'] = helpers.get_embedding(bedrock, item['description'])
+                # perform a classification
+                query = prompt[0]
+                v = helpers.get_embedding(bedrock, query)    
+                    
+                result = helpers.classify(classes, v)
+                #print(result)
+                st.write("Answer:")
+                st.info(result[0])
+                df = pd.DataFrame({'Class':["class1","class2","class3"], 'Distance':result[1]})
+                st.subheader("Distance between :orange[Prompt] and :orange[Text]")
+                st.table(df)
 
     if Examples == "Example2":
         
@@ -64,18 +66,20 @@ Here is the sample code to classify students into athletics, musician, or magici
         ]
  
         if submit:      
-            for item in classes:
-                item['embedding'] = get_embedding(bedrock, item['description'])
-            # perform a classification
-            query = prompt[0]
-            v = get_embedding(bedrock, query)  
-                              
-            result = classify(classes, v)
-            #print(result)
-            st.write("Answer:")
-            st.info(result[0])
-            df = pd.DataFrame({'Class':["class1","class2"], 'Distance':result[1]})
-            st.table(df)
+            with st.spinner("Classifying..."):
+                for item in classes:
+                    item['embedding'] = helpers.get_embedding(bedrock, item['description'])
+                # perform a classification
+                query = prompt[0]
+                v = helpers.get_embedding(bedrock, query)  
+                                
+                result = helpers.classify(classes, v)
+                #print(result)
+                st.write("Answer:")
+                st.info(result[0])
+                df = pd.DataFrame({'Class':["class1","class2"], 'Distance':result[1]})
+                st.subheader("Distance between :orange[Prompt] and :orange[Text]")
+                st.table(df)
 
 with code:
 
@@ -127,7 +131,7 @@ v = get_embedding(bedrock, query)
 result = classify(classes, v)
 print(result)
         """
-
+    st.subheader("Code")
     st.code(code_data, language="python")
 
 

@@ -1,0 +1,31 @@
+import boto3
+import json
+
+bedrock_runtime = boto3.client(
+    service_name='bedrock-runtime',
+    region_name='us-east-1', 
+)
+
+body = json.dumps({
+    "prompt": """Human: {{prompt}}
+
+    Assistant:""",
+
+    "maxTokens": {{max_tokens}},
+    "temperature": {{temperature}},
+    "topP": {{top_p}},
+    "stopSequences": [],
+    "countPenalty": {"scale": 0},
+    "presencePenalty": {"scale": 0},
+    "frequencyPenalty": {"scale": 0}
+  })
+
+response = bedrock_runtime.invoke_model(
+    body=body, 
+    modelId='{{model}}', 
+    accept='application/json', 
+    contentType='application/json'
+    )
+
+response_body = json.loads(response.get('body').read())
+print(response_body.get('completions')[0].get('data').get('text'))

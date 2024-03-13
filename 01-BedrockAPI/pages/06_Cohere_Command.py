@@ -5,55 +5,21 @@ import utils.helpers as helpers
 
 set_page_config()
 
-def form_callback():
-    for key in st.session_state.keys():
-        del st.session_state[key]
-
-st.sidebar.button(label='Reset Session', on_click=form_callback)
+helpers.reset_session()
 
 bedrock_runtime = bedrock_runtime_client()
 
-dataset = helpers.load_jsonl('utils/cohere.jsonl')
+dataset = helpers.load_jsonl('data/cohere.jsonl')
 
 helpers.initsessionkeys(dataset[0])
 text, code = st.columns([0.6,0.4])
-
-xcode = f'''import boto3
-import json
-
-bedrock_runtime = boto3.client(
-    service_name='bedrock-runtime',
-    region_name='us-east-1', 
-)
-
-body = json.dumps({{
-        "prompt": "{st.session_state['prompt']}",
-        "max_tokens": {st.session_state['max_tokens']},
-        "temperature": {st.session_state['temperature']},
-        "p": {st.session_state['top_p']},
-        "k": {st.session_state['top_k']},
-        "stop_sequences": [],
-        "return_likelihoods": "NONE"
-    }})
-
-#Invoke the model
-response = bedrock_runtime.invoke_model(
-    body=body,
-    modelId='{st.session_state['model']}', 
-    accept='application/json', 
-    contentType='application/json')
-
-response_body = json.loads(response.get('body').read())
-print(response_body['generations'][0]['text'])
-'''
-
 
 with text:
     st.title('Cohere')
     st.write('Cohere models are text generation models for business use cases. Cohere models are trained on data that supports reliable business applications, like text generation, summarization, copywriting, dialogue, extraction, and question answering.')
 
     with st.expander("See Code"): 
-        st.code(xcode,language="python")
+        st.code(helpers.render_claude_code('command.jinja'),language="python")
         
     with st.form("myform"):
         prompt_data = st.text_area("Enter your prompt here:",

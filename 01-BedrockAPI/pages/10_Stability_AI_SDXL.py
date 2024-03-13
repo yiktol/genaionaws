@@ -1,5 +1,3 @@
-from botocore.config import Config
-from botocore.exceptions import ClientError
 import json
 from PIL import Image
 from io import BytesIO
@@ -8,66 +6,25 @@ import boto3
 import streamlit as st
 from utils import bedrock_runtime_client, set_page_config
 import utils.helpers as helpers
-import stability_sdk.interfaces.gooseai.generation.generation_pb2 as generation
 
 set_page_config()
 
-
-def form_callback():
-    for key in st.session_state.keys():
-        del st.session_state[key]
-
-
-st.sidebar.button(label='Reset Session', on_click=form_callback)
+helpers.reset_session()
 
 bedrock_runtime = bedrock_runtime_client()
 
-dataset = helpers.load_jsonl('utils/stabilityai.jsonl')
+dataset = helpers.load_jsonl('data/stabilityai.jsonl')
 
 helpers.initsessionkeys(dataset[0])
 
 text, code = st.columns([0.6, 0.4])
-
-xcode = f'''import json
-from PIL import Image
-from io import BytesIO
-import base64
-from base64 import b64encode
-from base64 import b64decode
-import boto3
-
-bedrock_runtime = boto3.client(
-    service_name='bedrock-runtime',
-    region_name='us-east-1', 
-)
-
-body = json.dumps({{"text_prompts":[{{"text":\"{st.session_state["prompt"]}\"}}],
-        "cfg_scale":{st.session_state['cfg_scale']},
-        "seed":{st.session_state['seed']},
-        "steps":{st.session_state['steps']}
-        }})
-
-response = bedrock_runtime.invoke_model(
-        body=body, 
-        modelId='{st.session_state["model"]}', 
-        accept='application/json', 
-        contentType='application/json'
-    )
-    
-response = json.loads(response.get('body').read())
-
-images = response.get('artifacts')
-image = Image.open(BytesIO(b64decode(images[0].get('base64'))))
-image.save("generated_image.png")
-'''
-
 
 with text:
     st.title("Stable Diffusion")
     st.write("Deep learning, text-to-image model used to generate detailed images conditioned on text descriptions, inpainting, outpainting, and generating image-to-image translations.")
 
     with st.expander("See Code"):
-        st.code(xcode, language="python")
+        st.code(helpers.render_stabilityai_code('sdxl.jinja'), language="python")
 
     # Define prompt and model parameters
     with st.form("myform"):

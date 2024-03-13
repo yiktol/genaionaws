@@ -2,71 +2,19 @@ import streamlit as st
 import utils.helpers as helpers
 from io import BytesIO
 from random import randint
-from utils import bedrock_runtime_client, set_page_config,titan_generic
+import utils as u
 
-set_page_config()
+u.set_page_config()
 
-def form_callback():
-    for key in st.session_state.keys():
-        del st.session_state[key]
+helpers.reset_session()
 
-st.sidebar.button(label='Reset Session', on_click=form_callback)
+bedrock_runtime = u.bedrock_runtime_client()
 
-bedrock_runtime = bedrock_runtime_client()
-
-dataset = helpers.load_jsonl('utils/titan_image.jsonl')
+dataset = helpers.load_jsonl('data/titan_image.jsonl')
 
 helpers.initsessionkeys(dataset[0])
 
 text, code = st.columns([0.6,0.4])
-
-
-xcode = """import json
-import boto3
-import base64
-from io import BytesIO
-from random import randint
-
-bedrock = boto3.client(
-    service_name='bedrock-runtime', 
-    region_name='us-east-1'
-    )
-
-prompt = "Blue backpack on a table."
-negative_prompt = ""
-
-body = { 
-    "taskType": "TEXT_IMAGE",
-    "textToImageParams": {
-        "text": prompt,
-    },
-    "imageGenerationConfig": {
-        "numberOfImages": 1,
-        "quality": "premium",
-        "height": 512,
-        "width": 512,
-        "cfgScale": 8.0,
-        "seed": randint(0, 100000), 
-    },
-}
-
-if negative_prompt:
-    body['textToImageParams']['negativeText'] = negative_prompt
-
-response = bedrock.invoke_model(
-    body=body, 
-    modelId="amazon.titan-image-generator-v1", 
-    contentType="application/json", 
-    accept="application/json")
-
-response = json.loads(response.get('body').read())
-
-images = response.get('images')
-
-image_data = base64.b64decode(images[0])
-
-image = BytesIO(image_data)
-"""
 
 
 with text:
@@ -78,13 +26,13 @@ Users can edit an image with a text prompt (without a mask) or parts of an image
 It can also generate variations of an image.""")
 
     with st.expander("See Code"):
-        st.code(xcode,language="python")
+        st.code(helpers.render_titan_image_code('titan_image.jinja'),language="python")
     
     st.subheader("Image parameters")
     
     with st.form("form1"):
-        prompt_text = st.text_area("What you want to see in the image:",  height = st.session_state['ta_height'], key = "prompt", help="The prompt text")
-        negative_prompt = st.text_area("What shoud not be in the image:", height = st.session_state['ta_height'], key="negative_prompt", help="The negative prompt")
+        prompt_text = st.text_area("What you want to see in the image:",  height = st.session_state['prompt_height'], key = "prompt", help="The prompt text")
+        negative_prompt = st.text_area("What shoud not be in the image:", height = st.session_state['n_prompt_height'], key="negative_prompt", help="The negative prompt")
         generate_button = st.form_submit_button("Generate", type="primary")
 
     if generate_button:
@@ -92,14 +40,14 @@ It can also generate variations of an image.""")
         st.subheader("Result")
         with st.spinner("Drawing..."):
             generated_image = helpers.get_image_from_model(
-                prompt_content=prompt_text, 
-                negative_prompt=negative_prompt,
+                prompt_content = prompt_text, 
+                negative_prompt = negative_prompt,
                 numberOfImages = st.session_state['numberOfImages'],
                 quality = st.session_state['quality'], 
                 height = st.session_state['height'], 
-                width=st.session_state['width'], 
+                width = st.session_state['width'], 
                 cfgScale = st.session_state['cfg_scale'], 
-                seed= randint(0, 100000)
+                seed = st.session_state['seed']
             )
         st.image(generated_image)
 

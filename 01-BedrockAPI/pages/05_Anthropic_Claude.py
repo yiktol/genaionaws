@@ -3,50 +3,18 @@ import json
 import streamlit as st
 from utils import claude_generic, set_page_config, bedrock_runtime_client
 import utils.helpers as helpers
+
 set_page_config()
 
-def form_callback():
-    for key in st.session_state.keys():
-        del st.session_state[key]
+helpers.reset_session()
 
-st.sidebar.button(label='Reset Session', on_click=form_callback)
-
-#Create the connection to Bedrock
 bedrock_runtime = bedrock_runtime_client()
 
-dataset = helpers.load_jsonl('utils/anthropic.jsonl')
-# print(type(dataset[0].keys()))
+dataset = helpers.load_jsonl('data/anthropic.jsonl')
 
 helpers.initsessionkeys(dataset[0])
 text, code = st.columns([0.6,0.4])
 
-xcode = f'''import boto3
-import json
-
-bedrock_runtime = boto3.client(
-    service_name='bedrock-runtime',
-    region_name='us-east-1',    
-)
-
-body = json.dumps({{"prompt": \"{st.session_state['prompt']}\",
-        "max_tokens_to_sample": {st.session_state['max_tokens']}, 
-        "temperature": {st.session_state['temperature']},
-        "top_k": {st.session_state['top_k']},
-        "top_p": {st.session_state['top_p']},
-        "stop_sequences": ["\\n\\nHuman:"],
-        "anthropic_version": "bedrock-2023-05-31"
-        }})
-
-#Invoke the model
-response = bedrock_runtime.invoke_model(
-    body=body,
-    modelId='{st.session_state['model']}', 
-    accept='application/json', 
-    contentType='application/json')
-
-response_body = json.loads(response.get('body').read())
-print(response_body.get('completion'))
-'''
 
 with text:
     st.title("Anthropic")
@@ -57,7 +25,7 @@ with text:
             Claude can also take direction on personality, tone, and behavior.""")
 
     with st.expander("See Code"): 
-        st.code(xcode,language="python")
+        st.code(helpers.render_claude_code('claude.jinja'),language="python")
 
     modelId = st.session_state['model']
     accept = 'application/json'
