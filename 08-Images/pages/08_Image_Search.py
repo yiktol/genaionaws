@@ -8,10 +8,12 @@ set_page_config()
 st.title("Image Search") #page title
 
 
+if "is_index_available" not in st.session_state:
+    st.session_state.is_index_available = False
 if 'vector_index' not in st.session_state: #see if the vector index hasn't been created yet
-    with st.spinner("Indexing images..."): #show a spinner while the code in this with block runs
-        st.session_state.vector_index = glib.get_index() #retrieve the index through the supporting library and store in the app's session cache
-
+    st.session_state.vector_index = st.empty()
+    
+    
 
 search_images_tab, find_similar_images_tab = st.tabs(["Image search", "Find similar images"])
 
@@ -53,15 +55,37 @@ with search_images_tab:
         with st.form("search_form"): #create a form with a unique name (search_form)
             input_text = st.text_input("Search for:", key="query") #display a multiline text box with no label
             search_button = st.form_submit_button("Search", type="primary") #display a primary button
+            
+        s_col1, s_col2, s_col3 = search_col_1.columns(3)
+        
+        start_index = s_col1.button("Generate Index")
+        if start_index:
+            if not st.session_state.is_index_available:
+                with st.spinner("Indexing images..."): #show a spinner while the code in this with block runs
+                    st.session_state.vector_index = glib.get_index() #retrieve the index through the supporting library and store in the app's session cache
+                    st.session_state.is_index_available = True #indicate that the index is now available for use
+                    st.success("Index is now available, you may start to search.")
+            else:
+                st.info("Index already available, you may start to search.")
+                
+        clear_index = s_col2.button("Clear Index")
+        if clear_index:
+            st.session_state.vector_index = st.empty()
+            st.session_state.is_index_available = False
+            st.info("Index cleared.")
+                
         
     with search_col_2:
         if search_button: #code in this if block will be run when the button is clicked
             st.subheader("Results")
-            with st.spinner("Searching..."): #show a spinner while the code in this with block runs
-                response_content = glib.get_similarity_search_results(index=st.session_state.vector_index, search_term=input_text)
-                
-                for res in response_content:
-                    st.image(res, width=250)
+            if not st.session_state.is_index_available:
+                st.warning("Please generate an index first.")
+            else:
+                with st.spinner("Searching..."): #show a spinner while the code in this with block runs
+                    response_content = glib.get_similarity_search_results(index=st.session_state.vector_index, search_term=input_text)
+                    
+                    for res in response_content:
+                        st.image(res, width=250)
 
 
 with find_similar_images_tab:

@@ -1,6 +1,6 @@
 import streamlit as st
 import boto3
-from helpers import set_page_config, bedrock_runtime_client
+from utils.helpers import set_page_config, bedrock_runtime_client
 from langchain_community.llms import Bedrock
 from langchain_community.chat_models import BedrockChat
 from langchain.memory import ConversationBufferMemory
@@ -56,7 +56,6 @@ container = st.container(border=True)
 container.write(":orange[Template]")
 container.markdown(template)
 
-
 def form_callback():
 	st.session_state.messages = []
 	st.session_state.memory.clear()
@@ -64,6 +63,11 @@ def form_callback():
 
 st.sidebar.button(label='Clear Chat History', on_click=form_callback)
 
+def reset_session():
+    for key in st.session_state.keys():
+        del st.session_state[key]
+        
+st.sidebar.button(label='Reset Session', on_click=reset_session)
 
 # Initialize chat history
 if "messages" not in st.session_state.keys():

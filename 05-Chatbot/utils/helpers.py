@@ -1,7 +1,5 @@
-import json
 import boto3
-from datetime import datetime
-from langchain.prompts import PromptTemplate
+
 
 #Create the connection to Bedrock
 bedrock = boto3.client(

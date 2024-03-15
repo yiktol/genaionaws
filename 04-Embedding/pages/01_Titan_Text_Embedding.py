@@ -22,7 +22,7 @@ content_type = 'application/json'
 
 with text:
 
-    st.header("Vertorize using Titan Embedding Model")
+    st.header("Titan Text Embedding")
     st.write("""The new Titan Embeddings G1 - Text v1.2 can intake up to 8k tokens and outputs a vector of 1536 dimensions.\
     The model also works in 25+ different languages. The model is optimized for text retrieval tasks but can also perform\
     additional tasks such as semantic similarity and clustering. \

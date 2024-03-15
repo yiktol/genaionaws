@@ -1,6 +1,5 @@
 import streamlit as st
-import boto3
-from helpers import set_page_config, bedrock_runtime_client
+from utils.helpers import set_page_config, bedrock_runtime_client
 from langchain.chains import LLMChain
 from langchain_community.chat_models import BedrockChat
 from langchain.memory import ConversationBufferMemory
@@ -13,6 +12,26 @@ from langchain.prompts import (
 
 
 set_page_config()
+
+def reset_session():
+    for key in st.session_state.keys():
+        del st.session_state[key]
+        
+st.sidebar.button(label='Reset Session', on_click=reset_session)
+
+def form_callback():
+    st.session_state.messages = []
+    st.session_state.memory.clear()
+    del st.session_state.memory
+
+st.sidebar.button(label='Clear Chat Messages', on_click=form_callback)
+
+if "messages" not in st.session_state:
+    st.session_state.messages = [{"role": "AI", "content": "How may I assist you today?"}]
+
+if "memory" not in st.session_state:
+     st.session_state.memory = ConversationBufferMemory(memory_key="history", return_messages=True)
+
 
 st.title("Chatbot with Persona")
 st.write("AI assistant will play the role of a career coach. Role Play Dialogue requires user message to be set in before starting the chat. ConversationBufferMemory is used to pre-populate the dialog.")
@@ -27,9 +46,6 @@ with st.form(key ='Form1'):
     ai_message= st.text_input(':orange[AI Message:]', value='I am career coach and give career advice.')
     submitted = st.form_submit_button(label = 'Set Persona', type='primary') 
             
-if "memory" not in st.session_state:
-     st.session_state.memory = ConversationBufferMemory(memory_key="history", return_messages=True)
-
 
 prompt_template = ChatPromptTemplate.from_messages(
     [
@@ -53,16 +69,9 @@ chat_llm_chain = LLMChain(
     memory=st.session_state.memory,
 )
 
-def form_callback():
-    st.session_state.messages = []
-    st.session_state.memory.clear()
-    del st.session_state.memory
 
-st.sidebar.button(label='Clear Chat Messages', on_click=form_callback)
 
 # Initialize chat history
-if "messages" not in st.session_state:
-    st.session_state.messages = []
 
 # Display chat messages from history on app rerun
 for message in st.session_state.messages:

@@ -1,10 +1,26 @@
 import streamlit as st
-import json
+import json,jsonlines
 import boto3
 import math
 import numpy as np
 from numpy import dot
 from numpy.linalg import norm
+
+
+
+def reset_session():
+    for key in st.session_state.keys():
+        del st.session_state[key]
+
+
+    # st.sidebar.button(label='Reset Session', on_click=form_callback)
+
+def load_jsonl(file_path):
+    d = []
+    with jsonlines.open(file_path) as reader:
+        for obj in reader:
+            d.append(obj)
+    return d
 
 def get_embedding(bedrock, text):
     modelId = 'amazon.titan-embed-text-v1'
