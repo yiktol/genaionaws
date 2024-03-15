@@ -17,13 +17,17 @@ bedrock_runtime = helpers.bedrock_runtime_client()
 
 if "multimodal_embeddings" not in st.session_state:
     st.session_state.multimodal_embeddings = []
+    
+if "distance" not in st.session_state:
+    st.session_state.distance = np.array([])
+    
 if "is_multimodal_embeddings" not in st.session_state:
     st.session_state.is_multimodal_embeddings = False
 
 text, code = st.columns([0.6, 0.4])
 
 dataset = helpers.load_jsonl('data/metadata.jsonl')
-
+sttable = {}
 
 products = []
 for i in range(len(dataset)):
@@ -59,7 +63,7 @@ def display_embeddings(embedding):
     df = pd.DataFrame(numbers, columns=("col %d" % i for i in range(32)))
     return df
 
-    
+
 with text:
     st.header("Multimodal Embedding and Searching")
     st.write("""Amazon Titan Multimodal Embedding Models can be used for enterprise tasks such as image search and similarity based recommendation, and has built-in mitigation that helps reduce bias in searching results. \
@@ -80,16 +84,21 @@ There are multiple embedding dimension sizes for best latency/accuracy tradeoffs
             with st.expander("See Text Embedding"):
                 st.dataframe(display_embeddings(text_embedding),use_container_width=True,height=500)
             st.write("Result")
-            idx_returned = titan_multimodal.multimodal_search(
+            idx_returned, distance = titan_multimodal.multimodal_search(
                 description=prompt_data,
                 multimodal_embeddings=st.session_state.multimodal_embeddings,
                 top_k=k)
             for idx in idx_returned[:]:
                 st.image(Image.open(f"{dataset[idx]['file_name']}"))
+            
+            sttable = {"Product Name":"Distance"}
+            distance_list = np.array(distance).tolist()
+            for product in products:
+                sttable[product] = distance_list[0][products.index(product)] 
+            
 
     
 with code:
-               
        
     with st.container(border=True):       
         col1, col2 = code.columns(2)
@@ -112,4 +121,5 @@ with code:
         else:
             generate_embeddings()
     
-    
+    if sttable:
+        code.dataframe(sttable, use_container_width=True, height=500) 

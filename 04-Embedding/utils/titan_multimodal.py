@@ -8,6 +8,7 @@ import seaborn as sns
 from PIL import Image
 from io import BytesIO
 from scipy.spatial.distance import cdist
+import pandas as pd
 
 
 boto3_session = boto3.session.Session()
@@ -105,16 +106,17 @@ def plot_similarity_heatmap(embeddings_a, embeddings_b):
 
 def search(query_emb:np.array, indexes:np.array, top_k:int=1):
     dist = cdist(query_emb, indexes, metric="cosine")
-    return dist.argsort(axis=-1)[0,:top_k], np.sort(dist, axis=-1)[:top_k]
+    df = dist
+    return dist.argsort(axis=-1)[0,:top_k], np.sort(dist, axis=-1)[:top_k],df
 
 def multimodal_search(description:str,multimodal_embeddings:np.array,top_k:int,dimension:int=1024):
     query_emb = embedding(description=description, dimension=dimension)["embedding"]
 
-    idx_returned, dist = search(
+    idx_returned, dist, df = search(
         np.array(query_emb)[None], 
         np.array(multimodal_embeddings),
         top_k=top_k,
     )
     
-    return idx_returned
+    return idx_returned,df
 
