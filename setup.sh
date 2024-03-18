@@ -27,6 +27,15 @@ streamlit run Home.py --server.port 8087 &
 cd /home/ubuntu/environment/genaionaws/09-Antropic
 streamlit run Home.py --server.port 8088 &
 
+cd /home/ubuntu/environment/genaionaws/10-Fine_Tuning
+streamlit run Home.py --server.port 8089 &
+
+cd /home/ubuntu/environment/genaionaws/11-Agents
+streamlit run Home.py --server.port 8090 &
+
+cd /home/ubuntu/environment/genaionaws/12-Risk_and_Misuse
+streamlit run Home.py --server.port 8091 &
+
 chown ubuntu:root /home/ubuntu/environment -R
 
 git config --global --add safe.directory /home/ubuntu/environment/genaionaws
