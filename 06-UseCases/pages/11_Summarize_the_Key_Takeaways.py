@@ -1,13 +1,13 @@
 
 import streamlit as st
 import textwrap
-from helpers import bedrock_runtime_client, set_page_config, invoke_model
+from helpers import bedrock_runtime_client, set_page_config, invoke_model, getmodelId
 
 
 set_page_config()
 
 
-text, code = st.columns(2)
+text, code = st.columns([0.6,0.4])
 
 modelId = 'meta.llama2-13b-chat-v1'
 prompt = """The seeds of a machine learning (ML) paradigm shift have existed for decades, but with the ready availability of scalable compute capacity, a massive proliferation of data, and the rapid advancement of ML technologies, customers across industries are transforming their businesses. \
@@ -26,13 +26,14 @@ That's why today I'm excited to announce several new innovations that will make 
 Summarize the above text into three key takeaways. """
 
 with code:
-    
+    with st.container(border=True):
+        provider = st.selectbox('Provider',('Amazon','Anthropic','AI21','Cohere','Meta'))
+        model_id=st.text_input('model_id',getmodelId(provider))
+        
     with st.form(key ='form2'):
-        # provider = st.text_input('Provider', modelId.split('.')[0],disabled=True)
-        # model_id=st.text_input('model_id',modelId,disabled=True)
-        temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.0, step = 0.1)
+        temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.1, step = 0.1)
         top_p=st.slider('top_p',min_value = 0.0, max_value = 1.0, value = 1.0, step = 0.1)
-        max_gen_len=st.number_input('max_gen_len',min_value = 50, max_value = 2048, value = 512, step = 1)
+        max_gen_len=st.number_input('max_gen_len',min_value = 50, max_value = 2048, value = 1024, step = 1)
         submitted1 = st.form_submit_button(label = 'Tune Parameters')        
         
     code_data = f"""import json
@@ -67,8 +68,8 @@ results = response_body['generation']
 print(results)
 """        
     
-    st.code(code_data, language="python")
-
+    with st.expander("Show Code"):
+        st.code(code_data, language="python")
 
 
 
@@ -82,13 +83,14 @@ with text:
         submit = st.form_submit_button("Summarize",type='primary')
         
     if submit:
-        output = invoke_model(client=bedrock_runtime_client(), prompt=prompt, model=modelId,
-                             temperature=temperature,
-                             top_p=top_p,
-                             max_tokens=max_gen_len
-                             )
-        st.write("Answer:")
-        st.info(output)
-    
+        with st.spinner("Thinking..."):
+            output = invoke_model(client=bedrock_runtime_client(), prompt=prompt, model=model_id,
+                                temperature=temperature,
+                                top_p=top_p,
+                                max_tokens=max_gen_len
+                                )
+            st.write("Answer:")
+            st.info(output)
+        
 
 

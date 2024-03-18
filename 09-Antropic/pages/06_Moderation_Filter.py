@@ -8,7 +8,7 @@ bedrock_runtime = bedrock_runtime_client()
 
 with st.sidebar:
     with st.form(key ='Form1'):
-        model = st.text_input('model', 'anthropic.claude-3-sonnet-20240229-v1:0', disabled=True)
+        model = st.text_input('model', 'anthropic.claude-3-haiku-20240307-v1:0', disabled=True)
         temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.5, step = 0.1)
         top_k=st.slider('top_k',min_value = 0, max_value = 300, value = 250, step = 1)
         top_p=st.slider('top_p',min_value = 0.0, max_value = 1.0, value = 0.9, step = 0.1)

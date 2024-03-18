@@ -49,7 +49,7 @@ def generate_embeddings():
         st.session_state.multimodal_embeddings = multimodal_embeddings
         st.session_state.is_multimodal_embeddings =  True
     st.success("Embeddings Generated!, you may now search.")
-    time.sleep(5)
+    time.sleep(3)
     st.rerun()
     
 def display_embeddings_by_index(idx):
@@ -89,7 +89,7 @@ There are multiple embedding dimension sizes for best latency/accuracy tradeoffs
                 multimodal_embeddings=st.session_state.multimodal_embeddings,
                 top_k=k)
             for idx in idx_returned[:]:
-                st.image(Image.open(f"{dataset[idx]['file_name']}"))
+                st.image(Image.open(f"{dataset[idx]['file_name']}"),caption=products[idx])
             
             sttable = {"Product Name":"Distance"}
             distance_list = np.array(distance).tolist()
@@ -122,4 +122,5 @@ with code:
             generate_embeddings()
     
     if sttable:
-        code.dataframe(sttable, use_container_width=True, height=500) 
+        with st.expander("Cosine Distance:"):
+            st.dataframe(sttable, use_container_width=True, height=500) 

@@ -44,4 +44,5 @@ with row1_col1.form("myform"):
     topic_text = st.text_input("Enter a topic:", value="Generative AI")
     submitted = st.form_submit_button("Submit")
 if topic_text and submitted:
-    blog_outline(topic_text)
+    with st.spinner("Thinking..."):
+        blog_outline(topic_text)

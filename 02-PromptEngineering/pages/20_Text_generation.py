@@ -1,10 +1,10 @@
 import streamlit as st
 from langchain_community.llms import Bedrock
 from langchain.prompts import PromptTemplate
-from helpers import getmodelId, getmodelparams, set_page_config, bedrock_runtime_client
+import utils.helpers as helpers
 
-set_page_config()
-bedrock_runtime = bedrock_runtime_client()
+helpers.set_page_config()
+bedrock_runtime = helpers.bedrock_runtime_client()
 
 def form_callback():
     for key in st.session_state.keys():
@@ -79,11 +79,11 @@ def load_options(item_num,prompt_query):
 row1_col1.markdown(st.session_state.desc)
 with row1_col2:
     with st.container(border=True):
-        provider = st.text_input('Provider',st.session_state.provider )
-        model_id=st.text_input('model_id',getmodelId(st.session_state.provider))
+        provider = st.selectbox('Provider',['Amazon','Anthropic','AI21','Cohere','Meta'])
+        model_id=st.text_input('model_id',helpers.getmodelId(provider))
     
 def call_llm():
-    llm = Bedrock(model_id=model_id,client=bedrock_runtime,model_kwargs=getmodelparams(provider))
+    llm = Bedrock(model_id=model_id,client=bedrock_runtime,model_kwargs=helpers.getmodelparams(provider))
     response = llm.invoke(st.session_state.prompt_query)
     # Print results
     return st.info(response)

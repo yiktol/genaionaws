@@ -6,6 +6,24 @@ import numpy as np
 from numpy import dot
 from numpy.linalg import norm
 
+
+def claude_generic(input_prompt):
+    prompt = f"""Human: {input_prompt}\n\nAssistant:"""
+    return prompt
+
+def titan_generic(input_prompt):
+    prompt = f"""User: {input_prompt}\n\nAssistant:"""
+    return prompt
+
+def llama2_generic(input_prompt, system_prompt):
+    prompt = f"""<s>[INST] <<SYS>>
+    {system_prompt}
+    <</SYS>>
+
+    {input_prompt} [/INST]
+    """
+    return prompt
+
 def get_embedding(bedrock, text):
     modelId = 'amazon.titan-embed-text-v1'
     accept = 'application/json'
@@ -174,7 +192,7 @@ def invoke_model(client, prompt, model,
     # InvokeModel
     if (provider == 'anthropic'): 
         input = {
-            'prompt': prompt,
+            'prompt': claude_generic(prompt),
             'max_tokens_to_sample': max_tokens, 
             'temperature': temperature,
             'top_k': top_k,

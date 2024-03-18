@@ -67,10 +67,12 @@ if input_text: #run the code in this if block after the user submits a chat mess
         with st.chat_message("assistant"): #display a bot chat message
             st.warning("Please index a document first!")
     else:
-        with st.spinner("Thinking..."):
-            chat_response = glib.get_rag_chat_response(input_text=input_text, memory=st.session_state.memory, index=st.session_state.vector_index,) #call the model through the supporting library
+        
+        chat_response = glib.get_rag_chat_response(input_text=input_text, memory=st.session_state.memory, index=st.session_state.vector_index,) #call the model through the supporting library
+        
+        with st.chat_message("assistant"): #display a bot chat message
             
-            with st.chat_message("assistant"): #display a bot chat message
+            with st.spinner("Thinking..."):
                 st.markdown(chat_response) #display bot's latest response
             
             st.session_state.chat_history.append({"role":"assistant", "text":chat_response}) #append the bot's latest message to the chat history

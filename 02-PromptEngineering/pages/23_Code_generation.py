@@ -1,9 +1,9 @@
 import streamlit as st
 from langchain_community.llms import Bedrock
 from langchain.prompts import PromptTemplate
-from helpers import getmodelId, getmodelparams, set_page_config, bedrock_runtime_client
+import utils.helpers as helpers
 
-set_page_config()
+helpers.set_page_config()
 
 def form_callback():
     for key in st.session_state.keys():
@@ -23,10 +23,10 @@ The prompt describes the task or function and programming language for the code 
 '''
 
 row1_col1.markdown(t)
-with row1_col2.form(key ='Form1'):
-        provider = st.selectbox('Provider',('Amazon','AI21'))
-        model_id=st.text_input('model_id',getmodelId(provider))
-        submitted1 = st.form_submit_button(label = 'Set Parameters') 
+with row1_col2:
+    with st.container(border=True):
+        provider = st.selectbox('Provider',['Amazon','Anthropic','AI21','Cohere','Meta'])
+        model_id=st.text_input('model_id',helpers.getmodelId(provider))
 
 st.write(":orange[Template:]")
 template = '''
@@ -35,14 +35,14 @@ Write a function in {programming_language} to {task_description}
 st.code(template, language='None')
 
 #Create the connection to Bedrock
-bedrock_runtime = bedrock_runtime_client()
+bedrock_runtime = helpers.bedrock_runtime_client()
 
 def call_llm(task,language):
     # Instantiate LLM model
     llm = Bedrock(
     model_id=model_id,
     client=bedrock_runtime,
-    model_kwargs=getmodelparams(provider)
+    model_kwargs=helpers.getmodelparams(provider)
     )
     # Prompt
     
@@ -65,7 +65,7 @@ with st.form("myform"):
                             value = (f"Write a function in {language} to {task}."))        
         
         
-    submitted = st.form_submit_button("Submit")
+    submitted = st.form_submit_button("Submit",type="primary")
     
 if  text_prompt and submitted:
     call_llm(task,language)

@@ -13,7 +13,7 @@ row1_col1.title("✈️ Travel Itinerary Generator")
 with row1_col2.form(key ='Form1'):
         provider = st.selectbox('Provider',('Anthropic','AI21'),disabled=True)
         model_id=st.text_input('model_id',getmodelId(provider))
-        temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.5, step = 0.1)
+        temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.1, step = 0.1)
         top_k=st.slider('top_k',min_value = 0, max_value = 300, value = 250, step = 1)
         top_p=st.slider('top_p',min_value = 0.0, max_value = 1.0, value = 0.9, step = 0.1)
         max_tokens_to_sample=st.slider('max_tokens_to_sample',min_value = 50, max_value = 4096, value = 4096, step = 1)
@@ -65,9 +65,11 @@ with row1_col1.form("myform"):
     
     
 if numdays and city and submitted and check:
-    timing = 'Add timing and duration'
-    itinerary(numdays, city, timing)
+    with st.spinner("Thinking..."):
+        timing = 'Add timing and duration'
+        itinerary(numdays, city, timing)
 if numdays and city and submitted and not check:
-    timing = ''
-    itinerary(numdays, city, timing=timing)
+    with st.spinner("Thinking..."):
+        timing = ''
+        itinerary(numdays, city, timing=timing)
     
