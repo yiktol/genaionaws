@@ -6,10 +6,10 @@ bedrock_runtime = boto3.client(
     region_name='us-west-2', 
 )
 
-prompt = "{{prompt}}"
+prompt = """{{prompt}}"""
 
 body = json.dumps({
-    'prompt': f"<s>[INST] {prompt} [/INST]</s>",
+    'prompt': prompt,
     'max_tokens': {{max_tokens}}, 
     'top_p': {{top_p}},
     'temperature': {{temperature}},

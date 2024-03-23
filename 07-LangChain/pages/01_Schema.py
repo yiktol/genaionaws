@@ -54,7 +54,7 @@ with st.form("form2"):
     ]
     if submit2:
         response = chat.invoke(messages)
-        print(response)
+        # print(response)
         st.write("Answer:")
         st.info(f"{response.content}")
     

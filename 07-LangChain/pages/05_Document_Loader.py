@@ -1,7 +1,7 @@
 import streamlit as st
 from langchain.document_loaders.csv_loader import CSVLoader
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
-from pypdf import PdfReader, PdfWriter
+import utils.loader as docloader
 from urllib.request import urlretrieve
 import boto3
 
@@ -44,7 +44,7 @@ with st.form("form3"):
         with open(temp_file, "wb") as file:
             file.write(uploaded_file.getvalue())
             file_name = uploaded_file.name
-        documents = txt_loader(temp_file)
+        documents = docloader.txt_loader(temp_file)
         st.write(documents)
 
 st.subheader(":orange[CSV]")
@@ -79,7 +79,7 @@ with st.form("form1"):
         with open(temp_file, "wb") as file:
             file.write(uploaded_file.getvalue())
             file_name = uploaded_file.name
-        documents = csv_loader(temp_file)
+        documents = docloader.csv_loader(temp_file)
         st.write(documents)
 
 
@@ -114,7 +114,6 @@ with st.form("form2"):
         with open(temp_file, "wb") as file:
             file.write(uploaded_file.getvalue())
             file_name = uploaded_file.name
-        documents = pdf_loader(temp_file)
+        documents = docloader.pdf_loader(temp_file)
         st.write(documents)
-
 

@@ -6,14 +6,16 @@ bedrock_runtime = boto3.client(
     region_name='us-east-1', 
 )
 
+prompt = """{{prompt}}"""
+
 body = json.dumps({
-        "prompt": "{{prompt}}",
+        "prompt": prompt,
         "max_tokens": {{max_tokens}}, 
         "temperature": {{temperature}},
-        "p": {{top_p}},
-        "k": {{top_k}},
-        "stop_sequences": [],
-        "return_likelihoods": "NONE"
+        "p": {{p}},
+        "k": {{k}},
+        "stop_sequences": [{{stop_sequences}}],
+        "return_likelihoods": "{{return_likelihoods}}"
     })
 
 #Invoke the model

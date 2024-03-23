@@ -1,18 +1,21 @@
-import boto3
-import json
 import streamlit as st
-from utils import claude_generic, set_page_config, bedrock_runtime_client
-import utils.helpers as helpers
+import utils.bedrock as bedrock
+import utils.stlib as stlib
+import utils.claude2 as claude2
 
-set_page_config()
+stlib.set_page_config()
 
-helpers.reset_session()
+suffix = 'claude2'
+if suffix not in st.session_state:
+    st.session_state[suffix] = {}
 
-bedrock_runtime = bedrock_runtime_client()
+stlib.reset_session()
 
-dataset = helpers.load_jsonl('data/anthropic.jsonl')
+dataset = claude2.load_jsonl('data/anthropic.jsonl')
 
-helpers.initsessionkeys(dataset[0])
+stlib.initsessionkeys(dataset[0],suffix)
+stlib.initsessionkeys(claude2.params,suffix)
+
 text, code = st.columns([0.6,0.4])
 
 
@@ -25,11 +28,7 @@ with text:
             Claude can also take direction on personality, tone, and behavior.""")
 
     with st.expander("See Code"): 
-        st.code(helpers.render_claude_code('claude.jinja'),language="python")
-
-    modelId = st.session_state['model']
-    accept = 'application/json'
-    contentType = 'application/json'
+        st.code(claude2.render_claude_code('claude.jinja',suffix),language="python")
 
     # Define prompt and model parameters
     prompt_input = "Write a python code that list all countries."
@@ -37,26 +36,27 @@ with text:
     with st.form("myform"):
         prompt_data = st.text_area(
             "Enter your prompt here:",
-            height = st.session_state['height'],
-            value = st.session_state["prompt"]
+            height = st.session_state[suffix]['height'],
+            value = st.session_state[suffix]["prompt"]
         )
         submit = st.form_submit_button("Submit", type='primary')
         
     if prompt_data and submit:
         with st.spinner("Generating..."):
-            response = helpers.invoke_model(bedrock_runtime, claude_generic(prompt_data), st.session_state['model'], 
-                                            max_tokens  = st.session_state['max_tokens'], 
-                                            temperature = st.session_state['temperature'], 
-                                            top_p = st.session_state['top_p'],
-                                            top_k = st.session_state['top_k'])
+            response = claude2.invoke_model(client=bedrock.runtime_client(), 
+                                            prompt=prompt_data,
+                                            model=st.session_state[suffix]['model'], 
+                                            max_tokens_to_sample  = st.session_state[suffix]['max_tokens_to_sample'], 
+                                            temperature = st.session_state[suffix]['temperature'], 
+                                            top_p = st.session_state[suffix]['top_p'],
+                                            top_k = st.session_state[suffix]['top_k'])
 
             st.write("### Answer")
             st.info(response)
 
 with code:
 
-    helpers.tune_parameters('Anthropic',index=6)
+    claude2.tune_parameters('Anthropic',suffix,index=6)
     st.subheader('Prompt Examples:')   
-    container2 = st.container(border=True) 
-    with container2:
-        helpers.create_tabs(dataset)
+    with st.container(border=True):
+        stlib.create_tabs(dataset,suffix)

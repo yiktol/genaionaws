@@ -1,10 +1,11 @@
 
 import streamlit as st
 import textwrap
-from helpers import bedrock_runtime_client, set_page_config, invoke_model,getmodelId
+import helpers as helpers
+import utils.streamlit_lib as streamlit_lib
 
 
-set_page_config()
+helpers.set_page_config()
 
 
 text, code = st.columns([0.6,0.4])
@@ -27,17 +28,20 @@ From the meeting transcript above, Create a list of action items for each person
 
 
 with code:
-    with st.container(border=True):
-        provider = st.selectbox('Provider',('Amazon','Anthropic','AI21','Cohere','Meta'))
-        model_id=st.text_input('model_id',getmodelId(provider))
+    temperature, top_p, max_tokens_to_sample, model_id, submitted1, provider = streamlit_lib.tune_parameters()
+    
+    # with st.container(border=True):
+    #     provider = st.selectbox('Provider',('Amazon','Anthropic','AI21','Cohere','Meta','Mistral'))
+    #     models = helpers.getmodelIds(provider)
+    #     model_id=st.selectbox('model_id',models, index=models.index(helpers.getmodelId(provider)))
 
-    with st.form(key ='form2'):
-        temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.0, step = 0.1)
-        top_p=st.slider('topP',min_value = 0.0, max_value = 1.0, value = 1.0, step = 0.1)
-        max_tokens_to_sample=st.number_input('maxTokenCount',min_value = 50, max_value = 4096, value = 2048, step = 1)
-        submitted1 = st.form_submit_button(label = 'Tune Parameters') 
+    # with st.form(key ='form2'):
+    #     temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.1, step = 0.1)
+    #     top_p=st.slider('topP',min_value = 0.0, max_value = 1.0, value = 0.9, step = 0.1)
+    #     max_tokens_to_sample=st.number_input('maxTokenCount',min_value = 50, max_value = 4096, value = 2048, step = 1)
+    #     submitted1 = st.form_submit_button(label = 'Tune Parameters') 
 
-        code_data = f"""import json
+    code_data = f"""import json
 import boto3
 
 bedrock = boto3.client(
@@ -91,8 +95,8 @@ with text:
         
     if submit:
         with st.spinner("Thinking..."):
-            output = invoke_model(
-                client=bedrock_runtime_client(), 
+            output = helpers.invoke_model(
+                client=helpers.bedrock_runtime_client(), 
                 prompt=prompt, 
                 model=model_id,
                 temperature=temperature,

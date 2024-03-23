@@ -1,17 +1,23 @@
 import json
-from utils import set_page_config, bedrock_runtime_client, mistral_generic
-import utils.helpers as helpers
+import utils.bedrock as bedrock
+import utils.stlib as stlib
+import utils.mistral as mistral
 import streamlit as st
 
-set_page_config()
+stlib.set_page_config()
 
-helpers.reset_session()
+suffix = 'mistral'
+if suffix not in st.session_state:
+    st.session_state[suffix] = {}
 
-bedrock_runtime = bedrock_runtime_client(region='us-east-1')
+stlib.reset_session()
 
-dataset = helpers.load_jsonl('data/mistral.jsonl')
+bedrock_runtime = bedrock.runtime_client(region='us-east-1')
 
-helpers.initsessionkeys(dataset[0])
+dataset = mistral.load_jsonl('data/mistral.jsonl')
+
+stlib.initsessionkeys(dataset[0],suffix)
+stlib.initsessionkeys(mistral.params,suffix)
 
 text, code = st.columns([0.6,0.4])
 
@@ -23,46 +29,35 @@ with text:
                 """)
 
     with st.expander("See Code"):
-        st.code(helpers.render_mistral_code('instruct.jinja'),language="python")
+        st.code(mistral.render_mistral_code('instruct.jinja',suffix),language="python")
 
     # Define prompt and model parameters
     with st.form("myform"):
         prompt_data = st.text_area(
             "Enter your prompt here:",
-            height = st.session_state['height'],
-            value = st.session_state["prompt"]
+            height = st.session_state[suffix]['height'],
+            value = st.session_state[suffix]["prompt"]
         )
         submit = st.form_submit_button("Submit", type='primary')
 
-    model_id = st.session_state['model']
-    accept = 'application/json' 
-    content_type = 'application/json'
-
-    body = json.dumps({
-        "prompt": mistral_generic(prompt_data),
-        "max_tokens": st.session_state['max_tokens'],
-        "temperature": st.session_state['temperature'],
-        "top_p": st.session_state['top_p']
-    })
-
     if prompt_data and submit:
         with st.spinner("Generating..."):
-            response = bedrock_runtime.invoke_model(body=body.encode('utf-8'), # Encode to bytes
-                                            modelId=model_id, 
-                                            accept=accept, 
-                                            contentType=content_type)
 
-            response_body = json.loads(response.get('body').read().decode('utf-8'))
+            response = mistral.invoke_model(bedrock.runtime_client(), 
+                                            prompt_data, 
+                                            st.session_state[suffix]['model'], 
+                                            max_tokens=st.session_state[suffix]['max_tokens'], 
+                                            temperature=st.session_state[suffix]['temperature'], 
+                                            top_p=st.session_state[suffix]['top_p'])
 
-            st.write("Answer")
-            st.info(f"{response_body.get('outputs')[0].get('text')}")
+            st.write("### Answer")
+            st.info(response)
 
 with code:
-    helpers.tune_parameters('Mistral', index=0,region='us-east-1')
+    mistral.tune_parameters('Mistral',suffix, index=0,region='us-east-1')
     st.subheader('Prompt Examples:')   
-    container2 = st.container(border=True) 
-    with container2:
-        helpers.create_tabs(dataset)
+    with st.container(border=True):
+        stlib.create_tabs(dataset,suffix)
 
 
 

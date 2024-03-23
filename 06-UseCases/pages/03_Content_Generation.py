@@ -1,10 +1,11 @@
 
 import streamlit as st
 import textwrap
-from helpers import bedrock_runtime_client, set_page_config, invoke_model,getmodelId
+import helpers
+import utils.streamlit_lib as streamlit_lib
 
 
-set_page_config()
+helpers.set_page_config()
 
 
 text, code = st.columns([0.6,0.4])
@@ -16,15 +17,16 @@ Please put your rewrite in <rewrite></rewrite> tags.
 """
 
 with code:
-    with st.container(border=True):
-        provider = st.selectbox('Provider',('Amazon','Anthropic','AI21','Cohere','Meta'))
-        model_id=st.text_input('model_id',getmodelId(provider))
+    temperature, top_p, max_tokens, model_id, submitted1, provider = streamlit_lib.tune_parameters()
+    # with st.container(border=True):
+    #     provider = st.selectbox('Provider',('Amazon','Anthropic','AI21','Cohere','Meta'))
+    #     model_id=st.text_input('model_id',getmodelId(provider))
         
-    with st.form(key ='form2'):
-        temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.1, step = 0.1)
-        top_p=st.slider('topP',min_value = 0.0, max_value = 1.0, value = 1.0, step = 0.1)
-        max_tokens_to_sample=st.number_input('maxTokenCount',min_value = 50, max_value = 4096, value = 4096, step = 1)
-        submitted1 = st.form_submit_button(label = 'Tune Parameters')        
+    # with st.form(key ='form2'):
+    #     temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.1, step = 0.1)
+    #     top_p=st.slider('topP',min_value = 0.0, max_value = 1.0, value = 1.0, step = 0.1)
+    #     max_tokens_to_sample=st.number_input('maxTokenCount',min_value = 50, max_value = 4096, value = 4096, step = 1)
+    #     submitted1 = st.form_submit_button(label = 'Tune Parameters')        
         
     code_data = f"""import json
 import boto3
@@ -42,7 +44,7 @@ prompt= \"{textwrap.shorten(prompt,width=50,placeholder='...')}\"
 
 input = {{
     'prompt': prompt,
-    'max_tokens_to_sample': {max_tokens_to_sample}, 
+    'max_tokens_to_sample': {max_tokens}, 
     'temperature': {temperature},
     'top_k': 250,
     'top_p': {top_p},
@@ -78,10 +80,10 @@ with text:
         
     if submit:
         with st.spinner("Thinking..."):
-            output = invoke_model(client=bedrock_runtime_client(), prompt=prompt, model=model_id,
+            output = helpers.invoke_model(client=helpers.bedrock_runtime_client(), prompt=prompt, model=model_id,
                                 temperature=temperature,
                                 top_p=top_p,
-                                max_tokens=max_tokens_to_sample,
+                                max_tokens=max_tokens,
                                 )
             st.write("Answer:")
             st.info(output)

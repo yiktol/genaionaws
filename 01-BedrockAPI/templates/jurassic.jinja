@@ -6,14 +6,13 @@ bedrock_runtime = boto3.client(
     region_name='us-east-1', 
 )
 
+prompt =  """{{prompt}}""",
+
 body = json.dumps({
-    "prompt": """Human: {{prompt}}
-
-    Assistant:""",
-
-    "maxTokens": {{max_tokens}},
+    "prompt": prompt,
+    "maxTokens": {{maxTokens}},
     "temperature": {{temperature}},
-    "topP": {{top_p}},
+    "topP": {{topP}},
     "stopSequences": [],
     "countPenalty": {"scale": 0},
     "presencePenalty": {"scale": 0},

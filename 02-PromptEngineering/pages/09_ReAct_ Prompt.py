@@ -49,7 +49,7 @@ tools = [math_tool,wiki]
 
 options = [
     {"prompt_type":"Using Calulator Tool","prompt": "What is (4.5*2.1)^2.2?"},
-    {"prompt_type":"Using Wikipedia Tool","prompt": "Who is Andres Bonifacio?"}
+    {"prompt_type":"Using Wikipedia Tool","prompt": "Who is Rosalind Franklin?"}
     ]
 
 def update_options(item_num):

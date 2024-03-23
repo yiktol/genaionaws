@@ -15,19 +15,19 @@ systems and data sources. Since Amazon Bedrock is serverless, you don't have to 
 and you can securely integrate and deploy generative AI capabilities into your applications using the AWS services \
 you are already familiar with.""")
 
-with st.sidebar:
-    provider = st.selectbox('Provider', ('Amazon', 'Stability',
-                            'AI21', 'Anthropic', 'Cohere', 'Meta', 'Mistral'),)
-    Region = st.selectbox('Region', ('us-east-1', 'us-west-2',
-                          'ap-southeast-1', 'ap-northeast-1', 'eu-central-1',))
+# with st.sidebar:
+#     provider = st.selectbox('Provider', ('Amazon', 'Stability',
+#                             'AI21', 'Anthropic', 'Cohere', 'Meta', 'Mistral'),)
+#     Region = st.selectbox('Region', ('us-east-1', 'us-west-2',
+#                           'ap-southeast-1', 'ap-northeast-1', 'eu-central-1',))
 
 # Create the connection to Bedrock
-bedrock = bedrock_client(region=Region)
+
 
 
 def get_models(provider):
 
-   # Let's see all available Amazon Models
+    bedrock = bedrock_client(region=Region)
     available_models = bedrock.list_foundation_models()
 
     models = [{}]
@@ -45,21 +45,33 @@ def get_models(provider):
 
     return models
 
+def show_code(provider, Region):
+    code = f"""
+    import boto3
+    import json
 
-code = f"""
-import boto3
-import json
+    bedrock = boto3.client(service_name='bedrock', region_name='{Region}')
 
-bedrock = boto3.client(service_name='bedrock', region_name='{Region}')
+    available_models = bedrock.list_foundation_models()s
+ss
+    for model in available_models['modelSummaries']:
+    if '{provider}' in model['providerName']:
+        print(json.dumps(model, indent=4))
 
-available_models = bedrock.list_foundation_models()
+    """
+    return code
 
-for model in available_models['modelSummaries']:
-  if '{provider}' in model['providerName']:
-    print(json.dumps(model, indent=4))
-
-"""
-
-st.code(code, language="python")
-
+with st.container():
+    pycode, region = st.columns([0.7,0.3])    
+    
+    with region:
+        with st.container(border=True):
+            
+            provider = st.selectbox('Provider', ('Amazon', 'Stability',
+                                    'AI21', 'Anthropic', 'Cohere', 'Meta', 'Mistral'),)
+            Region = st.selectbox('Region', ('us-east-1', 'us-west-2',
+                                'ap-southeast-1', 'ap-northeast-1', 'eu-central-1',))
+    with pycode:
+        st.code(show_code(provider, Region), language="python")
+        
 st.table(get_models(provider))

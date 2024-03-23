@@ -1,3 +1,3 @@
-{"height":50,"temperature":0.2,"top_p":0.9,"max_tokens":2048,"model":"amazon.titan-tg1-large","prompt": "Write an essay about why someone should drink coffee."}
-{"height":100,"temperature":0.2,"top_p":0.9,"max_tokens":2048,"model":"amazon.titan-tg1-large","prompt": "Generate synthetic data for daily product sales in various categories - include row number, product name, category, date of sale and price. Produce output in JSON format. Count records and ensure there are no more than 5."}
-{"height":50,"temperature":0.2,"top_p":0.9,"max_tokens":2048,"model":"amazon.titan-tg1-large","prompt": "Create a 3 day itinerary for my visit to Dubai."}
+{"height":50,"prompt": "Write an essay about why someone should drink coffee."}
+{"height":100,"prompt": "Generate synthetic data for daily product sales in various categories - include row number, product name, category, date of sale and price. Produce output in JSON format. Count records and ensure there are no more than 5."}
+{"height":50,"prompt": "Create a 3 day itinerary for my visit to Dubai."}

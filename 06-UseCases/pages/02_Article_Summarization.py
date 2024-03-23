@@ -1,15 +1,14 @@
 
 import streamlit as st
 import textwrap
-from helpers import bedrock_runtime_client, set_page_config, invoke_model, getmodelId
+import helpers
+import utils.streamlit_lib as streamlit_lib
 
-
-set_page_config()
+helpers.set_page_config()
 
 
 text, code = st.columns([0.6,0.4])
 
-modelId = 'ai21.j2-ultra'
 prompt = """Meet Carbon Maps, a new French startup that raised $4.3 million (€4 million) just a few weeks after its inception. The company is building a software-as-a-service platform for the food industry so that they can track the environmental impact of each of their products in their lineup. The platform can be used as a basis for eco ratings. \
 While there are quite a few carbon accounting startups like Greenly, Sweep, Persefoni and Watershed, Carbon Maps isn't an exact competitor as it doesn't calculate a company's carbon emissions as a whole. It doesn't focus on carbon emissions exclusively either. Carbon Maps focuses on the food industry and evaluates the environmental impact of products — not companies. \
 Co-founded by Patrick Asdaghi, Jérémie Wainstain and Estelle Huynh, the company managed to raise a seed round with Breega and Samaipata — these two VC firms already invested in Asdaghi's previous startup, FoodChéri. \
@@ -31,15 +30,7 @@ Summarize the above text in 5 bullets."""
 
    
 with code:
-    with st.container(border=True):
-        provider = st.selectbox('Provider',('Amazon','Anthropic','AI21','Cohere','Meta'))
-        model_id=st.text_input('model_id',getmodelId(provider))
-    
-    with st.form(key ='form2'):
-        temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.1, step = 0.1)
-        topP=st.slider('topP',min_value = 0.0, max_value = 1.0, value = 1.0, step = 0.1)
-        maxTokens=st.number_input('maxTokens',min_value = 50, max_value = 4096, value = 2048, step = 1)
-        submitted1 = st.form_submit_button(label = 'Tune Parameters')    
+    temperature, topP, maxTokens, model_id, submitted1, provider = streamlit_lib.tune_parameters()  
 
     code_data = f"""import json
 import boto3
@@ -95,7 +86,7 @@ with text:
         
     if submit:
         with st.spinner("Thinking..."):
-            output = invoke_model(client=bedrock_runtime_client(), 
+            output = helpers.invoke_model(client=helpers.bedrock_runtime_client(), 
                                 prompt=prompt, 
                                 model=model_id,
                                 temperature=temperature,

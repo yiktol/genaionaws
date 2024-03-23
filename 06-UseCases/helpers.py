@@ -6,6 +6,28 @@ import numpy as np
 from numpy import dot
 from numpy.linalg import norm
 
+def set_page_config():
+    st.set_page_config( 
+    page_title="Use Cases",  
+    page_icon=":rock:",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+    
+def bedrock_runtime_client(region_name='us-east-1'):
+    bedrock_runtime = boto3.client(
+    service_name='bedrock-runtime',
+    region_name=region_name, 
+    )
+    return bedrock_runtime
+
+def bedrock_client(region_name='us-east-1'):
+    bedrock = boto3.client(
+        service_name='bedrock',
+        region_name=region_name, 
+        )
+    return bedrock
+
 
 def claude_generic(input_prompt):
     prompt = f"""Human: {input_prompt}\n\nAssistant:"""
@@ -15,13 +37,15 @@ def titan_generic(input_prompt):
     prompt = f"""User: {input_prompt}\n\nAssistant:"""
     return prompt
 
-def llama2_generic(input_prompt, system_prompt):
-    prompt = f"""<s>[INST] <<SYS>>
-    {system_prompt}
-    <</SYS>>
+def llama2_generic(input_prompt, system_prompt=None):
+    if system_prompt is None:
+        prompt = f"<s>[INST] {input_prompt} [/INST]"
+    else:
+        prompt = f"<s>[INST] <<SYS>>\n{system_prompt}\n<</SYS>>\n{input_prompt} [/INST]"
+    return prompt
 
-    {input_prompt} [/INST]
-    """
+def mistral_generic(input_prompt):
+    prompt = f"<s>[INST] {input_prompt} [/INST]"
     return prompt
 
 def get_embedding(bedrock, text):
@@ -128,29 +152,50 @@ def getmodelId(providername):
         "Anthropic" : "anthropic.claude-v2:1",
         "AI21" : "ai21.j2-ultra-v1",
         'Cohere': "cohere.command-text-v14",
-        'Meta': "meta.llama2-13b-chat-v1"
+        'Meta': "meta.llama2-70b-chat-v1",
+        "Mistral": "mistral.mixtral-8x7b-instruct-v0:1"
     }
     
     return model_mapping[providername]
+
+def getmodel_index(providername):
+    
+    default_model = getmodelId(providername)
+    
+    idx = getmodelIds(providername).index(default_model)
+    
+    return idx
+
+def getmodelIds(providername):
+    models =[]
+    bedrock =bedrock_client()
+    available_models = bedrock.list_foundation_models()
+    
+    for model in available_models['modelSummaries']:
+        if providername in model['providerName']:
+            models.append(model['modelId'])
+            
+    return models
+
 
 def getmodelparams(providername):
     model_mapping = {
         "Amazon" : {
             "maxTokenCount": 4096,
             "stopSequences": [], 
-            "temperature": 0.5,
+            "temperature": 0.1,
             "topP": 0.9
             },
         "Anthropic" : {
             "max_tokens_to_sample": 4096,
-            "temperature": 0.9,
+            "temperature": 0.1,
             "top_k": 250,
             "top_p": 0.9,
             "stop_sequences": ["\n\nHuman"],
             },
         "AI21" : {
             "maxTokens": 4096,
-            "temperature": 0.5,
+            "temperature": 0.1,
             "topP": 0.9,
             "stopSequences": [],
             "countPenalty": {
@@ -165,7 +210,7 @@ def getmodelparams(providername):
         },
         "Cohere": {
             "max_tokens": 4096,
-            "temperature": 0.5,
+            "temperature": 0.1,
             "p": 0.9,
             "k": 0,
             "stop_sequences": [],
@@ -174,7 +219,7 @@ def getmodelparams(providername):
         "Meta":{ 
             'max_gen_len': 1024,
             'top_p': 0.9,
-            'temperature': 0.8
+            'temperature': 0.1
         }
     }
     
@@ -183,7 +228,7 @@ def getmodelparams(providername):
 
 def invoke_model(client, prompt, model, 
     accept = 'application/json', content_type = 'application/json',
-    max_tokens  = 512, temperature = 1.0, top_p = 1.0, top_k = 250, stop_sequences = [],
+    max_tokens  = 512, temperature = 1.0, top_p = 1.0, top_k = 200, stop_sequences = [],
     count_penalty = 0, presence_penalty = 0, frequency_penalty = 0, return_likelihoods = 'NONE'):
     # default response
     output = ''
@@ -222,7 +267,7 @@ def invoke_model(client, prompt, model,
             output = output + part['data']['text']
     elif (provider == 'amazon'): 
         input = {
-            'inputText': prompt,
+            'inputText': titan_generic(prompt),
             'textGenerationConfig': {
                   'maxTokenCount': max_tokens,
                   'stopSequences': stop_sequences,
@@ -254,7 +299,7 @@ def invoke_model(client, prompt, model,
             output = output + result['text']
     elif (provider == 'meta'): 
         input = {
-            'prompt': prompt,
+            'prompt': llama2_generic(prompt),
             'max_gen_len': max_tokens,
             'temperature': temperature,
             'top_p': top_p
@@ -263,21 +308,18 @@ def invoke_model(client, prompt, model,
         response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
         response_body = json.loads(response.get('body').read())
         output = response_body['generation']
-    # return
+    elif (provider == 'mistral'): 
+        input = {
+            'prompt': mistral_generic(prompt),
+            'max_tokens': max_tokens,
+            'temperature': temperature,
+            'top_p': top_p,
+            'top_k': top_k
+        }
+        body=json.dumps(input)
+        response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
+        response_body = json.loads(response.get('body').read())
+        output = response_body.get('outputs')[0].get('text')
     return output
 
 
-def set_page_config():
-    st.set_page_config( 
-    page_title="Use Cases",  
-    page_icon=":rock:",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
-    
-def bedrock_runtime_client():
-    bedrock_runtime = boto3.client(
-    service_name='bedrock-runtime',
-    region_name='us-east-1', 
-    )
-    return bedrock_runtime

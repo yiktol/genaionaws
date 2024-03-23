@@ -6,13 +6,15 @@ bedrock_runtime = boto3.client(
     region_name='us-east-1'
     )
 
+prompt = """{{prompt}}"""
+
 body = json.dumps({
-        "inputText": "{{prompt}}",
+        "inputText": prompt,
         'textGenerationConfig': {
-            "maxTokenCount": {{max_tokens}},
+            "maxTokenCount": {{maxTokenCount}},
             "stopSequences": [], 
             "temperature": {{temperature}},
-            "topP": {{top_p}}
+            "topP": {{topP}}
             }
         })
 

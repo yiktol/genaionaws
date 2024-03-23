@@ -12,8 +12,10 @@ Please ensure that your responses are socially unbiased and positive in nature. 
 If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. \
 If you don't know the answer to a question, please don't share false information."""
 
-body = json.dumps({'prompt': "{{prompt}}",
-        'max_gen_len': {{max_tokens}}, 
+prompt = """{{prompt}}"""
+
+body = json.dumps({'prompt': prompt ,
+        'max_gen_len': {{max_gen_len}}, 
         'top_p': {{top_p}},
         'temperature': {{temperature}},
     })

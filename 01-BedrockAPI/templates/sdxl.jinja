@@ -11,14 +11,20 @@ bedrock_runtime = boto3.client(
     region_name='us-east-1', 
 )
 
+prompt = """{{prompt}}"""
+negative_prompt = """{{negative_prompt}}"""
+
 body = json.dumps(
         {"text_prompts":
             [
-                {"text":\"{{prompt}}\"}
+                {"text":prompt, "weight": 1},
+                {"text": negative_prompt, "weight": -1}
             ],
         "cfg_scale":{{cfg_scale}},
         "seed":{{seed}},
-        "steps":{{steps}}
+        "steps":{{steps}},
+        "width":{{width}},
+        "height":{{height}}
         })
 
 response = bedrock_runtime.invoke_model(

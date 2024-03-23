@@ -1,17 +1,21 @@
-import json
 import streamlit as st
-from utils import get_models, set_page_config, bedrock_runtime_client
-import utils.helpers as helpers
+import utils.bedrock as bedrock
+import utils.stlib as stlib
+import utils.cohere as cohere
 
-set_page_config()
+stlib.set_page_config()
 
-helpers.reset_session()
+suffix = 'cohere'
+if suffix not in st.session_state:
+    st.session_state[suffix] = {}
 
-bedrock_runtime = bedrock_runtime_client()
+stlib.reset_session()
 
-dataset = helpers.load_jsonl('data/cohere.jsonl')
+dataset = cohere.load_jsonl('data/cohere.jsonl')
 
-helpers.initsessionkeys(dataset[0])
+stlib.initsessionkeys(dataset[0],suffix)
+stlib.initsessionkeys(cohere.params,suffix)
+
 text, code = st.columns([0.6,0.4])
 
 with text:
@@ -19,22 +23,27 @@ with text:
     st.write('Cohere models are text generation models for business use cases. Cohere models are trained on data that supports reliable business applications, like text generation, summarization, copywriting, dialogue, extraction, and question answering.')
 
     with st.expander("See Code"): 
-        st.code(helpers.render_claude_code('command.jinja'),language="python")
+        st.code(cohere.render_cohere_code('command.jinja',suffix),language="python")
         
     with st.form("myform"):
         prompt_data = st.text_area("Enter your prompt here:",
-            height = st.session_state['height'],
-            value = st.session_state["prompt"]
+            height = st.session_state[suffix]['height'],
+            value = st.session_state[suffix]["prompt"]
         )
         submit = st.form_submit_button("Submit", type='primary')
 
     if prompt_data and submit:
         with st.spinner("Generating..."):
-            response = helpers.invoke_model(bedrock_runtime, prompt_data, st.session_state['model'], 
-                                            max_tokens  = st.session_state['max_tokens'], 
-                                            temperature = st.session_state['temperature'], 
-                                            top_p = st.session_state['top_p'],
-                                            top_k = st.session_state['top_k'])
+            response = cohere.invoke_model(client=bedrock.runtime_client(), 
+                                            prompt=prompt_data,
+                                            model=st.session_state[suffix]['model'], 
+                                            max_tokens  = st.session_state[suffix]['max_tokens'], 
+                                            temperature = st.session_state[suffix]['temperature'], 
+                                            p = st.session_state[suffix]['p'],
+                                            k = st.session_state[suffix]['k'],
+                                            stop_sequences = st.session_state[suffix]['stop_sequences'],
+                                            return_likelihoods = st.session_state[suffix]['return_likelihoods']
+                                            )
 
             st.write("### Answer")
             st.info(response)
@@ -43,10 +52,9 @@ with text:
 
 with code:
 
-    helpers.tune_parameters('Cohere', index=1)
+    cohere.tune_parameters('Cohere',suffix, index=1)
 
 
     st.subheader('Prompt Examples:')   
-    container2 = st.container(border=True) 
-    with container2:
-        helpers.create_tabs(dataset)
+    with st.container(border=True) :
+        stlib.create_tabs(dataset,suffix)

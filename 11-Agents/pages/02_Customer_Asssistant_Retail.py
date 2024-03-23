@@ -70,7 +70,7 @@ with st.expander(":orange[See Workflow]"):
     st.image("images/91-sequence-flow-agent.png")
 
 if 'chat_history' not in st.session_state: #see if the chat history hasn't been created yet
-    st.session_state.chat_history = [{"role": "assistant", "text": "Hi, I'm a Customer Reatail Assistant. How may I assist you today?"}]
+    st.session_state.chat_history = [{"role": "assistant", "text": "Hi, I'm a Customer Retail Assistant. How may I assist you today?"}]
 
 
 #Re-render the chat history (Streamlit re-runs this script, so need this to preserve previous chat messages)
