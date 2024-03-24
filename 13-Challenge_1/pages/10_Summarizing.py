@@ -70,7 +70,6 @@ text, code = st.columns([0.7, 0.3])
 
 with code:
                   
-    st.subheader("Parameters")
 
     with st.container(border=True):
         provider = st.selectbox('provider', helpers.list_providers)

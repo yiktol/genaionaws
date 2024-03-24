@@ -71,3 +71,14 @@ def getmodelIds(providername):
             
     return models
 
+def getmodelIds_claude3(providername='Anthropic'):
+    models =[]
+    bedrock = client()
+    available_models = bedrock.list_foundation_models()
+    
+    for model in available_models['modelSummaries']:
+        if providername in model['providerName'] and "IMAGE" in model['inputModalities']:
+            models.append(model['modelId'])
+            
+    return models
+

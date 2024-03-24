@@ -6,7 +6,7 @@ import boto3
 
 def set_page_config():
     st.set_page_config( 
-    page_title="Bedrock Foundation Models",  
+    page_title="Challenge",  
     page_icon=":rock:",
     layout="wide",
     initial_sidebar_state="expanded",

@@ -19,7 +19,7 @@ text, code = st.columns([0.6,0.4])
 
 
 with text:
-    st.title("Anthropic")
+    st.title("Anthropic Claude 2")
     st.write("""Anthropic offers the Claude family of large language models purpose built for conversations, 
             summarization, Q&A, workflow automation, coding and more. 
             Early customers report that Claude is much less likely to produce harmful outputs, 

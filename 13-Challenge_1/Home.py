@@ -1,9 +1,21 @@
 import streamlit as st
 
+
+
+st.set_page_config( 
+    page_title="Challenge",  
+    page_icon=":rock:",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
+for key in st.session_state.keys():
+    del st.session_state[key]
+
 st.title("Challenges")
 
 
-# st.markdown("##### _Practice isn't the thing you do once you're good. It's the thing you do that makes you good._ - Malcolm Gladwell")
+st.markdown("_Practice isn't the thing you do once you're good. It's the thing you do that makes you good._ - Malcolm Gladwell")
 
 st.markdown("""##### Please attempt the following Challenges.\n
 Do bear in mind that there is no single one way to arrive at the same AI responses.\n

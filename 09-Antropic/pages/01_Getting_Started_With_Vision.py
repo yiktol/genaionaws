@@ -101,7 +101,7 @@ with col1:
                 "temperature": temperature,
                 "top_k": top_k,
                 "top_p": top_p,
-                "stop_sequences": ["\\n\\nHuman:"],
+                "stop_sequences": ["\n\nHuman"],
                 "anthropic_version": "bedrock-2023-05-31",
                 "messages": message_list}        
         
