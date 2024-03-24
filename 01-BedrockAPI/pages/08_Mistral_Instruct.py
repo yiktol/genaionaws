@@ -10,7 +10,6 @@ suffix = 'mistral'
 if suffix not in st.session_state:
     st.session_state[suffix] = {}
 
-stlib.reset_session()
 
 bedrock_runtime = bedrock.runtime_client(region='us-east-1')
 

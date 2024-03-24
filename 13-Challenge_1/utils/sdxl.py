@@ -8,8 +8,7 @@ from base64 import b64decode
 from io import BytesIO
 from random import randint
 from jinja2 import Environment, FileSystemLoader
-import utils.bedrock as u_bedrock
-import utils.stlib as stlib
+import utils.helpers as u_bedrock
 
 
 params = {"model": "stability.stable-diffusion-xl",
@@ -20,6 +19,11 @@ params = {"model": "stability.stable-diffusion-xl",
 		  "height": 512,
 		  }
 
+def initsessionkeys(dataset,suffix):
+    for key in dataset.keys():
+        if key not in st.session_state[suffix]:
+            st.session_state[suffix][key] = dataset[key]
+    return st.session_state[suffix]
 
 def render_sdxl_image_code(templatePath, suffix):
 	env = Environment(loader=FileSystemLoader('templates'))
@@ -51,7 +55,6 @@ def load_jsonl(file_path):
 
 
 def image_parameters(provider, suffix, index=0, region='us-east-1'):
-	st.subheader("Parameters")
 	with st.container(border=True):
 		models = u_bedrock.getmodelIds('Stability AI')
 		model = st.selectbox(
@@ -67,11 +70,11 @@ def image_parameters(provider, suffix, index=0, region='us-east-1'):
 				  "steps": steps,
 				  "width": width, 
 				  "height": height,}
-		col1, col2, col3 = st.columns([0.4,0.3,0.3])
+		col1, col2 = st.columns(2)
 		with col1:
 			st.button(label = 'Tune Parameters', on_click=update_parameters, args=(suffix,), kwargs=(params))
 		with col2:
-			stlib.reset_session() 
+			u_bedrock.reset_session() 
 
 
 # get the stringified request body for the InvokeModel API call

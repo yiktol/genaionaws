@@ -6,16 +6,65 @@ import base64
 from io import BytesIO
 from random import randint
 from jinja2 import Environment, FileSystemLoader
-import utils.bedrock as u_bedrock
-import utils.stlib as stlib
+import uuid
+import utils.helpers as u_bedrock
 
+
+def getmodelId(providername):
+    model_mapping = {
+        "Amazon" : "amazon.titan-tg1-large",
+        "Amazon-Image" : "amazon.titan-image-generator-v1",
+        "Anthropic" : "anthropic.claude-v2:1",
+        "AI21" : "ai21.j2-ultra-v1",
+        'Cohere': "cohere.command-text-v14",
+        'Meta': "meta.llama2-70b-chat-v1",
+        "Mistral": "mistral.mixtral-8x7b-instruct-v0:1",
+        "Stability AI": "stability.stable-diffusion-xl-v1"
+    }
+    
+    return model_mapping[providername]
+
+def getmodel_index(providername):
+    
+    default_model = getmodelId(providername)
+    
+    idx = getmodelIds(providername).index(default_model)
+    
+    return idx
+
+def getmodelIds(providername):
+    models =[]
+    bedrock = boto3.client(service_name='bedrock', region_name="us-east-1")
+    available_models = bedrock.list_foundation_models()
+    
+    for model in available_models['modelSummaries']:
+        if providername in model['providerName']:
+            models.append(model['modelId'])
+            
+    return models
+
+
+
+def reset_session():
+    def form_callback():
+        for key in st.session_state.keys():
+            del st.session_state[key]
+
+
+    st.button(label='Reset', on_click=form_callback, key=uuid.uuid1())
+
+def initsessionkeys(dataset,suffix):
+    for key in dataset.keys():
+        if key not in st.session_state[suffix]:
+            st.session_state[suffix][key] = dataset[key]
+    return st.session_state[suffix]
 
 params = {
 	"cfg_scale":8,
 	"seed":randint(10,20000),
 	"quality":"premium",
-	"width":1024,
-	"height":1024,
+	"width":512,
+	"height":512,
 	"numberOfImages":1,
 	"model":"amazon.titan-image-generator-v1",
 	}
@@ -50,23 +99,23 @@ def load_jsonl(file_path):
 	return d
 
 def image_parameters(provider, suffix, index=0,region='us-east-1'):
-	st.subheader("Parameters")
 	with st.container(border=True):
-		models = u_bedrock.getmodelIds('Amazon')
-		model  = st.selectbox('model', models,index=index)
+		models = getmodelIds(provider)
+		model = st.selectbox(
+			'model', models, index=models.index(getmodelId('Amazon-Image')))
 		cfg_scale= st.number_input('cfg_scale',value = 8)
 		seed=st.number_input('seed',value = randint(10,20000))
 		quality=st.radio('quality',["premium", "standard"], horizontal=True)
-		width=st.number_input('width',value = 1024)
-		height=st.number_input('height',value = 1024)
+		width=st.number_input('width',value = 512)
+		height=st.number_input('height',value = 512)
 		numberOfImages=st.number_input('numberOfImages',value = 1)
 		params = {"model":model ,"cfg_scale":cfg_scale, "seed":seed,"quality":quality,
 					"width":width,"height":height,"numberOfImages":numberOfImages}
-		col1, col2, col3 = st.columns([0.4,0.3,0.3])
+		col1, col2= st.columns(2)
 		with col1:
 			st.button(label = 'Tune Parameters', on_click=update_parameters, args=(suffix,), kwargs=(params))
 		with col2:
-			stlib.reset_session() 
+			reset_session() 
 
 
 

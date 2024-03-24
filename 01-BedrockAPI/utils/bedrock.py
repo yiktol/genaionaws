@@ -39,3 +39,35 @@ def get_models(provider,region='us-east-1'):
   return models 
 
 
+def getmodelId(providername):
+    model_mapping = {
+        "Amazon" : "amazon.titan-tg1-large",
+        "Anthropic" : "anthropic.claude-v2:1",
+        "AI21" : "ai21.j2-ultra-v1",
+        'Cohere': "cohere.command-text-v14",
+        'Meta': "meta.llama2-70b-chat-v1",
+        "Mistral": "mistral.mixtral-8x7b-instruct-v0:1",
+        "Stability AI": "stability.stable-diffusion-xl-v1"
+    }
+    
+    return model_mapping[providername]
+
+def getmodel_index(providername):
+    
+    default_model = getmodelId(providername)
+    
+    idx = getmodelIds(providername).index(default_model)
+    
+    return idx
+
+def getmodelIds(providername):
+    models =[]
+    bedrock = client()
+    available_models = bedrock.list_foundation_models()
+    
+    for model in available_models['modelSummaries']:
+        if providername in model['providerName']:
+            models.append(model['modelId'])
+            
+    return models
+

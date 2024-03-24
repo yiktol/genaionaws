@@ -8,7 +8,6 @@ suffix = 'sdxl'
 if suffix not in st.session_state:
     st.session_state[suffix] = {}
 
-stlib.reset_session()
 
 dataset = sdxl.load_jsonl('data/stabilityai.jsonl')
 

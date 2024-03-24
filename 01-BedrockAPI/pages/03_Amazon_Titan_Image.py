@@ -13,9 +13,6 @@ suffix = 'titan_image'
 if suffix not in st.session_state:
     st.session_state[suffix] = {}
 
-
-stlib.reset_session()
-
 bedrock_runtime = bedrock.runtime_client()
 
 dataset = helpers.load_jsonl('data/titan_image.jsonl')

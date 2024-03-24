@@ -9,7 +9,6 @@ suffix = 'claude2'
 if suffix not in st.session_state:
     st.session_state[suffix] = {}
 
-stlib.reset_session()
 
 dataset = claude2.load_jsonl('data/anthropic.jsonl')
 

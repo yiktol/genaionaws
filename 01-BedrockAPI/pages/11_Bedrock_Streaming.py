@@ -12,7 +12,6 @@ if suffix not in st.session_state:
     
 bedrock_runtime = bedrock.runtime_client()
 
-stlib.reset_session()
 
 dataset = titan_text.load_jsonl('data/streaming.jsonl')
 

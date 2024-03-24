@@ -10,7 +10,6 @@ suffix = 'jurassic'
 if suffix not in st.session_state:
     st.session_state[suffix] = {}
 
-stlib.reset_session()
 
 dataset = helpers.load_jsonl('data/jurassic.jsonl')
 

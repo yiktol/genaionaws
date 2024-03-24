@@ -1,6 +1,6 @@
 import streamlit as st
 from jinja2 import Environment, FileSystemLoader
-import utils.helpers
+import uuid
 
 
 def set_page_config():
@@ -34,7 +34,7 @@ def reset_session():
             del st.session_state[key]
 
 
-    st.button(label='Reset', on_click=form_callback)
+    st.button(label='Reset', on_click=form_callback, key=uuid.uuid1())
 
 
 

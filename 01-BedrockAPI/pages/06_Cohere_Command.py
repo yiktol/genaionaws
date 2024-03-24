@@ -9,7 +9,6 @@ suffix = 'cohere'
 if suffix not in st.session_state:
     st.session_state[suffix] = {}
 
-stlib.reset_session()
 
 dataset = cohere.load_jsonl('data/cohere.jsonl')
 
