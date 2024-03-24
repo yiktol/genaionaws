@@ -36,6 +36,10 @@ streamlit run Home.py --server.port 8090 &
 cd /home/ubuntu/environment/genaionaws/12-Risk_and_Misuse
 streamlit run Home.py --server.port 8091 &
 
+cd /home/ubuntu/environment/genaionaws/13-Challenge_1
+streamlit run Home.py --server.port 8092 &
+
 chown ubuntu:root /home/ubuntu/environment -R
 
 git config --global --add safe.directory /home/ubuntu/environment/genaionaws
+
