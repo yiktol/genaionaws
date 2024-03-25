@@ -7,14 +7,14 @@ set_page_config()
 
 st.title("BERT Tokenizer")
 
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+tokenizer = BertTokenizer.from_pretrained('bert-large-uncased')
 
 with st.form("myform"):
     prompt = st.text_input(
         "Enter prompt to tokenize",
         placeholder="Where is Himalayas in the world map?",
         value="Where is Himalayas in the world map?",)
-    submit = st.form_submit_button("Tokenize")
+    submit = st.form_submit_button("Tokenize", type='primary')
 
 
 if prompt and submit:
@@ -27,9 +27,9 @@ if prompt and submit:
     d = {}
     
     st.write("### Answer")
-    print ("{:<25} {:<15}".format('Word','Token'))
+    # print ("{:<25} {:<15}".format('Word','Token'))
     for i in range(0,len(encoding)):
-        print("{:<25} {:<15}".format(tokenizer.decode(encoding[i]),encoding[i]))
+        # print("{:<25} {:<15}".format(tokenizer.decode(encoding[i]),encoding[i]))
         d[tokenizer.decode(encoding[i])] = encoding[i]
     st.table(d)
 

@@ -33,7 +33,7 @@ if f:
 		# tokenize the sentence into words
 		for j in word_tokenize(i):
 			temp.append(j.lower())
-			print(temp)
+			# print(temp)
 
 		data.append(temp)
 	
@@ -41,7 +41,7 @@ if f:
 	# Create CBOW model
 	model1 = gensim.models.Word2Vec(data, min_count=1,
 									vector_size=vector_size,)
-	print(model1.wv.vectors)
+	# print(model1.wv.vectors)
 
  
 	x = np.array(model1.wv.vectors)

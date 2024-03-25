@@ -27,7 +27,7 @@ prompt_display = []
 embedding_list =[]
 
 if submit:
-    with st.spinner("Calculating Distance..."):
+    with st.spinner("Generating..."):
         for animal in selected_animals:
             embedding = helpers.get_embedding(bedrock, animal)
             embedding_list.append(embedding)
