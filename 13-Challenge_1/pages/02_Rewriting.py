@@ -59,8 +59,10 @@ if 'temperature' not in st.session_state[suffix]:
 	st.session_state[suffix]['temperature'] = 0.1
 if 'topP' not in st.session_state[suffix]:
 	st.session_state[suffix]['topP'] = 0.9
+if 'topK' not in st.session_state[suffix]:
+	st.session_state[suffix]['topK'] = 100
 
-
+topK = 100
 text, code = st.columns([0.7, 0.3])
 
 
@@ -73,6 +75,8 @@ with code:
 			'model', models, index=models.index(helpers.getmodelId(provider)))
 		temperature = st.slider('temperature', min_value=0.0, max_value= 1.0, value = st.session_state[suffix]['temperature'], step = 0.1)
 		topP = st.slider('top_p', min_value=0.0, max_value=1.0, value = st.session_state[suffix]['topP'], step = 0.1)
+		if provider in ["Anthropic","Cohere","Mistral"]:
+			topK = st.slider('top_k', min_value=0, max_value=200, value = st.session_state[suffix]['topK'], step = 1)
 		maxTokenCount = st.slider('max_tokens', min_value=50, max_value=4096, value = st.session_state[suffix]['maxTokenCount'], step = 100)
 
 
@@ -93,6 +97,7 @@ with text:
 							maxTokenCount=maxTokenCount,
 							temperature=temperature,
 							topP=topP,
+       						topK=topK,
 							context=questions[0]['context'])
 		
 		if output:
@@ -107,6 +112,7 @@ with text:
 							maxTokenCount=maxTokenCount,
 							temperature=temperature,
 							topP=topP,
+       						topK=topK,
 							context=questions[1]['context'])
 		
 		if output:
@@ -121,6 +127,7 @@ with text:
 							maxTokenCount=maxTokenCount,
 							temperature=temperature,
 							topP=topP,
+							topK=topK,
 							context=questions[2]['context'])
 		
 		if output:

@@ -59,60 +59,63 @@ info2 = """- Littering issues go to Department L
 - Smell issues go to Department S
 - Noise issues go to Department N"""
 
+topK = 100
 questions = [
-    {"id":1,"task": task1, "context": context1, "output": output1},
-    {"id":2,"task": task2, "context": context2, "output": output2}
+	{"id":1,"task": task1, "context": context1, "output": output1},
+	{"id":2,"task": task2, "context": context2, "output": output2}
 ]
 
 text, code = st.columns([0.7, 0.3])
 
 
 with code:
-                  
+				  
 
-    with st.container(border=True):
-        provider = st.selectbox('provider', helpers.list_providers)
-        models = helpers.getmodelIds(provider)
-        model = st.selectbox('model', models, index=models.index(helpers.getmodelId(provider)))
-        temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.1, step = 0.1)
-        topP = st.slider('top_p',min_value = 0.0, max_value = 1.0, value = 0.9, step = 0.1)
-        maxTokenCount = st.slider('max_tokens',min_value = 50, max_value = 4096, value = 1024, step = 100)
+	with st.container(border=True):
+		provider = st.selectbox('provider', helpers.list_providers)
+		models = helpers.getmodelIds(provider)
+		model = st.selectbox('model', models, index=models.index(helpers.getmodelId(provider)))
+		temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.1, step = 0.1)
+		topP = st.slider('top_p',min_value = 0.0, max_value = 1.0, value = 0.9, step = 0.1)
+		if provider in ["Anthropic","Cohere","Mistral"]:
+			topK = st.slider('top_k', min_value=0, max_value=200, value = 50, step = 1)
+		maxTokenCount = st.slider('max_tokens',min_value = 50, max_value = 4096, value = 1024, step = 100)
 
 
 with text:
 
-    tab1, tab2 = st.tabs(['Question 1','Question 2'])
+	tab1, tab2 = st.tabs(['Question 1','Question 2'])
 
-    with tab1:
-        st.markdown(task1)
-        st.markdown(context1)      
-        with st.expander("See Expected Output"):
-                st.markdown(output1)
-        output = helpers.prompt_box(questions[0]['id'], provider,
-                            model,
-                            maxTokenCount=maxTokenCount,
-                            temperature=temperature,
-                            topP=topP,
-                            context=questions[0]['context'])
-        
-        if output:
-            st.write("### Answer")
-            st.info(output)
-    with tab2:
-        st.markdown(task2)
-        st.markdown(context2)
-        with st.expander("See Additional Information"):
-                st.markdown(info2)  
-        with st.expander("See Expected Output"):
-                st.markdown(output2)
-        
-        output = helpers.prompt_box(questions[1]['id'], provider,
-                            model,
-                            maxTokenCount=maxTokenCount,
-                            temperature=temperature,
-                            topP=topP,
-                            context=questions[1]['context'])
-        
-        if output:
-            st.write("### Answer")
-            st.info(output)
+	with tab1:
+		st.markdown(task1)
+		st.markdown(context1)      
+		with st.expander("See Expected Output"):
+				st.markdown(output1)
+		output = helpers.prompt_box(questions[0]['id'], provider,
+							model,
+							maxTokenCount=maxTokenCount,
+							temperature=temperature,
+							topP=topP,
+							context=questions[0]['context'])
+		
+		if output:
+			st.write("### Answer")
+			st.info(output)
+	with tab2:
+		st.markdown(task2)
+		st.markdown(context2)
+		with st.expander("See Additional Information"):
+				st.markdown(info2)  
+		with st.expander("See Expected Output"):
+				st.markdown(output2)
+		
+		output = helpers.prompt_box(questions[1]['id'], provider,
+							model,
+							maxTokenCount=maxTokenCount,
+							temperature=temperature,
+							topP=topP,
+							context=questions[1]['context'])
+		
+		if output:
+			st.write("### Answer")
+			st.info(output)
