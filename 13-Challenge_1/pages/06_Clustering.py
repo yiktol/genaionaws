@@ -3,7 +3,7 @@ import utils.helpers as helpers
 
 helpers.set_page_config()
 
-task1 = "#### Get the AI to form meaningful clusters"
+task1 = "#### Get the AI to form meaningful groups from the folowwing list."
 context1 = """1) "The Great Gatsby" by F. Scott Fitzgerald
 2) "Thriller" by Michael Jackson
 3) "To Kill a Mockingbird" by Harper Lee
@@ -42,7 +42,7 @@ Group 3:
 - The Hobbit by J.R.R. Tolkien
 """
 
-task2 = "#### Company Meeting Reports"
+task2 = "#### Company Meeting Reports: Create a prompt that will re-create the expected output."
 context2 = """Your company spoke to several potential partners in tech. The following call reports are recorded after two weeks of meetings.
 1. ABC Tech: Our representative met with ABC Tech to discuss the integration of their video analytics solutions into our organization's security framework. Although their AI-driven technology shows potential in enhancing surveillance systems, concerns were raised regarding the privacy implications of implementing such solutions. Both parties agreed to conduct further research to address these concerns before moving forward with any collaboration. We also asked them to show documentation of compliance to local laws.
 2. DEF Synapse: Our team met with DEF Synapse to explore the application of their innovative Deep Neural Networks for enhancing our data analysis processes. While their AI technology appeared promising, the complexity of integrating it into our existing systems raised concerns about the feasibility and required resources. They did not seem to support implementation on the cloud. Both parties agreed to continue discussions but will re-evaluate the practicality of this potential partnership.

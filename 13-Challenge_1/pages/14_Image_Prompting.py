@@ -16,8 +16,8 @@ if suffix2 not in st.session_state:
 titan_image.initsessionkeys(titan_image.params,suffix1)
 sdxl.initsessionkeys(sdxl.params,suffix2)
 
-task1 = "#### Generate an image for social media post."
-context1 = """Busines Name: Green Thumb Organization
+task1 = "#### Ask the AI to generate an image for social media post."
+context1 = """Organization Name: Green Thumb Org.
 
 Tagline: Saving the Planet One tree at a time.
 
@@ -29,7 +29,7 @@ Goals: The company main objective is to promote sustainability and the replantin
 output1 = """
 """
 
-task2 = "#### Create a new SuperHero Character"
+task2 = "#### Ask the AI to create a new SuperHero Character, define the superpowers you want."
 context2 = """Create an Image of a new Super hero Character.
 """
 output2 = """

@@ -1,6 +1,6 @@
 import json
 import boto3
-from datetime import datetime
+import math
 from langchain.prompts import PromptTemplate
 
 #Create the connection to Bedrock
@@ -85,3 +85,21 @@ def bedrock_runtime_client():
     region_name='us-east-1', 
     )
     return bedrock_runtime
+
+def get_embedding(bedrock, text):
+    modelId = 'amazon.titan-embed-text-v1'
+    accept = 'application/json'
+    contentType = 'application/json'
+    input = {
+            'inputText': text
+        }
+    body=json.dumps(input)
+    response = bedrock.invoke_model(
+        body=body, modelId=modelId, accept=accept,contentType=contentType)
+    response_body = json.loads(response.get('body').read())
+    embedding = response_body['embedding']
+    return embedding
+
+def calculate_distance(v1, v2):
+    distance = math.dist(v1, v2)
+    return distance

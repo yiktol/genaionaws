@@ -46,17 +46,16 @@ def get_models(provider):
     return models
 
 def show_code(provider, Region):
-    code = f"""
-    import boto3
-    import json
+    code = f"""import boto3
+import json
 
-    bedrock = boto3.client(service_name='bedrock', region_name='{Region}')
+bedrock = boto3.client(service_name='bedrock', region_name='{Region}')
 
-    available_models = bedrock.list_foundation_models()s
-ss
-    for model in available_models['modelSummaries']:
-    if '{provider}' in model['providerName']:
-        print(json.dumps(model, indent=4))
+available_models = bedrock.list_foundation_models()
+
+for model in available_models['modelSummaries']:
+if '{provider}' in model['providerName']:
+    print(json.dumps(model, indent=4))
 
     """
     return code

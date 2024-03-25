@@ -3,7 +3,7 @@ import utils.helpers as helpers
 import uuid
 
 helpers.set_page_config()
-task = """#### Fill in the prompt below."""
+task = """#### Fill in the prompt below to re-create the expected output."""
 context = """- John Smith
 - Emma Johnson
 - Michael Davis

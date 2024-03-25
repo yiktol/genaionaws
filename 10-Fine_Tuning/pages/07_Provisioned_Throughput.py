@@ -130,7 +130,7 @@ with code:
         with col1:
             # provisionedModelId1 = st.selectbox("Provisioned Throughputs", provisioned_model_throughputs, key="show_provisioned_throughputs")
             st.button("Delete Provisioned Throughput",
-                      on_click=delete_provisioned_throughput, args=(provisionedModelId,))
+                      on_click=delete_provisioned_throughput, args=(provisionedModelId,), disabled=st.session_state.is_disabled)
 
         with col2:
 

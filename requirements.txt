@@ -21,3 +21,4 @@ langchainhub
 ipython
 jsonlines
 bert_score
+plotly

@@ -2,6 +2,7 @@ import boto3
 import json
 import streamlit as st
 import numpy as np
+import pandas as pd
 from helpers import set_page_config
 
 set_page_config()
@@ -23,7 +24,7 @@ with st.sidebar:
     "Max tokens: 8k"
     "modelId: amazon.titan-embed-text-v1"
 
-st.title("Vertorize using Titan Embeddings")
+st.title("Titan Embeddings")
 
 # Define prompt and model parameters
 with st.form("myform"):
@@ -31,7 +32,7 @@ with st.form("myform"):
         "Enter a prompt to vectorize", 
         placeholder="Write me a poem about apples",
         value="Write me a poem about apples")
-    submitted = st.form_submit_button("Vectorize")
+    submitted = st.form_submit_button("Vectorize",type="primary")
 
 if prompt_data and submitted:
     body = json.dumps({
@@ -51,15 +52,7 @@ if prompt_data and submitted:
     response_body = json.loads(response['body'].read())
     embedding = response_body.get('embedding')
 
-    
-    
-    # def print_matrix_numpy(matrix):
-    #     # Convert the list to a NumPy array
-    #     np_matrix = np.array(matrix)
-    #     # Print the NumPy array
-    #     return np_matrix
-
-    #Print the Embedding
-    #print(embedding)
-    st.write(embedding)
-    #print(embedding)
+    numbers = (np.array(embedding).reshape(128,12))
+    df = pd.DataFrame(numbers, columns=("col %d" % i for i in range(12)))
+    st.subheader("Embeddings:")
+    st.dataframe(df,use_container_width=True,height=800)
