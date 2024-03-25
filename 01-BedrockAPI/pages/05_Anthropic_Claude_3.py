@@ -12,12 +12,14 @@ suffix = 'claude3'
 if suffix not in st.session_state:
     st.session_state[suffix] = {}
 
-if "image" not in st.session_state:
-    st.session_state.image = "images/sg_skyline.jpg"
+if "image" not in st.session_state[suffix]:
+    st.session_state[suffix]['image'] = "images/sg_skyline.jpg"
+if "prompt" not in st.session_state:
+    st.session_state[suffix]['prompt'] = "Describe the image"
 
 stlib.initsessionkeys(claude3.params,suffix)
 
-with open(st.session_state.image, "rb") as image_file:
+with open(st.session_state[suffix]['image'], "rb") as image_file:
     binary_data = image_file.read()
     base_64_encoded_data = base64.b64encode(binary_data)
     base64_string = base_64_encoded_data.decode('utf-8')
@@ -26,14 +28,14 @@ text, code = st.columns([0.6,0.4])
 
 
 with text:
-    st.title("Anthropic Claude 3")
+    st.title("Anthropic Claude 3 (MultiModal)")
     st.write("""Anthropic's Claude family of models - Haiku, Sonnet, and Opus - allow customers to choose the exact combination of intelligence, speed, and cost that suits their business needs. \
 Claude 3 Opus, the company's most capable model, has set a market standard on benchmarks. \
 All of the latest Claude models have vision capabilities that enable them to process and analyze image data, meeting a growing demand for multimodal AI systems that can handle diverse data formats. While the family offers impressive performance across the board, Claude 3 Haiku is one of the most affordable and fastest options on the market for its intelligence category.""")
 
-    # with st.expander("See Code"): 
-    #     st.code(claude3.render_claude_code('claude.jinja',suffix),language="python")
-    st.image(st.session_state.image)
+    with st.expander("See Code"): 
+        st.code(claude3.render_claude_code('claude3.jinja',suffix),language="python")
+    st.image(st.session_state[suffix]['image'])
 
     # Define prompt and model parameters
     prompt_input = "Write a python code that list all countries."
@@ -42,7 +44,7 @@ All of the latest Claude models have vision capabilities that enable them to pro
         prompt_data = st.text_area(
             "Enter your prompt here:",
             height = 100,
-            value = "Describe the image"
+            value = st.session_state[suffix]['prompt']
         )
         submit = st.form_submit_button("Submit", type='primary')
         
