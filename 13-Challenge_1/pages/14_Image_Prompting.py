@@ -92,6 +92,7 @@ with text:
                             cfg_scale = st.session_state[suffix2]['cfg_scale'], 
                             seed = st.session_state[suffix2]['seed'],
                             steps = st.session_state[suffix2]['steps'],
+                            style_preset = st.session_state[suffix2]['style_preset']
                             
                         )
             st.image(generated_image)
@@ -131,6 +132,7 @@ with text:
                             cfg_scale = st.session_state[suffix2]['cfg_scale'], 
                             seed = st.session_state[suffix2]['seed'],
                             steps = st.session_state[suffix2]['steps'],
+                            style_preset = st.session_state[suffix2]['style_preset']
                             
                         )
             st.image(generated_image)

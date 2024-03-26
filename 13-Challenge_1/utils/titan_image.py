@@ -38,11 +38,10 @@ def getmodelIds(providername):
     available_models = bedrock.list_foundation_models()
     
     for model in available_models['modelSummaries']:
-        if providername in model['providerName']:
+        if providername in model['providerName'] and "titan-image" in model['modelId']:
             models.append(model['modelId'])
             
     return models
-
 
 
 def reset_session():
@@ -60,7 +59,7 @@ def initsessionkeys(dataset,suffix):
     return st.session_state[suffix]
 
 params = {
-	"cfg_scale":8,
+	"cfg_scale":8.0,
 	"seed":randint(10,20000),
 	"quality":"premium",
 	"width":512,
@@ -99,16 +98,18 @@ def load_jsonl(file_path):
 	return d
 
 def image_parameters(provider, suffix, index=0,region='us-east-1'):
+	size = ["512x512","1024x1024"]
 	with st.container(border=True):
 		models = getmodelIds(provider)
 		model = st.selectbox(
 			'model', models, index=models.index(getmodelId('Amazon-Image')))
-		cfg_scale= st.number_input('cfg_scale',value = 8)
-		seed=st.number_input('seed',value = randint(10,20000))
+		cfg_scale= st.slider('cfg_scale',value = st.session_state[suffix]['cfg_scale'],min_value = 1.1, max_value = 10.0, step = 1.0)
+		seed=st.number_input('seed', value = st.session_state[suffix]['seed'])
 		quality=st.radio('quality',["premium", "standard"], horizontal=True)
-		width=st.number_input('width',value = 512)
-		height=st.number_input('height',value = 512)
-		numberOfImages=st.number_input('numberOfImages',value = 1)
+		selected_size=st.radio('size',size, horizontal=True, index=1)
+		width = int(selected_size.split('x')[0])
+		height = int(selected_size.split('x')[1])
+		numberOfImages=st.selectbox('numberOfImages',[1],disabled=True)
 		params = {"model":model ,"cfg_scale":cfg_scale, "seed":seed,"quality":quality,
 					"width":width,"height":height,"numberOfImages":numberOfImages}
 		col1, col2= st.columns(2)
@@ -116,7 +117,6 @@ def image_parameters(provider, suffix, index=0,region='us-east-1'):
 			st.button(label = 'Tune Parameters', on_click=update_parameters, args=(suffix,), kwargs=(params))
 		with col2:
 			reset_session() 
-
 
 
 
