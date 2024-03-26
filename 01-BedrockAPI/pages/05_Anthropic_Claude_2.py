@@ -30,11 +30,18 @@ with text:
         st.code(claude2.render_claude_code('claude.jinja',suffix),language="python")
 
     # Define prompt and model parameters
+    system_prompt = None
     prompt_input = "Write a python code that list all countries."
     
     with st.form("myform"):
+        if st.session_state[suffix]["system"] != "":
+            system_prompt = st.text_area(
+                ":orange[System Prompt:]",
+                height = st.session_state[suffix]['height'],
+                value = st.session_state[suffix]["system"]
+            )
         prompt_data = st.text_area(
-            "Enter your prompt here:",
+            ":orange[User Prompt:]",
             height = st.session_state[suffix]['height'],
             value = st.session_state[suffix]["prompt"]
         )
@@ -44,6 +51,7 @@ with text:
         with st.spinner("Generating..."):
             response = claude2.invoke_model(client=bedrock.runtime_client(), 
                                             prompt=prompt_data,
+                                            system = system_prompt,
                                             model=st.session_state[suffix]['model'], 
                                             max_tokens_to_sample  = st.session_state[suffix]['max_tokens_to_sample'], 
                                             temperature = st.session_state[suffix]['temperature'], 

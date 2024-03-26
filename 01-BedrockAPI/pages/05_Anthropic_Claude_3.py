@@ -12,17 +12,19 @@ suffix = 'claude3'
 if suffix not in st.session_state:
     st.session_state[suffix] = {}
 
-if "image" not in st.session_state[suffix]:
-    st.session_state[suffix]['image'] = "images/sg_skyline.jpg"
-if "prompt" not in st.session_state:
-    st.session_state[suffix]['prompt'] = "Describe the image"
+dataset = claude3.load_jsonl('data/claude3.jsonl')
 
+stlib.initsessionkeys(dataset[0],suffix)
 stlib.initsessionkeys(claude3.params,suffix)
 
-with open(st.session_state[suffix]['image'], "rb") as image_file:
-    binary_data = image_file.read()
-    base_64_encoded_data = base64.b64encode(binary_data)
-    base64_string = base_64_encoded_data.decode('utf-8')
+if st.session_state[suffix]['image']:
+    with open(st.session_state[suffix]['image'], "rb") as image_file:
+        binary_data = image_file.read()
+        base_64_encoded_data = base64.b64encode(binary_data)
+        base64_string = base_64_encoded_data.decode('utf-8')
+    image_data = base64_string
+else:
+    image_data = None
 
 text, code = st.columns([0.6,0.4])
 
@@ -35,16 +37,26 @@ All of the latest Claude models have vision capabilities that enable them to pro
 
     with st.expander("See Code"): 
         st.code(claude3.render_claude_code('claude3.jinja',suffix),language="python")
-    st.image(st.session_state[suffix]['image'])
+    if st.session_state[suffix]['image']:
+        st.image(st.session_state[suffix]['image'])
+        media_type = "image/jpeg"
+    else:
+        media_type = None
 
     # Define prompt and model parameters
     prompt_input = "Write a python code that list all countries."
     
     with st.form("myform"):
+        if st.session_state[suffix]["system"] != "":
+            system_prompt = st.text_area(
+                ":orange[System Prompt:]",
+                height = st.session_state[suffix]['height'],
+                value = st.session_state[suffix]["system"]
+            )
         prompt_data = st.text_area(
-            "Enter your prompt here:",
-            height = 100,
-            value = st.session_state[suffix]['prompt']
+            ":orange[User Prompt:]",
+            height = st.session_state[suffix]['height'],
+            value = st.session_state[suffix]["prompt"]
         )
         submit = st.form_submit_button("Submit", type='primary')
         
@@ -57,8 +69,9 @@ All of the latest Claude models have vision capabilities that enable them to pro
                                             temperature = st.session_state[suffix]['temperature'], 
                                             top_p = st.session_state[suffix]['top_p'],
                                             top_k = st.session_state[suffix]['top_k'],
-                                            media_type="image/jpeg",
-        		                            image_data=base64_string)
+                                            system=st.session_state[suffix]["system"],
+                                            media_type=media_type,
+        		                            image_data=image_data)
 
             st.write("### Answer")
             st.info(response)
@@ -66,3 +79,6 @@ All of the latest Claude models have vision capabilities that enable them to pro
 with code:
 
     claude3.tune_parameters('Anthropic',suffix,index=6)
+    st.subheader('Prompt Examples:')   
+    with st.container(border=True):
+        stlib.create_tabs(dataset,suffix)

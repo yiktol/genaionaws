@@ -39,11 +39,12 @@ with text:
                 prompt = prompt_data, 
                 negative_prompt = negative_prompt,
                 model=st.session_state[suffix]['model'],
-                height = st.session_state[suffix]['height'], 
-                width = st.session_state[suffix]['width'], 
+                height = st.session_state[suffix]['size'].split('x')[1],
+                width = st.session_state[suffix]['size'].split('x')[0],
                 cfg_scale = st.session_state[suffix]['cfg_scale'], 
                 seed = st.session_state[suffix]['seed'],
                 steps = st.session_state[suffix]['steps'],
+                style_preset = st.session_state[suffix]['style_preset']
                 
             )
         st.image(generated_image)

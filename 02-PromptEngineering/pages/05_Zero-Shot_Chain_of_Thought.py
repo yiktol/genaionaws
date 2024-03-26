@@ -2,6 +2,9 @@ from langchain_community.llms import Bedrock
 import streamlit as st
 import utils.helpers as helpers
 import threading
+# from streamlit.runtime.scriptrunner import add_script_run_ctx
+# from streamlit.runtime.scriptrunner.script_run_context import get_script_run_ctx
+
 
 helpers.set_page_config()
 bedrock_runtime = helpers.bedrock_runtime_client()
@@ -69,6 +72,7 @@ options = [{"prompt_type":"Zero-shot-CoT", "prompt": prompt2, "height":150,},
 
     
 def call_llm(prompt_data):
+    
     response = llm.invoke(prompt_data)
     st.write("### Answer")
     st.info(response)
@@ -90,17 +94,19 @@ if submit:
     with st.spinner("Thinking..."):
         col1, col2 = st.columns(2)
         
+        # ctx = get_script_run_ctx()
         with col1:
-            t1 = threading.Thread(target=call_llm(prompt_data1))
+            call_llm(prompt_data1)
         with col2:
-            t2 = threading.Thread(target=call_llm(prompt_data2))
+            call_llm(prompt_data2)
+                
 
-
-        t1.start()
-        t2.start()
-        
-        t2.join()
-        t1.join()
+        # add_script_run_ctx(t1)
+        # add_script_run_ctx(t2)
+        # t1.start() 
+        # t2.start()
+        # t1.join()
+        # t2.join()
         #print(response)
 
         

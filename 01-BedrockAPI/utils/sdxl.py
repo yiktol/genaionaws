@@ -12,12 +12,14 @@ import utils.bedrock as u_bedrock
 import utils.stlib as stlib
 
 
-params = {"model": "stability.stable-diffusion-xl",
-		  "cfg_scale": 10,
-		  "seed": randint(10, 200000),
-		  "steps": 20,
-		  "width": 512,
-		  "height": 512,
+params = {"model": "stability.stable-diffusion-xl-v1",
+		#   "cfg_scale": 10,
+		#   "seed": randint(10, 200000),
+		#   "steps": 10,
+		#   "width": 1024,
+		#   "height": 1024,
+		#  "style_preset":"3d-model"
+  		# "size":"1024x1024"
 		  }
 
 
@@ -26,8 +28,8 @@ def render_sdxl_image_code(templatePath, suffix):
 	template = env.get_template(templatePath)
 	output = template.render(
 		prompt=st.session_state[suffix]['prompt'],
-		height=st.session_state[suffix]['height'],
-		width=st.session_state[suffix]['width'],
+		height=int(st.session_state[suffix]['size'].split('x')[1]),
+		width=int(st.session_state[suffix]['size'].split('x')[0]),
 		cfg_scale=st.session_state[suffix]['cfg_scale'],
 		seed=st.session_state[suffix]['seed'],
 		steps=st.session_state[suffix]['steps'],
@@ -51,41 +53,46 @@ def load_jsonl(file_path):
 
 
 def image_parameters(provider, suffix, index=0, region='us-east-1'):
+	size = ["1024x1024", "1152x896", "1216x832", "1344x768", "1536x640", "640x1536", "768x1344", "832x1216", "896x1152"]
 	st.subheader("Parameters")
 	with st.container(border=True):
 		models = u_bedrock.getmodelIds('Stability AI')
 		model = st.selectbox(
 			'model', models, index=models.index(u_bedrock.getmodelId(provider)))
-		cfg_scale = st.number_input('cfg_scale', value=10)
-		seed = st.number_input('seed', value=randint(10, 200000))
-		width = st.number_input('width', value=512)
-		height = st.number_input('height', value=512)
-		steps = st.number_input('steps', value=20)
-		params = {"model": model, 
+		cfg_scale = st.slider('cfg_scale', value=st.session_state[suffix]['cfg_scale'], min_value=1, max_value=35, step=1)
+		seed = st.number_input('seed', value=st.session_state[suffix]['seed'])
+		selected_size = st.selectbox('size', size)
+		width = int(selected_size.split('x')[0])
+		height = int(selected_size.split('x')[1])
+		steps = st.number_input('steps', value=st.session_state[suffix]['steps'], min_value=10, max_value=50, step=1)
+		style_preset = st.selectbox('style', ["3d-model", "analog-film", "anime", "cinematic", "comic-book", "digital-art", "enhance", "fantasy-art", "isometric", "line-art", "low-poly", "modeling-compound", "neon-punk", "origami","photographic", "pixel-art", "tile-texture"],index=14)
+		new_params = {"model": model, 
 				  "cfg_scale": cfg_scale, 
 				  "seed": seed,
 				  "steps": steps,
-				  "width": width, 
-				  "height": height,}
+				  "width": width, 	
+				  "height": height,
+	  			  "style_preset":style_preset}
 		col1, col2, col3 = st.columns([0.4,0.3,0.3])
 		with col1:
-			st.button(label = 'Tune Parameters', on_click=update_parameters, args=(suffix,), kwargs=(params))
+			st.button(label = 'Tune Parameters', on_click=update_parameters, args=(suffix,), kwargs=(new_params))
 		with col2:
 			stlib.reset_session() 
 
 
 # get the stringified request body for the InvokeModel API call
-def get_sdxl_image_generation_request_body(prompt, negative_prompt, height, width, cfg_scale, seed,steps):
+def get_sdxl_image_generation_request_body(prompt, negative_prompt, height, width, cfg_scale, seed,steps,style_preset):
 
 	body = {"text_prompts": [
 		{"text": prompt, "weight": 1},
 		{"text": negative_prompt, "weight": -1}
 	],
-		"cfg_scale": cfg_scale,
-		"seed": seed,
-		"steps": steps,
-		"height": height,
-		"width": width
+		"cfg_scale": float(cfg_scale),
+		"seed": int(seed),
+		"steps": int(steps),
+		"height": int(height),
+		"width": int(width),
+		"style_preset": str(style_preset)
 	}
 
 	return json.dumps(body)
@@ -105,7 +112,7 @@ def get_sdxl_response_image(response):
 
 
 # generate an image using Amazon sdxl Image Generator
-def get_image_from_model(prompt, negative_prompt,model, height, width, cfg_scale, seed, steps):
+def get_image_from_model(prompt, negative_prompt,model, height, width, cfg_scale, seed, steps,style_preset):
 
 	bedrock = boto3.client(
 		service_name='bedrock-runtime',
@@ -118,7 +125,8 @@ def get_image_from_model(prompt, negative_prompt,model, height, width, cfg_scale
 												   width=width, 
 												   cfg_scale=cfg_scale, 
 												   seed=seed,
-												   steps=steps
+												   steps=steps,
+			   										style_preset=style_preset
 												   )
 
 	response = bedrock.invoke_model(body=body, modelId=model,

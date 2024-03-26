@@ -17,8 +17,9 @@ bedrock_runtime = bedrock.runtime_client()
 
 dataset = helpers.load_jsonl('data/titan_image.jsonl')
 
-stlib.initsessionkeys(dataset[0],suffix)
+
 stlib.initsessionkeys(titan_image.params,suffix)
+stlib.initsessionkeys(dataset[0],suffix)
 
 text, code = st.columns([0.6,0.4])
 
@@ -58,7 +59,7 @@ It can also generate variations of an image.""")
         st.image(generated_image)
 
 with code:
-    titan_image.image_parameters('Amazon', suffix, index=2,region='us-east-1')
+    titan_image.image_parameters('Amazon', suffix, index=2)
 
     st.subheader('Prompt Examples:')   
     with st.container(border=True):

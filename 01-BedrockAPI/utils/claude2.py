@@ -79,21 +79,42 @@ def invoke_model(client, prompt, model,
 				 temperature = 0.1, 
 				 top_p = 0.9,
 				 top_k = 50,
-				 stop_sequences = ["\n\nHuman"]):
+				 stop_sequences = ["\n\nHuman"],
+     			system = None):
 	output = ''
-	input = {
-		'prompt': claude_generic(prompt),
-		'max_tokens_to_sample': max_tokens_to_sample,
+ 
+	if system:
+		input = {
+		'max_tokens': max_tokens_to_sample,
 		'stop_sequences': stop_sequences,
 		'temperature': temperature,
 		'top_p': top_p,
 		'top_k': top_k,
-		"anthropic_version": "bedrock-2023-05-31"
+		"anthropic_version": "bedrock-2023-05-31",
+  		"messages": [{"role": "user", "content": prompt}],
+		"system": system,
 		}
-	body=json.dumps(input)
-	response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
-	response_body = json.loads(response.get('body').read())
-	output = response_body['completion']
+  
+		body=json.dumps(input)
+		response = client.invoke_model(body=body, modelId=model, accept=accept, contentType=content_type)
+		response_body = json.loads(response.get('body').read())
+		output = response_body.get('content')[0]['text']
+     
+	else:
+		input = {
+			'prompt': claude_generic(prompt),
+			'max_tokens_to_sample': max_tokens_to_sample,
+			'stop_sequences': stop_sequences,
+			'temperature': temperature,
+			'top_p': top_p,
+			'top_k': top_k,
+			"anthropic_version": "bedrock-2023-05-31"
+			}
+ 
+		body=json.dumps(input)
+		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
+		response_body = json.loads(response.get('body').read())
+		output = response_body['completion']
 
 	return output
 

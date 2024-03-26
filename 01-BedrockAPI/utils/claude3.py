@@ -79,6 +79,7 @@ def invoke_model(client, prompt, model,
 				 top_p = 0.9,
 				 top_k = 50,
 				 stop_sequences = ["\n\nHuman"],
+				system=None,
      			media_type=None,
         		image_data=None
         		):
@@ -108,7 +109,9 @@ def invoke_model(client, prompt, model,
   		"messages": message_list
 		}
  
-	
+	if system:
+		input['system'] = system
+ 
 	body=json.dumps(input)
 	response = client.invoke_model(body=body, # Encode to bytes
 									modelId=model, 

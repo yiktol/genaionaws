@@ -22,6 +22,8 @@ def update_options(dataset,suffix,item_num):
         st.session_state[suffix][key] = dataset[item_num][key]
 
 def load_options(dataset,suffix, item_num):    
+    if "system" in dataset[item_num].keys():
+        st.write("System Prompt:", dataset[item_num]["system"])
     st.write("Prompt:",dataset[item_num]["prompt"])
     if "negative_prompt" in dataset[item_num].keys():
         st.write("Negative Prompt:", dataset[item_num]["negative_prompt"])

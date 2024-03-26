@@ -11,7 +11,7 @@ import utils.stlib as stlib
 
 
 params = {
-	"cfg_scale":8,
+	"cfg_scale":8.0,
 	"seed":randint(10,20000),
 	"quality":"premium",
 	"width":1024,
@@ -49,17 +49,22 @@ def load_jsonl(file_path):
 			d.append(obj)
 	return d
 
-def image_parameters(provider, suffix, index=0,region='us-east-1'):
+
+
+
+def image_parameters(provider, suffix, index=0):
+	size = ["512x512","1024x1024"]
 	st.subheader("Parameters")
 	with st.container(border=True):
-		models = u_bedrock.getmodelIds('Amazon')
+		models = u_bedrock.getmodelIds(provider)
 		model  = st.selectbox('model', models,index=index)
-		cfg_scale= st.number_input('cfg_scale',value = 8)
-		seed=st.number_input('seed',value = randint(10,20000))
+		cfg_scale= st.slider('cfg_scale',value = st.session_state[suffix]['cfg_scale'],min_value = 1.1, max_value = 10.0, step = 1.0)
+		seed=st.number_input('seed', value = st.session_state[suffix]['seed'])
 		quality=st.radio('quality',["premium", "standard"], horizontal=True)
-		width=st.number_input('width',value = 1024)
-		height=st.number_input('height',value = 1024)
-		numberOfImages=st.number_input('numberOfImages',value = 1)
+		selected_size=st.radio('size',size, horizontal=True, index=1)
+		width = int(selected_size.split('x')[0])
+		height = int(selected_size.split('x')[1])
+		numberOfImages=st.selectbox('numberOfImages',[1])
 		params = {"model":model ,"cfg_scale":cfg_scale, "seed":seed,"quality":quality,
 					"width":width,"height":height,"numberOfImages":numberOfImages}
 		col1, col2, col3 = st.columns([0.4,0.3,0.3])
