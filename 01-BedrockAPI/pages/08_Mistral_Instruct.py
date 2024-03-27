@@ -42,7 +42,7 @@ with text:
     if prompt_data and submit:
         with st.spinner("Generating..."):
 
-            response = mistral.invoke_model(bedrock.runtime_client(), 
+            outputs = mistral.invoke_model(bedrock.runtime_client(), 
                                             prompt_data, 
                                             st.session_state[suffix]['model'], 
                                             max_tokens=st.session_state[suffix]['max_tokens'], 
@@ -50,7 +50,11 @@ with text:
                                             top_p=st.session_state[suffix]['top_p'])
 
             st.write("### Answer")
-            st.info(response)
+            for index, output in enumerate(outputs):
+
+                st.info(f"Output {index + 1}\n")
+                st.success(f"Text:\n{output['text']}\n")
+                st.info(f"Stop reason: {output['stop_reason']}\n")
 
 with code:
     mistral.tune_parameters('Mistral',suffix, index=0,region='us-east-1')

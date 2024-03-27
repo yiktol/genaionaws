@@ -2,7 +2,7 @@ import streamlit as st
 import jsonlines
 import json
 from jinja2 import Environment, FileSystemLoader
-import utils.bedrock as u_bedrock
+import utils.bedrock as bedrock
 import utils.stlib as stlib
 
 
@@ -33,10 +33,6 @@ def titan_generic(input_prompt):
 	prompt = f"""User: {input_prompt}\n\nAssistant:"""
 	return prompt
 
-def update_parameters(suffix,**args):
-	for key in args:
-		st.session_state[suffix][key] = args[key]
-	return st.session_state[suffix]
 
 def load_jsonl(file_path):
 	d = []
@@ -48,24 +44,21 @@ def load_jsonl(file_path):
 def tune_parameters(provider, suffix,index=0,region='us-east-1'):
 	st.subheader("Parameters")
 
-	with st.container(border=True):
-		models = u_bedrock.getmodelIds('Amazon')
+	with st.form("titan-text-form"):
+		models = bedrock.getmodelIds('Amazon')
 		model = st.selectbox(
-			'model', models, index=models.index(u_bedrock.getmodelId(provider)))
-		temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = st.session_state[suffix]['temperature'], step = 0.1)
+			'model', models, index=models.index(bedrock.getmodelId(provider)))
+		temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.1, step = 0.1)
 		topP = st.slider('topP',min_value = 0.0, max_value = 1.0, value = st.session_state[suffix]['topP'], step = 0.1)
-		maxTokenCount = st.number_input('maxTokenCount',min_value = 50, max_value = 4096, value = st.session_state[suffix]['maxTokenCount'], step = 1)
+		maxTokenCount = st.number_input('maxTokenCount',min_value = 50, max_value = 4096, value = 1024, step = 1)
 		params = {
 			"model":model, 
 			"temperature":temperature, 
 			"topP":topP,
 			"maxTokenCount":maxTokenCount
 			}
-		col1, col2, col3 = st.columns([0.4,0.3,0.3])
-		with col1:
-			st.button(label = 'Tune Parameters', on_click=update_parameters, args=(suffix,), kwargs=(params))
-		with col2:
-			stlib.reset_session() 
+		st.form_submit_button(label = 'Tune Parameters', on_click=stlib.update_parameters, args=(suffix,), kwargs=(params))
+
 
 
 def invoke_model(client, prompt, model, 

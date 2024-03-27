@@ -3,22 +3,30 @@ import jsonlines
 import json
 import boto3
 import base64
+from jinja2 import Environment, FileSystemLoader
 from io import BytesIO
 from random import randint
-from jinja2 import Environment, FileSystemLoader
-import utils.bedrock as u_bedrock
+import utils.bedrock as client
 import utils.stlib as stlib
 
 
 params = {
 	"cfg_scale":8.0,
-	"seed":randint(10,20000),
+	"seed":randint(10,2147483646),
 	"quality":"premium",
 	"width":1024,
 	"height":1024,
 	"numberOfImages":1,
 	"model":"amazon.titan-image-generator-v1",
 	}
+
+
+def load_jsonl(file_path):
+	d = []
+	with jsonlines.open(file_path) as reader:
+		for obj in reader:
+			d.append(obj)
+	return d
 
 
 def render_titan_image_code(templatePath,suffix):
@@ -36,44 +44,29 @@ def render_titan_image_code(templatePath,suffix):
 		model = st.session_state[suffix]['model'])
 	return output
 
-
-def update_parameters(suffix,**args):
-	for key in args:
-		st.session_state[suffix][key] = args[key]
-	return st.session_state[suffix]
-
-def load_jsonl(file_path):
-	d = []
-	with jsonlines.open(file_path) as reader:
-		for obj in reader:
-			d.append(obj)
-	return d
-
-
-
-
 def image_parameters(provider, suffix, index=0):
-	size = ["512x512","1024x1024"]
+	size = ["512x512","1024x1024","768x768","768x1152", "384x576","1152x768","576x384","768x1280","384x640","1280x768","640x384"]
 	st.subheader("Parameters")
-	with st.container(border=True):
-		models = u_bedrock.getmodelIds(provider)
+	with st.form("image-form"):
+		models = client.getmodelIds(provider)
 		model  = st.selectbox('model', models,index=index)
-		cfg_scale= st.slider('cfg_scale',value = st.session_state[suffix]['cfg_scale'],min_value = 1.1, max_value = 10.0, step = 1.0)
-		seed=st.number_input('seed', value = st.session_state[suffix]['seed'])
+		cfg_scale= st.slider('cfg_scale',value = 8.0,min_value = 1.1, max_value = 10.0, step = 1.0, help="Specifies how strongly the generated image should adhere to the prompt.")
+		seed=st.number_input('seed', value = None, help="Use to control and reproduce results. (min=0, max=2,147,483,646)")
 		quality=st.radio('quality',["premium", "standard"], horizontal=True)
-		selected_size=st.radio('size',size, horizontal=True, index=1)
+		selected_size=st.selectbox('size',size, index=1, help="The WxH of the image in pixels.")
 		width = int(selected_size.split('x')[0])
 		height = int(selected_size.split('x')[1])
-		numberOfImages=st.selectbox('numberOfImages',[1])
+		numberOfImages=st.selectbox('numberOfImages',[1], disabled=True)
+  
+		if seed is None:
+			seed = randint(10, 2147483646)
 		params = {"model":model ,"cfg_scale":cfg_scale, "seed":seed,"quality":quality,
 					"width":width,"height":height,"numberOfImages":numberOfImages}
-		col1, col2, col3 = st.columns([0.4,0.3,0.3])
+		col1, col2 = st.columns([0.5,0.5])
 		with col1:
-			st.button(label = 'Tune Parameters', on_click=update_parameters, args=(suffix,), kwargs=(params))
-		with col2:
-			stlib.reset_session() 
-
-
+			st.form_submit_button(label = 'Tune Parameters', on_click=stlib.update_parameters, args=(suffix,), kwargs=(params))
+		# with col2:
+		# 	stlib.reset_session() 
 
 
 #get the stringified request body for the InvokeModel API call

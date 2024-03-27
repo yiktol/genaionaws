@@ -98,7 +98,7 @@ def load_jsonl(file_path):
 	return d
 
 def image_parameters(provider, suffix, index=0,region='us-east-1'):
-	size = ["512x512","1024x1024"]
+	size = ["512x512","1024x1024","768x768","768x1152", "384x576","1152x768","576x384","768x1280","384x640","1280x768","640x384"]
 	with st.container(border=True):
 		models = getmodelIds(provider)
 		model = st.selectbox(
@@ -106,7 +106,7 @@ def image_parameters(provider, suffix, index=0,region='us-east-1'):
 		cfg_scale= st.slider('cfg_scale',value = st.session_state[suffix]['cfg_scale'],min_value = 1.1, max_value = 10.0, step = 1.0)
 		seed=st.number_input('seed', value = st.session_state[suffix]['seed'])
 		quality=st.radio('quality',["premium", "standard"], horizontal=True)
-		selected_size=st.radio('size',size, horizontal=True, index=1)
+		selected_size=st.selectbox('size',size, index=1)
 		width = int(selected_size.split('x')[0])
 		height = int(selected_size.split('x')[1])
 		numberOfImages=st.selectbox('numberOfImages',[1],disabled=True)

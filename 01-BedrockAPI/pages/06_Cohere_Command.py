@@ -33,7 +33,7 @@ with text:
 
     if prompt_data and submit:
         with st.spinner("Generating..."):
-            response = cohere.invoke_model(client=bedrock.runtime_client(), 
+            generations = cohere.invoke_model(client=bedrock.runtime_client(), 
                                             prompt=prompt_data,
                                             model=st.session_state[suffix]['model'], 
                                             max_tokens  = st.session_state[suffix]['max_tokens'], 
@@ -41,12 +41,20 @@ with text:
                                             p = st.session_state[suffix]['p'],
                                             k = st.session_state[suffix]['k'],
                                             stop_sequences = st.session_state[suffix]['stop_sequences'],
+                                            stream = st.session_state[suffix]['stream'],
+                                            num_generations = st.session_state[suffix]['num_generations'],
                                             return_likelihoods = st.session_state[suffix]['return_likelihoods']
                                             )
 
             st.write("### Answer")
-            st.info(response)
+            for index, generation in enumerate(generations):
 
+                st.success(f"Generation {index + 1}\n")
+                st.info(f"Text:\n {generation['text']}\n")
+                if 'likelihood' in generation:
+                    st.write(f"Likelihood:\n {generation['likelihood']}\n")
+                
+                st.info(f"Reason: {generation['finish_reason']}\n\n")
 
 
 with code:

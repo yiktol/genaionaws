@@ -45,7 +45,10 @@ with text:
                  maxTokens = st.session_state[suffix]['maxTokens'], 
                  temperature = st.session_state[suffix]['temperature'], 
                  topP = st.session_state[suffix]['topP'],
-                 stop_sequences = [])
+                 stopSequences = st.session_state[suffix]['stopSequences'],
+                 countPenalty = st.session_state[suffix]['countPenalty_scale'],
+                 presencePenalty = st.session_state[suffix]['presencePenalty_scale'],
+                 frequencyPenalty = st.session_state[suffix]['frequencyPenalty_scale'])
 
         st.write("### Answer")
         st.info(response)

@@ -56,13 +56,13 @@ def tune_parameters(provider, suffix,index=0,region='us-east-1'):
 		top_p = st.slider('top_p',min_value = 0.0, max_value = 1.0, value = 0.9, step = 0.1)
 		top_k = st.slider('top_k', min_value = 0, max_value = 100, value = 50, step = 1)
 		max_tokens_to_sample = st.number_input('max_tokens_to_sample',min_value = 50, max_value = 4096, value = 1024, step = 1)
-		stop_sequences = st.text_input('stop_sequences', value = ["\n\nHuman"])
+		stop_sequences = st.text_input('stop_sequences', value = "\n\nHuman")
 		params = {
 			"model":model, 
 			"temperature":temperature, 
 			"top_p":top_p,
 			"top_k":top_k,
-			"stop_sequences":stop_sequences,
+			"stop_sequences":[stop_sequences],
 			"max_tokens_to_sample":max_tokens_to_sample
 			}
 		col1, col2, col3 = st.columns([0.4,0.3,0.3])

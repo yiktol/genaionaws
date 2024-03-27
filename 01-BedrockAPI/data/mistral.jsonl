@@ -3,4 +3,3 @@
 {"height":50,"prompt": "In Bash, how do I list all text files in the current directory (excluding subdirectories) that have been modified in the last month?"}
 {"height":50,"prompt": "I am going to Paris, what should I see?"}
 {"height":50,"prompt": "What is the difference between inorder and preorder traversal? Give an example in Python."}
-{"height":150,"prompt": " What is your favourite condiment? [/INST]\nWell, I'm quite partial to a good squeeze of fresh lemon juice.\n It adds just the right amount of zesty flavour to whatever I'm cooking up in the kitchen!</s> \n[INST] Do you have mayonnaise recipes?"}

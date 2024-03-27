@@ -1,8 +1,4 @@
 import streamlit as st
-import utils.helpers as helpers
-from io import BytesIO
-from random import randint
-import utils.helpers as helpers
 import utils.bedrock as bedrock
 import utils.stlib as stlib
 import utils.titan_image as titan_image
@@ -15,8 +11,7 @@ if suffix not in st.session_state:
 
 bedrock_runtime = bedrock.runtime_client()
 
-dataset = helpers.load_jsonl('data/titan_image.jsonl')
-
+dataset = titan_image.load_jsonl('data/titan_image.jsonl')
 
 stlib.initsessionkeys(titan_image.params,suffix)
 stlib.initsessionkeys(dataset[0],suffix)

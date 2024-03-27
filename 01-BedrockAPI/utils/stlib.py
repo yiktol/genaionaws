@@ -1,5 +1,4 @@
 import streamlit as st
-from jinja2 import Environment, FileSystemLoader
 import uuid
 
 
@@ -10,6 +9,11 @@ def set_page_config():
     layout="wide",
     initial_sidebar_state="expanded",
 )
+
+def update_parameters(suffix,**args):
+	for key in args:
+		st.session_state[suffix][key] = args[key]
+	return st.session_state[suffix]
 
 def initsessionkeys(dataset,suffix):
     for key in dataset.keys():
@@ -24,6 +28,16 @@ def update_options(dataset,suffix,item_num):
 def load_options(dataset,suffix, item_num):    
     if "system" in dataset[item_num].keys():
         st.write("System Prompt:", dataset[item_num]["system"])
+    if "cfg_scale" in dataset[item_num].keys():
+        st.write("CFG Scale:", dataset[item_num]["cfg_scale"])
+    if "steps" in dataset[item_num].keys():
+        st.write("Steps:", dataset[item_num]["steps"])
+    if "width" in dataset[item_num].keys():
+        st.write(f'HeightxWidth: {dataset[item_num]["height"]}x{dataset[item_num]["width"]}')
+    if "seed" in dataset[item_num].keys():
+        st.write("Seed:", dataset[item_num]["seed"])
+    if "quality" in dataset[item_num].keys():
+        st.write("Quality:", dataset[item_num]["quality"])
     st.write("Prompt:",dataset[item_num]["prompt"])
     if "negative_prompt" in dataset[item_num].keys():
         st.write("Negative Prompt:", dataset[item_num]["negative_prompt"])
@@ -37,60 +51,6 @@ def reset_session():
 
 
     st.button(label='Reset', on_click=form_callback, key=uuid.uuid1())
-
-
-
-
-def render_claude_code(templatePath):
-    env = Environment(loader=FileSystemLoader('templates'))
-    template = env.get_template(templatePath)
-    output = template.render(
-        prompt=st.session_state['prompt'], 
-        max_tokens=st.session_state['max_tokens'], 
-        temperature=st.session_state['temperature'], 
-        top_p=st.session_state['top_p'],
-        top_k = st.session_state['top_k'],
-        model = st.session_state['model'])
-    return output
-
-def render_cohere_code(templatePath):
-    env = Environment(loader=FileSystemLoader('templates'))
-    template = env.get_template(templatePath)
-    output = template.render(
-        prompt=st.session_state['prompt'], 
-        max_tokens=st.session_state['max_tokens'], 
-        temperature=st.session_state['temperature'], 
-        top_p=st.session_state['top_p'],
-        top_k = st.session_state['top_k'],
-        model = st.session_state['model'])
-    return output
-
-def render_meta_code(templatePath):
-    env = Environment(loader=FileSystemLoader('templates'))
-    template = env.get_template(templatePath)
-    output = template.render(
-        prompt=st.session_state['prompt'], max_tokens=st.session_state['max_tokens'], 
-        temperature=st.session_state['temperature'], top_p=st.session_state['top_p'],
-        model = st.session_state['model'])
-    return output
-
-def render_mistral_code(templatePath):
-    env = Environment(loader=FileSystemLoader('templates'))
-    template = env.get_template(templatePath)
-    output = template.render(
-        prompt=st.session_state['prompt'], max_tokens=st.session_state['max_tokens'], 
-        temperature=st.session_state['temperature'], top_p=st.session_state['top_p'],
-        model = st.session_state['model'])
-    return output
-
-def render_stabilityai_code(templatePath):
-    env = Environment(loader=FileSystemLoader('templates'))
-    template = env.get_template(templatePath)
-    output = template.render(
-        prompt=st.session_state['prompt'], cfg_scale=st.session_state['cfg_scale'], 
-        seed=st.session_state['seed'], steps=st.session_state['steps'],
-        model = st.session_state['model'])
-    return output
 
 
 def create_two_tabs(dataset,suffix):

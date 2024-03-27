@@ -47,7 +47,11 @@ with text:
                                           )
 
             st.write("### Answer")
-            st.info(response)
+            st.success(f"Generated Text: {response['generation']}")
+            st.info(f"Prompt Token count:  {response['prompt_token_count']}")
+            st.info(f"Generation Token count:  {response['generation_token_count']}")
+            st.info(f"Stop reason:  {response['stop_reason']}")
+
 
 
 with code:

@@ -13,10 +13,10 @@ body = json.dumps({
     "maxTokens": {{maxTokens}},
     "temperature": {{temperature}},
     "topP": {{topP}},
-    "stopSequences": [],
-    "countPenalty": {"scale": 0},
-    "presencePenalty": {"scale": 0},
-    "frequencyPenalty": {"scale": 0}
+    "stopSequences": {{stopSequences}},
+    "countPenalty": {"scale": {{countPenalty}}},
+    "presencePenalty": {"scale": {{presencePenalty}}},
+    "frequencyPenalty": {"scale": {{frequencyPenalty}}}
   })
 
 response = bedrock_runtime.invoke_model(

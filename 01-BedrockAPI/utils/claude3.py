@@ -2,7 +2,7 @@ import streamlit as st
 import jsonlines
 import json
 from jinja2 import Environment, FileSystemLoader
-import utils.bedrock as u_bedrock
+import utils.bedrock as bedrock
 import utils.stlib as stlib
 
 def load_jsonl(file_path):
@@ -48,27 +48,24 @@ def update_parameters(suffix,**args):
 def tune_parameters(provider, suffix,index=0,region='us-east-1'):
 	st.subheader("Parameters")
 
-	with st.container(border=True):
-		models = u_bedrock.getmodelIds_claude3()
+	with st.form("claude3-form"):
+		models = bedrock.getmodelIds_claude3()
 		model = st.selectbox('model', models, index=0)
 		temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.1, step = 0.1)
 		top_p = st.slider('top_p',min_value = 0.0, max_value = 1.0, value = 0.9, step = 0.1)
 		top_k = st.slider('top_k', min_value = 0, max_value = 100, value = 50, step = 1)
 		max_tokens = st.number_input('max_tokens',min_value = 50, max_value = 4096, value = 1024, step = 1)
-		stop_sequences = st.text_input('stop_sequences', value = ["\n\nHuman"])
+		stop_sequences = st.text_input('stop_sequences', value = "\n\nHuman")
 		params = {
 			"model":model, 
 			"temperature":temperature, 
 			"top_p":top_p,
 			"top_k":top_k,
-			"stop_sequences":stop_sequences,
+			"stop_sequences":[stop_sequences],
 			"max_tokens":max_tokens
 			}
-		col1, col2, col3 = st.columns([0.4,0.3,0.3])
-		with col1:
-			st.button(label = 'Tune Parameters', on_click=update_parameters, args=(suffix,), kwargs=(params))
-		with col2:
-			stlib.reset_session() 
+
+		st.form_submit_button(label = 'Tune Parameters', on_click=update_parameters, args=(suffix,), kwargs=(params))
 
 
 def invoke_model(client, prompt, model, 
