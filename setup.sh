@@ -5,10 +5,6 @@ git config --global --add safe.directory /home/ubuntu/environment/genaionaws/
 
 cd /home/ubuntu/environment/genaionaws
 
-python3 -m venv .venv
-
-source .venv/bin/activate
-
 pip install -r /home/ubuntu/environment/genaionaws/requirements.txt
 
 cd /home/ubuntu/environment/genaionaws/01-BedrockAPI
