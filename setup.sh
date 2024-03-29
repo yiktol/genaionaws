@@ -1,3 +1,14 @@
+
+chown ubuntu:root /home/ubuntu/ -R
+
+git config --global --add safe.directory /home/ubuntu/environment/genaionaws/
+
+cd /home/ubuntu/environment/genaionaws
+
+python3 -m venv .venv
+
+source .venv/bin/activate
+
 pip install -r /home/ubuntu/environment/genaionaws/requirements.txt
 
 cd /home/ubuntu/environment/genaionaws/01-BedrockAPI
@@ -33,13 +44,11 @@ streamlit run Home.py --server.port 8089 &
 cd /home/ubuntu/environment/genaionaws/11-Agents
 streamlit run Home.py --server.port 8090 &
 
-cd /home/ubuntu/environment/genaionaws/12-Risk_and_Misuse
+cd /home/ubuntu/environment/genaionaws/12-Risk_Misuse_and_Bias_Mitigation
 streamlit run Home.py --server.port 8091 &
 
 cd /home/ubuntu/environment/genaionaws/13-Challenge_1
 streamlit run Home.py --server.port 8092 &
 
-chown ubuntu:root /home/ubuntu/environment -R
 
-git config --global --add safe.directory /home/ubuntu/environment/genaionaws
 

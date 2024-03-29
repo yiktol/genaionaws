@@ -3,6 +3,7 @@ boto3
 faiss-cpu
 transformers
 langchain
+langchain_experimental
 streamlit
 nltk 
 gensim
