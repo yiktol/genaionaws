@@ -220,7 +220,7 @@ Use Amazon Comprehend Moderation with a configuration to control what moderation
 				invoke_chain(prompt_data, model)
 
 		except Exception as e:
-			print(str(e))
+			# print(str(e))
 			st.write(str(e))    
 	
 	with tab3:
@@ -236,6 +236,6 @@ Use Amazon Comprehend Moderation with a configuration to control what moderation
 			if submit:
 				invoke_chain(prompt_data, model)
 		except Exception as e:
-			print(str(e))
+			# print(str(e))
 			st.write(str(e))
 

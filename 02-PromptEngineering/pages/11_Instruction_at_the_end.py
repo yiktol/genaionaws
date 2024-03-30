@@ -60,7 +60,7 @@ if prompt_data and submit:
 
     response = llm(prompt_data)
 
-    print(response)
+    # print(response)
     st.write("### Answer")
     st.info(response)
   

@@ -53,7 +53,7 @@ if prompt_data and submit:
     with st.spinner("Thinking..."):
         response = llm(prompt_data)
 
-        print(response)
+        # print(response)
         st.write("### Answer")
         st.info(response)
     

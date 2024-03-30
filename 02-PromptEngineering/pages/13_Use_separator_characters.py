@@ -81,7 +81,7 @@ with row1_col1:
 
         response = llm(prompt_data)
 
-        print(response)
+        # print(response)
         st.write("### Answer")
         st.info(response)
   
