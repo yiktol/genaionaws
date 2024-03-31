@@ -1,5 +1,6 @@
 import warnings 
 import boto3
+import json
 from textwrap import dedent 
 import streamlit as st
 from langchain_community.llms import Bedrock
@@ -9,7 +10,6 @@ from langchain.chains.question_answering import LLMChain
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.chains.constitutional_ai.principles import PRINCIPLES
 from langchain.chains.constitutional_ai.base import ConstitutionalPrinciple
-
 
 st.set_page_config(
 	page_title="Constitutional chain",
@@ -231,9 +231,9 @@ with prompt_col:
 				st.markdown(invoke_constitional_chain(principle_name, prompt_data,evil_qa_prompt,llm))
 	with tab3:
 		with st.expander("Custom Principle"):
-			st.write(custom_principle)
+			st.markdown(custom_principle)
 		with st.expander("Prompt Template"):
-			st.write(injection_example)
+			st.markdown(injection_example)
 		submit, prompt_data = prompt_box(options[2]['prompt'],options[2]['height'],options[2]['id'])
 		if submit:
 			st.info("Basic Chain Output")

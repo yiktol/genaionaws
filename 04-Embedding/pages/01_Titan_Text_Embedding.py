@@ -70,7 +70,7 @@ with code:
     code_data=f"""import json
 import boto3
 
-modelId = 'amazon.titan-embed-text-v1'
+modelId = 'amazon.titan-embed-g1-text-02'
 accept = 'application/json'
 contentType = 'application/json'
 input = {{

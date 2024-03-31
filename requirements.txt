@@ -5,6 +5,9 @@ transformers
 langchain
 langchain_experimental
 streamlit
+llama-index
+llama-index-llms-bedrock
+llama-index-embeddings-bedrock
 nltk 
 gensim
 threadpoolctl==3.1.0

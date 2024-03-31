@@ -65,10 +65,15 @@ with text:
             )
 
             st.write("### Answer")
+            placeholder = st.empty()
+            full_response = ''
             for event in response['body']:
                 data = json.loads(event['chunk']['bytes'])
-                #print(data['outputText'])
-                st.info(data['outputText'])
+                chuck = data['outputText']
+                full_response += chuck
+                placeholder.info(full_response)
+            placeholder.info(full_response)
+                
             
 with code:
     titan_text.tune_parameters('Amazon',suffix)
