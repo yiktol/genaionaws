@@ -135,7 +135,10 @@ with st.sidebar:
         except client.exceptions.ResourceNotFoundException:
             st.sidebar.info("Table does not exist, nothing to delete")         
         except Exception as e:
-            st.sidebar.write(f"Error deleting DynamoDB table: {e}")
+            if "AccessDeniedException" in str(e):
+                st.sidebar.warning("Access Denied")
+            else:
+                st.sidebar.write(f"Error deleting DynamoDB table: {e}")
     streaming_on = st.toggle('Streaming')
     st.button('Clear Screen', on_click=clear_screen)
 
