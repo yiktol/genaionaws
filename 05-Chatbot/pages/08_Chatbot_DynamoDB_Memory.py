@@ -73,7 +73,7 @@ model = BedrockChat(
 chain = prompt | model | StrOutputParser()
 
 # DynamoDB Chat Message History
-history = DynamoDBChatMessageHistory(table_name="SessionTable", session_id="0")
+history = DynamoDBChatMessageHistory(table_name="SessionTable", session_id="0", region="us-east-1")
 
 # Chain with History
 chain_with_history = RunnableWithMessageHistory(
