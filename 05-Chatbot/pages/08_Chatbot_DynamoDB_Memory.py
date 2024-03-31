@@ -133,9 +133,7 @@ with st.sidebar:
             )
             st.sidebar.success(f"DynamoDB table is deleted!")
         except client.exceptions.ResourceNotFoundException:
-            st.sidebar.info("Table does not exist, nothing to delete")
-        except botocore.exceptions.AccessDeniedException:
-            st.sidebar.warning('Access Denied')            
+            st.sidebar.info("Table does not exist, nothing to delete")         
         except Exception as e:
             st.sidebar.write(f"Error deleting DynamoDB table: {e}")
     streaming_on = st.toggle('Streaming')
