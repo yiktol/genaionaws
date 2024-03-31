@@ -49,6 +49,7 @@ model_id = "anthropic.claude-3-sonnet-20240229-v1:0"
 # DynamoDB
 
 TableName="SessionTable"
+boto3_session = boto3.Session(region_name="us-east-1")
 client = boto3.client('dynamodb', region_name="us-east-1")
 dynamodb = boto3.resource("dynamodb", region_name="us-east-1")
 table = dynamodb.Table(TableName)
@@ -73,7 +74,7 @@ model = BedrockChat(
 chain = prompt | model | StrOutputParser()
 
 # DynamoDB Chat Message History
-history = DynamoDBChatMessageHistory(table_name="SessionTable", session_id="0", config={"region":"us-east-1"})
+history = DynamoDBChatMessageHistory(table_name="SessionTable", session_id="0", boto3_session=boto3_session)
 
 # Chain with History
 chain_with_history = RunnableWithMessageHistory(
