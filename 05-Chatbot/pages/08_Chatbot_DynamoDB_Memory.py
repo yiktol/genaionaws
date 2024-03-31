@@ -121,7 +121,9 @@ with st.sidebar:
 
         except botocore.exceptions.ClientError as error:
             if error.response['Error']['Code'] == 'ResourceInUseException':
-                st.sidebar.write('Table already exists!')
+                st.sidebar.info('Table already exists!')
+            elif error.response['Error']['Code'] == 'AccessDeniedException':
+                st.sidebar.warning('Access Denied')
             else:
                 raise error
     if st.button('Delete DynamoDB Table'): # Delete DynamoDB Table Sidebar Button
@@ -132,6 +134,9 @@ with st.sidebar:
             st.sidebar.write(f"DynamoDB table is deleted!")
         except client.exceptions.ResourceNotFoundException:
             st.sidebar.write("Table does not exist, nothing to delete")
+        except botocore.exceptions.ClientError:
+            if error.response['Error']['Code'] == 'AccessDeniedException':
+                st.sidebar.warning('Access Denied')            
         except Exception as e:
             st.sidebar.write(f"Error deleting DynamoDB table: {e}")
     streaming_on = st.toggle('Streaming')
