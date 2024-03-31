@@ -74,13 +74,13 @@ model = BedrockChat(
 chain = prompt | model | StrOutputParser()
 
 # DynamoDB Chat Message History
-history = DynamoDBChatMessageHistory(table_name="SessionTable", session_id="0", boto3_session=boto3_session)
+history = DynamoDBChatMessageHistory(table_name="SessionTable", session_id="0")
 
 # Chain with History
 chain_with_history = RunnableWithMessageHistory(
     chain,
     lambda session_id: DynamoDBChatMessageHistory(
-        table_name="SessionTable", session_id=session_id
+        table_name="SessionTable", session_id=session_id, boto3_session=boto3_session
     ),
     input_messages_key="question",
     history_messages_key="history",
