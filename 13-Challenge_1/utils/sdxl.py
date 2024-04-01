@@ -112,52 +112,42 @@ def getmodelIds_claude3(providername='Anthropic'):
     return models
 
 
-def image_parameters(provider, suffix, index=0, region='us-east-1'):
+def image_parameters():
     size = ["1024x1024", "1152x896", "1216x832", "1344x768",
             "1536x640", "640x1536", "768x1344", "832x1216", "896x1152"]
-    with st.container(border=True):
-        models = getmodelIds('Stability AI')
-        model = st.selectbox(
-            'model', models, index=models.index(getmodelId(provider)))
-        cfg_scale = st.slider(
-            'cfg_scale', value=st.session_state[suffix]['cfg_scale'], min_value=1, max_value=35, step=1)
-        seed = st.number_input('seed', value=st.session_state[suffix]['seed'])
-        selected_size = st.selectbox('size', size)
-        width = int(selected_size.split('x')[0])
-        height = int(selected_size.split('x')[1])
-        steps = st.slider(
-            'steps', value=st.session_state[suffix]['steps'], min_value=10, max_value=50, step=1)
-        style_preset = st.selectbox('style', ["3d-model", "analog-film", "anime", "cinematic", "comic-book", "digital-art", "enhance", "fantasy-art",
-                                    "isometric", "line-art", "low-poly", "modeling-compound", "neon-punk", "origami", "photographic", "pixel-art", "tile-texture"], index=14)
-        new_params = {"model": model,
-                      "cfg_scale": cfg_scale,
-                      "seed": seed,
-                      "steps": steps,
-                      "width": width,
-                      "height": height,
-                      "style_preset": style_preset}
-        col1, col2 = st.columns([0.5, 0.5])
-        with col1:
-            st.button(label='Tune Parameters', on_click=update_parameters, args=(
-                suffix,), kwargs=(new_params))
-        with col2:
-            reset_session()
+    cfg_scale = st.slider(
+        'cfg_scale', value=8, min_value=1, max_value=35, step=1)
+    seed = st.number_input('seed', value=20000)
+    selected_size = st.selectbox('size', size)
+    width = int(selected_size.split('x')[0])
+    height = int(selected_size.split('x')[1])
+    steps = st.slider(
+        'steps', value=20, min_value=10, max_value=50, step=1)
+    style_preset = st.selectbox('style', ["3d-model", "analog-film", "anime", "cinematic", "comic-book", "digital-art", "enhance", "fantasy-art",
+                                "isometric", "line-art", "low-poly", "modeling-compound", "neon-punk", "origami", "photographic", "pixel-art", "tile-texture"], index=14)
+    params = {
+        "cfg_scale": cfg_scale,
+        "seed": seed,
+        "steps": steps,
+        "width": width,
+        "height": height,
+        "style_preset": style_preset
+    }
+
+    return params
 
 
 # get the stringified request body for the InvokeModel API call
-def get_sdxl_image_generation_request_body(prompt, negative_prompt, height, width, cfg_scale, seed, steps, style_preset):
+def get_sdxl_image_generation_request_body(prompt, negative_prompt=None, **params):
 
-    body = {"text_prompts": [
+    body = {"text_prompts": 
+        [
             {"text": prompt, "weight": 1},
             {"text": negative_prompt, "weight": -1}
-            ],
-            "cfg_scale": cfg_scale,
-            "seed": seed,
-            "steps": steps,
-            "height": int(height),
-            "width": int(width),
-            "style_preset": str(style_preset)
-            }
+        ],
+    }
+
+    body.update(params)
 
     return json.dumps(body)
 
@@ -176,7 +166,7 @@ def get_sdxl_response_image(response):
 
 
 # generate an image using Amazon sdxl Image Generator
-def get_image_from_model(prompt, negative_prompt, model, height, width, cfg_scale, seed, steps, style_preset):
+def get_image_from_model(model,prompt, negative_prompt=None, **params):
 
     bedrock = boto3.client(
         service_name='bedrock-runtime',
@@ -185,12 +175,7 @@ def get_image_from_model(prompt, negative_prompt, model, height, width, cfg_scal
 
     body = get_sdxl_image_generation_request_body(prompt=prompt,
                                                   negative_prompt=negative_prompt,
-                                                  height=height,
-                                                  width=width,
-                                                  cfg_scale=cfg_scale,
-                                                  seed=seed,
-                                                  steps=steps,
-                                                  style_preset=style_preset
+                                                  **params
                                                   )
 
     response = bedrock.invoke_model(body=body, modelId=model,

@@ -9,6 +9,8 @@ import utils.mistral as mistral
 import utils.cohere as cohere
 import utils.jurassic as jurassic
 import utils.claude3 as claude3
+import utils.titan_image as titan_image
+import utils.sdxl as sdxl
 
 
 def tune_parameters(provider):
@@ -39,6 +41,45 @@ def tune_parameters(provider):
 			return False
 	return params
 
+def image_parameters(provider):
+	match provider:
+		case 'Titan Image':          
+			titan_image.initsessionkeys(titan_image.params,'titan-image')
+			params = titan_image.image_parameters()
+		case 'Stability AI':
+			sdxl.initsessionkeys(sdxl.params,'sdxl')
+			params = sdxl.image_parameters()
+   
+	return params
+
+def image_model(provider):
+	match provider:
+		case 'Titan Image':          
+			models = getmodelIds_titan_image()
+		case 'Stability AI':
+			models = getmodelIds(provider)
+	model = st.selectbox(
+		'model', models, index=models.index(getmodelId(provider)))  
+ 
+	return model
+
+def generate_image(provider,model, prompt,negative_prompt,**params):
+	match provider:
+		case 'Titan Image':   
+			generated_image = titan_image.get_image_from_model(model,
+				prompt_content = prompt, 
+				negative_prompt = negative_prompt,
+				**params
+			)
+			
+		case 'Stability AI':
+			generated_image = sdxl.get_image_from_model(model,
+				prompt = prompt, 
+				negative_prompt = negative_prompt,
+				**params
+				
+			)
+	return generated_image
 
 def set_page_config():
 	st.set_page_config( 
@@ -104,6 +145,7 @@ def reset_session():
 def getmodelId(providername):
 	model_mapping = {
 		"Amazon" : "amazon.titan-tg1-large",
+		"Titan Image": "amazon.titan-image-generator-v1",
 		"Anthropic" : "anthropic.claude-v2:1",
 		"Claude 3": "anthropic.claude-3-sonnet-20240229-v1:0",
 		"AI21" : "ai21.j2-ultra-v1",
@@ -122,6 +164,8 @@ def getmodel_index(providername):
 	
 	if providername == "Claude 3":
 		idx = getmodelIds_claude3(providername).index(default_model)
+	elif providername == "Titan Image":
+		idx = getmodelIds_titan_image(providername).index(default_model)
 	else:
 		idx = getmodelIds(providername).index(default_model)
 	
@@ -149,7 +193,18 @@ def getmodelIds_claude3(providername='Anthropic'):
 	available_models = bedrock.list_foundation_models()
 	
 	for model in available_models['modelSummaries']:
-		if providername in model['providerName'] and "IMAGE" in model['inputModalities']:
+		if providername in model['providerName'] and "anthropic.claude-3" in model['modelId']:
+			models.append(model['modelId'])
+			
+	return models
+
+def getmodelIds_titan_image(providername='Amazon'):
+	models =[]
+	bedrock = client()
+	available_models = bedrock.list_foundation_models()
+	
+	for model in available_models['modelSummaries']:
+		if providername in model['providerName'] and "amazon.titan-image" in model['modelId']:
 			models.append(model['modelId'])
 			
 	return models
@@ -195,14 +250,13 @@ def prompt_box(key,provider,model,context=None,**params):
 
 list_providers = ['Amazon','Anthropic','AI21','Claude 3','Cohere','Meta','Mistral']
 
-def invoke_model(client, prompt, model, 
-	accept = 'application/json', content_type = 'application/json',**params):
+def invoke_model(client, prompt, model, accept = 'application/json', content_type = 'application/json',**params):
 	# default response
 	output = ''
 	# identify the model provider
 	provider = model.split('.')[0] 
 	# InvokeModel
-	if ('claude-3' in model.split('.')[1] ): 
+	if ('anthropic.claude-3' in model): 
 		input = {
 			"anthropic_version": "bedrock-2023-05-31",
 			"messages": [{"role": "user", "content": prompt}]
@@ -214,7 +268,7 @@ def invoke_model(client, prompt, model,
 		response_body = json.loads(response.get('body').read())
 		output = response_body.get('content')[0]['text']
  
-	elif (provider == 'anthropic'): 
+	elif ('anthropic.claude' in model): 
 		input = {
 			'prompt': prompt,
 		}
@@ -276,7 +330,7 @@ def invoke_model(client, prompt, model,
 		output = response_body.get('outputs')[0].get('text')
 
 	 
-	return output
+	return output	
 
 # dataset = load_jsonl('mistral.jsonl')
 # initsessionkeys(dataset[0])

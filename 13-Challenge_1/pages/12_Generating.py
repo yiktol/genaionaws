@@ -52,6 +52,7 @@ output1 = """
 
 questions = [
 	{"id":1,"task": task1, "context": context1, "output": output1},
+	{"id":2,"task": "Under Construction...", "context": "", "output": ""},
 ]
 
 text, code = st.columns([0.7, 0.3])
@@ -69,21 +70,20 @@ with code:
 
 with text:
 
-	tab1, tab2 = st.tabs(['Question 1','Question 2'])
+	tab_names = [f"Question {question['id']}" for question in questions]
 
-	with tab1:
-		st.markdown(task1)
-		with st.expander("Additional Information"):
-			st.markdown(context1)
-		# with st.expander("See Expected Output"):
-		#         st.markdown(output1)
-		output = helpers.prompt_box(questions[0]['id'], provider,
-							model,
-							context=questions[0]['context'],
-							**params)
-		
-		if output:
-			st.write("### Answer")
-			st.info(output)
-	with tab2:
-		st.markdown("Under Construction...")
+	tabs = st.tabs(tab_names)
+
+	for tab, content in zip(tabs,questions):
+		with tab:
+			st.markdown(content['task'])
+			with st.expander("Additional Information"):
+				st.markdown(content['context'])
+			output = helpers.prompt_box(content['id'], provider,
+								model,
+								context=content['context'],
+								**params)
+			
+			if output:
+				st.write("### Answer")
+				st.info(output)

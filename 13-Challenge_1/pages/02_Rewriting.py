@@ -48,9 +48,7 @@ suffix = 'challenge1'
 if suffix not in st.session_state:
 	st.session_state[suffix] = {}
 
-
 text, code = st.columns([0.7, 0.3])
-
 
 with code:
 
@@ -63,50 +61,24 @@ with code:
 	with st.container(border=True):
 		params = helpers.tune_parameters(provider)
 
-
 with text:
 
-	menu = []
-	for question in questions:
-		menu.append(f"Question {question['id']}")
+	tab_names = [f"Question {question['id']}" for question in questions]
 
-	tab1, tab2, tab3 = st.tabs(menu)
+	tabs = st.tabs(tab_names)
 
-	with tab1:
-		st.markdown(questions[0]['task'])
-		st.markdown(questions[0]['context'])
+	for tab, content in zip(tabs,questions):
+		with tab:
+			st.markdown(content['task'])
+			st.markdown(content['context'])
 
-		output = helpers.prompt_box(questions[0]['id'], provider,
-							model,
-							context=questions[0]['context'],
-							**params)
-		
-		if output:
-			st.write("### Answer")
-			st.info(output)
-	with tab2:
-		st.markdown(questions[1]['task'])
-		st.markdown(questions[1]['context'])
-
-		output = helpers.prompt_box(questions[1]['id'], provider,
-							model,
-							context=questions[1]['context'],
-							**params)
-		
-		if output:
-			st.write("### Answer")
-			st.info(output)
-	with tab3:
-		st.markdown(questions[2]['task'])
-		st.markdown(questions[2]['context'])
-
-		output = helpers.prompt_box(questions[2]['id'], provider,
-							model,
-							context=questions[2]['context'],
-							**params)
-		
-		if output:
-			st.write("### Answer")
-			st.info(output)
+			output = helpers.prompt_box(content['id'], provider,
+								model,
+								context=content['context'],
+								**params)
 			
+			if output:
+				st.write("### Answer")
+				st.info(output)
+
 

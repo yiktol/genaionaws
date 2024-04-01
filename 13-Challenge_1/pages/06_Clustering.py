@@ -65,7 +65,6 @@ Group 2 (Lower Interest to Proceed):
 6. MNO Solutions: Consulting services for business processes and strategy; proposed fees higher than budget; seeking alternative service providers.
 7. PQR Automation: Collaboration on electric vehicle development; concerns about limited track record and ability to challenge established giants; unable to reveal big investors; monitoring progress before committing.
 """
-topK = 100
 
 questions = [
 	{"id":1,"task": task1, "context": context1, "output": output1},
@@ -74,10 +73,8 @@ questions = [
 
 text, code = st.columns([0.7, 0.3])
 
-
 with code:
 				  
-
 	with st.container(border=True):
 		provider = st.selectbox('provider', helpers.list_providers)
 		models = helpers.getmodelIds(provider)
@@ -87,32 +84,21 @@ with code:
 
 with text:
 
-	tab1, tab2 = st.tabs(['Question 1','Question 2'])
+	tab_names = [f"Question {question['id']}" for question in questions]
 
-	with tab1:
-		st.markdown(task1)
-		st.markdown(context1)
-		with st.expander("See Expected Output"):
-				st.markdown(output1)
-		output = helpers.prompt_box(questions[0]['id'], provider,
-							model,
-							context=questions[0]['context'],
-							**params)
-		
-		if output:
-			st.write("### Answer")
-			st.info(output)
-	with tab2:
-		st.markdown(task2)
-		st.markdown(context2)
-		with st.expander("See Expected Output"):
-				st.markdown(output2)
-		
-		output = helpers.prompt_box(questions[1]['id'], provider,
-							model,
-							context=questions[1]['context'],
-							**params)
-		
-		if output:
-			st.write("### Answer")
-			st.info(output)
+	tabs = st.tabs(tab_names)
+
+	for tab, content in zip(tabs,questions):
+		with tab:
+			st.markdown(content['task'])
+			st.markdown(content['context'])
+			with st.expander("See Expected Output"):
+					st.markdown(content['output'])
+			response = helpers.prompt_box(content['id'], provider,
+								model,
+								context=content['context'],
+								**params)
+			
+			if response:
+				st.write("### Answer")
+				st.info(response)

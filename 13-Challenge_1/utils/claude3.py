@@ -58,7 +58,6 @@ def tune_parameters():
 	max_tokens = st.number_input('max_tokens',min_value = 50, max_value = 4096, value = 1024, step = 1)
 	stop_sequences = st.text_input('stop_sequences', value = "\n\nHuman")
 	params = {
-		# "model":model, 
 		"temperature":temperature, 
 		"top_p":top_p,
 		"top_k":top_k,

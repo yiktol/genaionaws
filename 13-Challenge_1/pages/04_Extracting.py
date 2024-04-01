@@ -9,10 +9,16 @@ context = """- John Smith
 - Michael Davis
 - Olivia Williams
 - Abbey Thompson"""
-output = {"LastName":["Smith","Johnson","Davis","Williams","Thompson"],
-			"FirstName":["John","Emma","Michael","Olivia","Abbey"],
-			"LastName + FirstName": ["Smith, John","Johnson, Emma","Davis, Michael","Williams, Olivia","Thompson, Abbey"],
-			}
+output = """
+| LastName | FirstName | LastName, FirstName |
+| :--- | :--- | :--- |
+| Smith | John | Smith, John |
+| Johnson | Emma | Johnson, Emma |
+| Davis | Michael | Davis, Michael |
+| Williams | Olivia | Williams, Olivia |
+| Thompson | Abbey | Thompson, Abbey |
+"""
+
 task2 = """#### Fill in the prompt below. From the trip report, you want to be able to extract out action items that need to be done."""
 context2 = """#### Trip Report:
 I am writing to provide a summary of our recent visit to the ABC Synapse facility on [Date]. The purpose of the trip was to gain a deeper understanding of how ABC Synapse builds and sells electric vehicles (EVs) and to explore potential collaboration opportunities.\n
@@ -53,34 +59,21 @@ with code:
 
 with text:
 
-	tab1, tab2 = st.tabs(['Question 1','Question 2'])
+	tab_names = [f"Question {question['id']}" for question in questions]
 
-	with tab1:
-		st.markdown(task)
-		st.markdown(context)
-		with st.expander("See Expected Output"):
-				st.dataframe(output)
-		output = helpers.prompt_box(questions[0]['id'], provider,
-							model,
-							context=questions[0]['context'],
-							**params)
-		
-		if output:
-			st.write("### Answer")
-			st.info(output)
-	with tab2:
-		st.markdown(task2)
-		st.markdown(context2)
-		with st.expander("See Expected Output"):
-				st.markdown(output2)
-		
-		output = helpers.prompt_box(questions[1]['id'], provider,
-							model,
-							context=questions[1]['context'],
-							**params)
-		
-		if output:
-			st.write("### Answer")
-			st.info(output)
+	tabs = st.tabs(tab_names)
 
-
+	for tab, content in zip(tabs,questions):
+		with tab:
+			st.markdown(content['task'])
+			st.markdown(content['context'])
+			with st.expander("See Expected Output"):
+					st.markdown(content['output'])
+			response = helpers.prompt_box(content['id'], provider,
+								model,
+								context=content['context'],
+								**params)
+			
+			if response:
+				st.write("### Answer")
+				st.info(response)
