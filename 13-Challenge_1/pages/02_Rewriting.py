@@ -1,6 +1,6 @@
 import streamlit as st
 import utils.helpers as helpers
-import uuid
+
 
 helpers.set_page_config()
 
@@ -47,22 +47,8 @@ inclusive, allowing teams to focus on what really matters - achieving their goal
 suffix = 'challenge1'
 if suffix not in st.session_state:
 	st.session_state[suffix] = {}
-if 'height' not in st.session_state[suffix]:
-	st.session_state[suffix]['height'] = 100
-if 'prompt' not in st.session_state[suffix]:
-	st.session_state[suffix]['prompt'] = ""
-if 'model' not in st.session_state[suffix]:
-	st.session_state[suffix]['model'] = "amazon.titan-tg1-large"
-if 'maxTokenCount' not in st.session_state[suffix]:
-	st.session_state[suffix]['maxTokenCount'] = 1024
-if 'temperature' not in st.session_state[suffix]:
-	st.session_state[suffix]['temperature'] = 0.1
-if 'topP' not in st.session_state[suffix]:
-	st.session_state[suffix]['topP'] = 0.9
-if 'topK' not in st.session_state[suffix]:
-	st.session_state[suffix]['topK'] = 100
 
-topK = 100
+
 text, code = st.columns([0.7, 0.3])
 
 
@@ -73,11 +59,9 @@ with code:
 		models = helpers.getmodelIds(provider)
 		model = st.selectbox(
 			'model', models, index=models.index(helpers.getmodelId(provider)))
-		temperature = st.slider('temperature', min_value=0.0, max_value= 1.0, value = st.session_state[suffix]['temperature'], step = 0.1)
-		topP = st.slider('top_p', min_value=0.0, max_value=1.0, value = st.session_state[suffix]['topP'], step = 0.1)
-		if provider in ["Anthropic","Cohere","Mistral"]:
-			topK = st.slider('top_k', min_value=0, max_value=200, value = st.session_state[suffix]['topK'], step = 1)
-		maxTokenCount = st.slider('max_tokens', min_value=50, max_value=4096, value = st.session_state[suffix]['maxTokenCount'], step = 100)
+		
+	with st.container(border=True):
+		params = helpers.tune_parameters(provider)
 
 
 with text:
@@ -94,11 +78,8 @@ with text:
 
 		output = helpers.prompt_box(questions[0]['id'], provider,
 							model,
-							maxTokenCount=maxTokenCount,
-							temperature=temperature,
-							topP=topP,
-       						topK=topK,
-							context=questions[0]['context'])
+							context=questions[0]['context'],
+							**params)
 		
 		if output:
 			st.write("### Answer")
@@ -109,11 +90,8 @@ with text:
 
 		output = helpers.prompt_box(questions[1]['id'], provider,
 							model,
-							maxTokenCount=maxTokenCount,
-							temperature=temperature,
-							topP=topP,
-       						topK=topK,
-							context=questions[1]['context'])
+							context=questions[1]['context'],
+							**params)
 		
 		if output:
 			st.write("### Answer")
@@ -124,14 +102,11 @@ with text:
 
 		output = helpers.prompt_box(questions[2]['id'], provider,
 							model,
-							maxTokenCount=maxTokenCount,
-							temperature=temperature,
-							topP=topP,
-							topK=topK,
-							context=questions[2]['context'])
+							context=questions[2]['context'],
+							**params)
 		
 		if output:
 			st.write("### Answer")
 			st.info(output)
-    		
+			
 

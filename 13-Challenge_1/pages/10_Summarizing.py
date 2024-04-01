@@ -75,11 +75,8 @@ with code:
 		provider = st.selectbox('provider', helpers.list_providers)
 		models = helpers.getmodelIds(provider)
 		model = st.selectbox('model', models, index=models.index(helpers.getmodelId(provider)))
-		temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.1, step = 0.1)
-		topP = st.slider('top_p',min_value = 0.0, max_value = 1.0, value = 0.9, step = 0.1)
-		if provider in ["Anthropic","Cohere","Mistral"]:
-			topK = st.slider('top_k', min_value=0, max_value=200, value = 50, step = 1)
-		maxTokenCount = st.slider('max_tokens',min_value = 50, max_value = 4096, value = 1024, step = 100)
+	with st.container(border=True):
+		params = helpers.tune_parameters(provider)
 
 
 with text:
@@ -93,10 +90,8 @@ with text:
 				st.markdown(output1)
 		output = helpers.prompt_box(questions[0]['id'], provider,
 							model,
-							maxTokenCount=maxTokenCount,
-							temperature=temperature,
-							topP=topP,
-							context=questions[0]['context'])
+							context=questions[0]['context'],
+							**params)
 		
 		if output:
 			st.write("### Answer")
@@ -109,10 +104,8 @@ with text:
 		
 		output = helpers.prompt_box(questions[1]['id'], provider,
 							model,
-							maxTokenCount=maxTokenCount,
-							temperature=temperature,
-							topP=topP,
-							context=questions[1]['context'])
+							context=questions[0]['context'],
+							**params)
 		
 		if output:
 			st.write("### Answer")

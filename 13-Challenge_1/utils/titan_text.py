@@ -86,45 +86,32 @@ def getmodelIds(providername):
             
     return models
 
-def tune_parameters(provider='Amazon', suffix='titan_text',index=0,region='us-east-1'):
-	st.subheader("Parameters")
+def tune_parameters(provider='Amazon'):
 
-	with st.container(border=True):
-		models = getmodelIds('Amazon')
-		model = st.selectbox(
-			'model', models, index=models.index(getmodelId(provider)))
-		temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = st.session_state[suffix]['temperature'], step = 0.1)
-		topP = st.slider('topP',min_value = 0.0, max_value = 1.0, value = st.session_state[suffix]['topP'], step = 0.1)
-		maxTokenCount = st.number_input('maxTokenCount',min_value = 50, max_value = 4096, value = st.session_state[suffix]['maxTokenCount'], step = 1)
-		params = {
-			"model":model, 
-			"temperature":temperature, 
-			"topP":topP,
-			"maxTokenCount":maxTokenCount
-			}
-		# col1, col2, col3 = st.columns([0.4,0.3,0.3])
-		# with col1:
-		# 	st.button(label = 'Tune Parameters', on_click=update_parameters, args=(suffix,), kwargs=(params))
-		# with col2:
-		# 	reset_session() 
+	# models = getmodelIds('Amazon')
+	# model = st.selectbox(
+	# 	'model', models, index=models.index(getmodelId(provider)))
+	temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.1, step = 0.1)
+	topP = st.slider('topP',min_value = 0.0, max_value = 1.0, value = 0.9, step = 0.1)
+	maxTokenCount = st.number_input('maxTokenCount',min_value = 50, max_value = 4096, value = 1024, step = 1)
+	params = {
+		# "model":model, 
+		"temperature":temperature, 
+		"topP":topP,
+		"maxTokenCount":maxTokenCount
+		}
+
+	return params
 
 
 def invoke_model(client, prompt, model, 
 				 accept = 'application/json', 
 				 content_type = 'application/json',
-				 maxTokenCount = 512, 
-				 temperature = 0.1, 
-				 topP = 0.9,
-				 stop_sequences = []):
+				 **params):
 	output = ''
 	input = {
 		'inputText': titan_generic(prompt),
-		'textGenerationConfig': {
-				'maxTokenCount': maxTokenCount,
-				'stopSequences': stop_sequences,
-				'temperature': temperature,
-				'topP': topP
-		}
+		'textGenerationConfig': params
 	}
 	body=json.dumps(input)
 	response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)

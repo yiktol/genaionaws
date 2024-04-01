@@ -32,7 +32,10 @@ Settings.embed_model = embed_model
 # Streamlit
 
 # Page title
-st.set_page_config(page_title='LlamaIndex Q&A over you data 📂')
+st.set_page_config(page_title='RAG',
+                   page_icon=":brain:",
+	layout="wide",
+	initial_sidebar_state="expanded",)
 
 # Clear Chat History fuction
 def clear_screen():

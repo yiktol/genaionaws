@@ -8,31 +8,36 @@ import utils.llama2 as llama2
 import utils.mistral as mistral
 import utils.cohere as cohere
 import utils.jurassic as jurassic
+import utils.claude3 as claude3
 
 
 def tune_parameters(provider):
 	match provider:
 		case "Anthropic":
 			claude2.initsessionkeys(claude2.params, 'claude2')
-			claude2.tune_parameters()
+			params = claude2.tune_parameters()
 		case "Amazon":
 			titan.initsessionkeys(titan.params, 'titan')
-			titan.tune_parameters()
+			params = titan.tune_parameters()
+		case "Claude 3":
+			claude3.initsessionkeys(claude3.params, 'claude3')
+			params = claude3.tune_parameters()
 		case "Cohere":
 			cohere.initsessionkeys(cohere.params, 'cohere')
-			cohere.tune_parameters()
+			params = cohere.tune_parameters()
 		case "AI21":
 			jurassic.initsessionkeys(llama2.params, 'jurassic')          
-			jurassic.tune_parameters()
+			params = jurassic.tune_parameters()
 		case "Mistral":
 			mistral.initsessionkeys(mistral.params, 'mistral')
-			mistral.tune_parameters()
+			params = mistral.tune_parameters()
 		case "Meta":
 			llama2.initsessionkeys(llama2.params, 'llama2')
-			llama2.tune_parameters()
+			params = llama2.tune_parameters()
 		case _:
 			print("Provider not supported")
 			return False
+	return params
 
 
 def set_page_config():
@@ -48,7 +53,7 @@ def claude_generic(input_prompt):
 	return prompt
 
 def titan_generic(input_prompt):
-	prompt = f"""User: {input_prompt}\n\nAssistant:"""
+	prompt = f"""User: {input_prompt}\n\nBot:"""
 	return prompt
 
 def llama2_generic(input_prompt, system_prompt=None):
@@ -100,6 +105,7 @@ def getmodelId(providername):
 	model_mapping = {
 		"Amazon" : "amazon.titan-tg1-large",
 		"Anthropic" : "anthropic.claude-v2:1",
+		"Claude 3": "anthropic.claude-3-sonnet-20240229-v1:0",
 		"AI21" : "ai21.j2-ultra-v1",
 		'Cohere': "cohere.command-text-v14",
 		'Meta': "meta.llama2-70b-chat-v1",
@@ -114,7 +120,10 @@ def getmodel_index(providername):
 	
 	default_model = getmodelId(providername)
 	
-	idx = getmodelIds(providername).index(default_model)
+	if providername == "Claude 3":
+		idx = getmodelIds_claude3(providername).index(default_model)
+	else:
+		idx = getmodelIds(providername).index(default_model)
 	
 	return idx
 
@@ -123,9 +132,14 @@ def getmodelIds(providername):
 	bedrock = client()
 	available_models = bedrock.list_foundation_models()
 	
-	for model in available_models['modelSummaries']:
-		if providername in model['providerName']:
-			models.append(model['modelId'])
+	if providername == "Claude 3":
+		for model in available_models['modelSummaries']:
+			if 'claude-3' in model['modelId'].split('.')[1]:
+				models.append(model['modelId'])
+	else:
+		for model in available_models['modelSummaries']:
+			if providername in model['providerName']:
+				models.append(model['modelId'])
 			
 	return models
 
@@ -146,7 +160,7 @@ def update_parameters(suffix,**args):
 	return st.session_state[suffix]
 
 
-def prompt_box(key,provider,model,maxTokenCount=1024,temperature=0.1,topP=0.9,topK=100,context=None):
+def prompt_box(key,provider,model,context=None,**params):
 	response = ''
 	with st.container(border=True):
 		prompt = st.text_area("Enter your prompt here",
@@ -174,19 +188,15 @@ def prompt_box(key,provider,model,maxTokenCount=1024,temperature=0.1,topP=0.9,to
 				runtime_client(), 
 				prompt, 
 				model=model, 
-				max_tokens=maxTokenCount, 
-				temperature=temperature, 
-				top_p=topP,
-				top_k=topK)
+				**params)
 				
 	return response
 
-list_providers = ['Amazon','Anthropic','AI21','Cohere','Meta','Mistral']
+
+list_providers = ['Amazon','Anthropic','AI21','Claude 3','Cohere','Meta','Mistral']
 
 def invoke_model(client, prompt, model, 
-	accept = 'application/json', content_type = 'application/json',
-	max_tokens  = 512, temperature = 0.1, top_p = 0.9, top_k = 100, stop_sequences = [],
-	count_penalty = 0, presence_penalty = 0, frequency_penalty = 0, return_likelihoods = 'NONE'):
+	accept = 'application/json', content_type = 'application/json',**params):
 	# default response
 	output = ''
 	# identify the model provider
@@ -194,14 +204,11 @@ def invoke_model(client, prompt, model,
 	# InvokeModel
 	if ('claude-3' in model.split('.')[1] ): 
 		input = {
-			'max_tokens': max_tokens,
-			'stop_sequences': stop_sequences,
-			'temperature': temperature,
-			'top_p': top_p,
-			'top_k': top_k,
 			"anthropic_version": "bedrock-2023-05-31",
 			"messages": [{"role": "user", "content": prompt}]
 		}
+
+		input.update(params)
 		body=json.dumps(input)
 		response = client.invoke_model(body=body, modelId=model, accept=accept, contentType=content_type)
 		response_body = json.loads(response.get('body').read())
@@ -210,12 +217,8 @@ def invoke_model(client, prompt, model,
 	elif (provider == 'anthropic'): 
 		input = {
 			'prompt': prompt,
-			'max_tokens_to_sample': max_tokens, 
-			'temperature': temperature,
-			'top_k': top_k,
-			'top_p': top_p,
-			'stop_sequences': stop_sequences
 		}
+		input.update(params)
 		body=json.dumps(input)
 		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
 		response_body = json.loads(response.get('body').read())
@@ -223,14 +226,8 @@ def invoke_model(client, prompt, model,
 	elif (provider == 'ai21'): 
 		input = {
 			'prompt': prompt, 
-			'maxTokens': max_tokens,
-			'temperature': temperature,
-			'topP': top_p,
-			'stopSequences': stop_sequences,
-			'countPenalty': {'scale': count_penalty},
-			'presencePenalty': {'scale': presence_penalty},
-			'frequencyPenalty': {'scale': frequency_penalty}
 		}
+		input.update(params)
 		body=json.dumps(input)
 		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
 		response_body = json.loads(response.get('body').read())
@@ -240,12 +237,7 @@ def invoke_model(client, prompt, model,
 	elif (provider == 'amazon'): 
 		input = {
 			'inputText': prompt,
-			'textGenerationConfig': {
-				  'maxTokenCount': max_tokens,
-				  'stopSequences': stop_sequences,
-				  'temperature': temperature,
-				  'topP': top_p
-			}
+			'textGenerationConfig': params
 		}
 		body=json.dumps(input)
 		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
@@ -256,13 +248,8 @@ def invoke_model(client, prompt, model,
 	elif (provider == 'cohere'): 
 		input = {
 			'prompt': prompt, 
-			'max_tokens': max_tokens,
-			'temperature': temperature,
-			'k': top_k,
-			'p': top_p,
-			'stop_sequences': stop_sequences,
-			'return_likelihoods': return_likelihoods
 		}
+		input.update(params)
 		body=json.dumps(input)
 		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
 		response_body = json.loads(response.get('body').read())
@@ -272,22 +259,17 @@ def invoke_model(client, prompt, model,
 	elif (provider == 'meta'): 
 		input = {
 			'prompt': prompt,
-			'max_gen_len': max_tokens,
-			'temperature': temperature,
-			'top_p': top_p
 		}
+		input.update(params)
 		body=json.dumps(input)
 		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
 		response_body = json.loads(response.get('body').read())
 		output = response_body['generation']
 	elif (provider == 'mistral'): 
 		input = {
-			'prompt': mistral_generic(prompt),
-			'max_tokens': max_tokens,
-			'temperature': temperature,
-			'top_p': top_p,
-			'top_k': top_k
+			'prompt': prompt,
 		}
+		input.update(params)
 		body=json.dumps(input)
 		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
 		response_body = json.loads(response.get('body').read())
