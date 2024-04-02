@@ -3,7 +3,6 @@ import jsonlines
 import json
 from jinja2 import Environment, FileSystemLoader
 import utils.bedrock as bedrock
-import utils.stlib as stlib
 
 
 params = {

@@ -1,9 +1,15 @@
 import streamlit as st
 import jsonlines
 import json
+import boto3
 from jinja2 import Environment, FileSystemLoader
 import utils.bedrock as bedrock
-import utils.stlib as stlib
+import base64
+
+
+bedrock = boto3.client(service_name='bedrock', region_name='us-east-1')
+bedrock_runtime = boto3.client(service_name='bedrock-runtime', region_name='us-east-1')
+
 
 def load_jsonl(file_path):
 	d = []
@@ -20,6 +26,23 @@ params = {  "model": "anthropic.claude-3-sonnet-20240229-v1:0",
 			"stop_sequences": ["\n\nHuman"],
 			}
 
+
+def getmodelIds_claude3():
+	models =[]
+	available_models = bedrock.list_foundation_models()
+	
+	for model in available_models['modelSummaries']:
+		if "anthropic.claude-3" in model['modelId']:
+			models.append(model['modelId'])
+			
+	return models
+
+def modelId():
+	models = getmodelIds_claude3()
+	model = st.selectbox(
+		'model', models, index=models.index("anthropic.claude-3-sonnet-20240229-v1:0"))  
+ 
+	return model
 
 def render_claude_code(templatePath,suffix):
 	env = Environment(loader=FileSystemLoader('templates'))
@@ -45,41 +68,80 @@ def update_parameters(suffix,**args):
 		st.session_state[suffix][key] = args[key]
 	return st.session_state[suffix]
 
-def tune_parameters(provider, suffix,index=0,region='us-east-1'):
-	st.subheader("Parameters")
+def tune_parameters():
+	temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.1, step = 0.1)
+	top_p = st.slider('top_p',min_value = 0.0, max_value = 1.0, value = 0.9, step = 0.1)
+	top_k = st.slider('top_k', min_value = 0, max_value = 100, value = 50, step = 1)
+	max_tokens = st.number_input('max_tokens',min_value = 50, max_value = 4096, value = 1024, step = 1)
+	stop_sequences = st.text_input('stop_sequences', value = "\n\nHuman")
+	params = {
+		"temperature":temperature, 
+		"top_p":top_p,
+		"top_k":top_k,
+		"stop_sequences":[stop_sequences],
+		"max_tokens":max_tokens
+		}
+	
+	return params
 
-	with st.form("claude3-form"):
-		models = bedrock.getmodelIds_claude3()
-		model = st.selectbox('model', models, index=0)
-		temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.1, step = 0.1)
-		top_p = st.slider('top_p',min_value = 0.0, max_value = 1.0, value = 0.9, step = 0.1)
-		top_k = st.slider('top_k', min_value = 0, max_value = 100, value = 50, step = 1)
-		max_tokens = st.number_input('max_tokens',min_value = 50, max_value = 4096, value = 1024, step = 1)
-		stop_sequences = st.text_input('stop_sequences', value = "\n\nHuman")
-		params = {
-			"model":model, 
-			"temperature":temperature, 
-			"top_p":top_p,
-			"top_k":top_k,
-			"stop_sequences":[stop_sequences],
-			"max_tokens":max_tokens
-			}
 
-		st.form_submit_button(label = 'Tune Parameters', on_click=update_parameters, args=(suffix,), kwargs=(params))
+def image_selector(item):
+
+	if item['image']:
+		with open(item['image'], "rb") as image_file:
+			binary_data = image_file.read()
+			base_64_encoded_data = base64.b64encode(binary_data)
+			base64_string = base_64_encoded_data.decode('utf-8')
+		image_data = base64_string
+	else:
+		image_data = None
+
+	if item['media_type']:
+		media_type = item['media_type']
+	else:
+		media_type = None
+		
+	return image_data, media_type
+
+
+def prompt_box(key, model, prompt, system=None, media_type=None,image_data=None,height=100, **params):
+	response = ''
+	system_prompt = None
+	with st.form(f"form-{key}"):
+		if system:
+			system_prompt = st.text_area(
+				":orange[System Prompt:]",
+				height = height,
+				value = system
+			)
+		prompt_data = st.text_area(
+			":orange[User Prompt:]",
+			height = height,
+			value = prompt
+		)
+		submit = st.form_submit_button("Submit", type='primary')
+	if submit:
+		with st.spinner("Generating..."):
+			response = invoke_model(
+				bedrock_runtime,
+				prompt=prompt_data,
+				model=model,
+				system=system_prompt,
+				media_type=media_type,
+				image_data=image_data,
+				**params)
+
+	return response
 
 
 def invoke_model(client, prompt, model, 
 				 accept = 'application/json', 
 				 content_type = 'application/json',
-				 max_tokens = 512, 
-				 temperature = 0.1, 
-				 top_p = 0.9,
-				 top_k = 50,
-				 stop_sequences = ["\n\nHuman"],
 				system=None,
-     			media_type=None,
-        		image_data=None
-        		):
+	 			media_type=None,
+				image_data=None,
+				**params
+				):
 	output = ''
  
 
@@ -88,7 +150,7 @@ def invoke_model(client, prompt, model,
 			{
 				"role": "user",
 				"content": [
-        			{"type": "text", "text": prompt},
+					{"type": "text", "text": prompt},
 					{"type": "image", "source": {"type": "base64", "media_type": media_type, "data": image_data}}					
 				]
 			}
@@ -97,17 +159,14 @@ def invoke_model(client, prompt, model,
 		message_list = [{"role": "user", "content": prompt}]
   
 	input = {
-		'max_tokens': max_tokens,
-		'stop_sequences': stop_sequences,
-		'temperature': temperature,
-		'top_p': top_p,
-		'top_k': top_k,
 		"anthropic_version": "bedrock-2023-05-31",
   		"messages": message_list
 		}
  
 	if system:
 		input['system'] = system
+  
+	input.update(params)
  
 	body=json.dumps(input)
 	response = client.invoke_model(body=body, # Encode to bytes

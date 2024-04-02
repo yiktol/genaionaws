@@ -8,7 +8,7 @@ stlib.set_page_config()
 
 suffix = 'jurassic'
 if suffix not in st.session_state:
-    st.session_state[suffix] = {}
+		st.session_state[suffix] = {}
 
 
 dataset = helpers.load_jsonl('data/jurassic.jsonl')
@@ -16,46 +16,38 @@ dataset = helpers.load_jsonl('data/jurassic.jsonl')
 stlib.initsessionkeys(dataset[0],suffix)
 stlib.initsessionkeys(jurassic.params,suffix)
 
-text, code = st.columns([0.6, 0.4])
-
 bedrock_runtime = bedrock.runtime_client()
+
+text, code = st.columns([0.7, 0.3])
+
+with code:
+					
+	with st.container(border=True):
+		provider = st.selectbox('provider', ['AI21'])
+		model = jurassic.modelId()
+	with st.container(border=True):
+		params = jurassic.tune_parameters()
 
 with text:
 
-  st.title("AI21")
-  st.write("AI21's Jurassic family of leading LLMs to build generative AI-driven applications and services leveraging existing organizational data. Jurassic supports cross-industry use cases including long and short-form text generation, contextual question answering, summarization, and classification. Designed to follow natural language instructions, Jurassic is trained on a massive corpus of web text and supports six languages in addition to English. ")
+	st.title("AI21")
+	st.write("AI21's Jurassic family of leading LLMs to build generative AI-driven applications and services leveraging existing organizational data. Jurassic supports cross-industry use cases including long and short-form text generation, contextual question answering, summarization, and classification. Designed to follow natural language instructions, Jurassic is trained on a massive corpus of web text and supports six languages in addition to English. ")
 
-  with st.expander("See Code"):
-      st.code(jurassic.render_jurassic_code('jurassic.jinja',suffix), language="python")
+	with st.expander("See Code"):
+			st.code(jurassic.render_jurassic_code('jurassic.jinja',suffix), language="python")
 
-  with st.form("myform"):
-    prompt_data = st.text_area(
-        "Enter your prompt here:",
-        height=st.session_state[suffix]['height'],
-        value=st.session_state[suffix]["prompt"]
-    )
-    submit = st.form_submit_button("Submit", type='primary')
 
-  if prompt_data and submit:
-    with st.spinner("Generating..."):
-      # Invoke the model
-        response = jurassic.invoke_model(client=bedrock_runtime, 
-                prompt=prompt_data, 
-                model=st.session_state[suffix]['model'], 
-                 maxTokens = st.session_state[suffix]['maxTokens'], 
-                 temperature = st.session_state[suffix]['temperature'], 
-                 topP = st.session_state[suffix]['topP'],
-                 stopSequences = st.session_state[suffix]['stopSequences'],
-                 countPenalty = st.session_state[suffix]['countPenalty_scale'],
-                 presencePenalty = st.session_state[suffix]['presencePenalty_scale'],
-                 frequencyPenalty = st.session_state[suffix]['frequencyPenalty_scale'])
+	tab_names = [f"Prompt {question['id']}" for question in dataset]
 
-        st.write("### Answer")
-        st.info(response)
+	tabs = st.tabs(tab_names)
 
-with code:
-  
-    jurassic.tune_parameters('AI21',suffix, index=5)
-    st.subheader('Prompt Examples:')
-    with st.container(border=True):
-        stlib.create_tabs(dataset,suffix)
+	for tab, content in zip(tabs,dataset):
+		with tab:
+			response = jurassic.prompt_box(content['id'],
+								model=model,
+								context=content['prompt'],height=content['height'],
+								**params)
+			
+			if response:
+				st.write("### Answer")
+				st.info(response)

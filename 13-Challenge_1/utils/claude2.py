@@ -5,6 +5,10 @@ from jinja2 import Environment, FileSystemLoader
 import boto3
 import uuid
 
+
+bedrock = boto3.client(service_name='bedrock', region_name='us-east-1')
+bedrock_runtime = boto3.client(service_name='bedrock-runtime', region_name='us-east-1')
+
 def load_jsonl(file_path):
 	d = []
 	with jsonlines.open(file_path) as reader:
@@ -49,16 +53,22 @@ def getmodelId(providername):
     
     return model_mapping[providername]
 
-def getmodelIds(providername):
+def getmodelIds():
     models =[]
-    bedrock = boto3.client(service_name='bedrock', region_name='us-east-1')
     available_models = bedrock.list_foundation_models()
     
     for model in available_models['modelSummaries']:
-        if providername in model['providerName']:
+        if "anthropic.claude-v2" in model['modelId']  or "anthropic.claude-instant" in model['modelId']:
             models.append(model['modelId'])
             
     return models
+
+def modelId():
+	models = getmodelIds()
+	model = st.selectbox(
+		'model', models, index=models.index("anthropic.claude-v2:1"))  
+ 
+	return model
 
 def render_claude_code(templatePath,suffix):
 	env = Environment(loader=FileSystemLoader('templates'))
@@ -101,23 +111,60 @@ def tune_parameters():
 	return params
 
 
+def prompt_box(key, model, context=None, height=100, **params):
+    response = ''
+    with st.container(border=True):
+        prompt = st.text_area("Enter your prompt here", value=context,
+                              height=height,
+                              key=f"Q{key}")
+        submit = st.button("Submit", type="primary", key=f"S{key}")
+
+    if submit:
+        if context is not None:
+            prompt = context + "\n\n" + prompt
+            
+        prompt = claude_generic(prompt)
+
+        with st.spinner("Generating..."):
+            response = invoke_model(
+                bedrock_runtime,
+                prompt,
+                model=model,
+                **params)
+
+    return response
+
 def invoke_model(client, prompt, model, 
 				 accept = 'application/json', 
 				 content_type = 'application/json',
-				 **params):
+     			system = None,
+        		**params):
 	output = ''
-	input = {
-		'prompt': claude_generic(prompt),
-		"anthropic_version": "bedrock-2023-05-31"
+ 
+	if system:
+		input = {
+		"anthropic_version": "bedrock-2023-05-31",
+  		"messages": [{"role": "user", "content": prompt}],
+		"system": system,
 		}
-      
-	input.update(params)
-	body=json.dumps(input)
-	response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
-	response_body = json.loads(response.get('body').read())
-	output = response_body['completion']
+  
+		input.update(params)
+  
+		body=json.dumps(input)
+		response = client.invoke_model(body=body, modelId=model, accept=accept, contentType=content_type)
+		response_body = json.loads(response.get('body').read())
+		output = response_body.get('content')[0]['text']
+     
+	else:
+		input = {
+			'prompt': claude_generic(prompt),
+			"anthropic_version": "bedrock-2023-05-31"
+			}
+		input.update(params)
+		body=json.dumps(input)
+		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
+		response_body = json.loads(response.get('body').read())
+		output = response_body['completion']
 
 	return output
-
-
 

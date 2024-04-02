@@ -1,10 +1,12 @@
 import streamlit as st
 import jsonlines
 import json
+import boto3
 from jinja2 import Environment, FileSystemLoader
-import utils.bedrock as bedrock
-import utils.stlib as stlib
 
+
+bedrock = boto3.client(service_name='bedrock', region_name='us-east-1')
+bedrock_runtime = boto3.client(service_name='bedrock-runtime', region_name='us-east-1')
 
 params = {
 	"model": "amazon.titan-tg1-large",
@@ -29,8 +31,20 @@ def render_titan_code(templatePath, suffix):
 	return output
 
 
+def getmodelIds():
+	models = []
+	available_models = bedrock.list_foundation_models()
+
+	for model in available_models['modelSummaries']:
+		if "amazon.titan-tg1-large" in model['modelId'] or "amazon.titan-text" in model['modelId']:
+			models.append(model['modelId'])
+
+	return models
+
+
+
 def titan_generic(input_prompt):
-	prompt = f"""User: {input_prompt}\n\nAssistant:"""
+	prompt = f"""User: {input_prompt}\n\nBot:"""
 	return prompt
 
 
@@ -41,42 +55,60 @@ def load_jsonl(file_path):
 			d.append(obj)
 	return d
 
-def tune_parameters(provider, suffix,index=0,region='us-east-1'):
-	st.subheader("Parameters")
 
-	with st.form("titan-text-form"):
-		models = bedrock.getmodelIds('Amazon')
-		model = st.selectbox(
-			'model', models, index=models.index(bedrock.getmodelId(provider)))
-		temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.1, step = 0.1)
-		topP = st.slider('topP',min_value = 0.0, max_value = 1.0, value = st.session_state[suffix]['topP'], step = 0.1)
-		maxTokenCount = st.number_input('maxTokenCount',min_value = 50, max_value = 4096, value = 1024, step = 1)
-		params = {
-			"model":model, 
-			"temperature":temperature, 
-			"topP":topP,
-			"maxTokenCount":maxTokenCount
-			}
-		st.form_submit_button(label = 'Tune Parameters', on_click=stlib.update_parameters, args=(suffix,), kwargs=(params))
+def modelId():
+	models = getmodelIds()
+	model = st.selectbox(
+		'model', models, index=models.index("amazon.titan-tg1-large"))  
+ 
+	return model
+
+def tune_parameters():
+	temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.1, step = 0.1)
+	topP = st.slider('topP',min_value = 0.0, max_value = 1.0, value = 0.9, step = 0.1)
+	maxTokenCount = st.number_input('maxTokenCount',min_value = 50, max_value = 4096, value = 1024, step = 1)
+	stopSequences = st.text_input('stopSequences', value = "User:")
+	params = {
+		"temperature":temperature, 
+		"topP":topP,
+		"maxTokenCount":maxTokenCount,
+		"stopSequences":[stopSequences]
+		}
+
+	return params
 
 
+def prompt_box(key, model, context=None, height=100, **params):
+    response = ''
+    with st.container(border=True):
+        prompt = st.text_area("Enter your prompt here", value=context,
+                              height=height,
+                              key=f"Q{key}")
+        submit = st.button("Submit", type="primary", key=f"S{key}")
+
+    if submit:
+        if context is not None:
+            prompt = context + "\n\n" + prompt
+            
+        prompt = titan_generic(prompt)
+
+        with st.spinner("Generating..."):
+            response = invoke_model(
+                bedrock_runtime,
+                prompt,
+                model=model,
+                **params)
+
+    return response
 
 def invoke_model(client, prompt, model, 
 				 accept = 'application/json', 
 				 content_type = 'application/json',
-				 maxTokenCount = 512, 
-				 temperature = 0.1, 
-				 topP = 0.9,
-				 stop_sequences = []):
+				**params):
 	output = ''
 	input = {
 		'inputText': titan_generic(prompt),
-		'textGenerationConfig': {
-				'maxTokenCount': maxTokenCount,
-				'stopSequences': stop_sequences,
-				'temperature': temperature,
-				'topP': topP
-		}
+		'textGenerationConfig': params
 	}
 	body=json.dumps(input)
 	response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)

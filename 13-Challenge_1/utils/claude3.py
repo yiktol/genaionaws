@@ -1,7 +1,11 @@
 import streamlit as st
 import jsonlines
 import json
+import boto3
 from jinja2 import Environment, FileSystemLoader
+
+bedrock = boto3.client(service_name='bedrock', region_name='us-east-1')
+bedrock_runtime = boto3.client(service_name='bedrock-runtime', region_name='us-east-1')
 
 
 def load_jsonl(file_path):
@@ -42,6 +46,23 @@ def render_claude_code(templatePath,suffix):
 	return output
 
 
+def getmodelIds_claude3():
+	models =[]
+	available_models = bedrock.list_foundation_models()
+	
+	for model in available_models['modelSummaries']:
+		if "anthropic.claude-3" in model['modelId']:
+			models.append(model['modelId'])
+			
+	return models
+
+def modelId():
+	models = getmodelIds_claude3
+	model = st.selectbox(
+		'model', models, index=models.index("anthropic.claude-3-sonnet-20240229-v1:0"))  
+ 
+	return model
+
 def claude_generic(input_prompt):
 	prompt = f"""Human: {input_prompt}\n\nAssistant:"""
 	return prompt
@@ -72,6 +93,7 @@ def tune_parameters():
 def invoke_model(client, prompt, model, 
 				 accept = 'application/json', 
 				 content_type = 'application/json',
+     			system=None,
      			media_type=None,
         		image_data=None,
 				**params
@@ -97,6 +119,9 @@ def invoke_model(client, prompt, model,
   		"messages": message_list
 		}
  
+	if system:
+		input['system'] = system
+  
 	input.update(params)
 	body=json.dumps(input)
 	response = client.invoke_model(body=body, 

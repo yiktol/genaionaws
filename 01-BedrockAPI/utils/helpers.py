@@ -1,7 +1,15 @@
 import streamlit as st
 import jsonlines
 import json
-
+import utils.titan_text as titan
+import utils.claude2 as claude2
+import utils.llama as llama
+import utils.mistral as mistral
+import utils.cohere as cohere
+import utils.jurassic as jurassic
+import utils.claude3 as claude3
+import utils.titan_image as titan_image
+import utils.sdxl as sdxl
 import base64
 from io import BytesIO
 from random import randint
@@ -64,7 +72,37 @@ def getmodelparams(providername):
     
     return model_mapping[providername]
 
+def prompt_box(key, provider, model, context=None, height=100, **params):
+    response = ''
+    with st.container(border=True):
+        prompt = st.text_area("Enter your prompt here", value=context,
+                              height=height,
+                              key=f"Q{key}")
+        submit = st.button("Submit", type="primary", key=f"S{key}")
 
+    if submit:
+        if context is not None:
+            prompt = context + "\n\n" + prompt
+            match provider:
+                case "Amazon":
+                    prompt = titan_generic(prompt)
+                case "Anthropic":
+                    prompt = claude_generic(prompt)
+                case "Meta":
+                    prompt = llama2_generic(prompt)
+                case "Mistral":
+                    prompt = mistral_generic(prompt)
+                case _:
+                    prompt = prompt
+
+        with st.spinner("Generating..."):
+            response = invoke_model(
+                runtime_client(),
+                prompt,
+                model=model,
+                **params)
+
+    return response
 
 
 

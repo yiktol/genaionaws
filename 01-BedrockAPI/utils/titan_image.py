@@ -10,6 +10,9 @@ import utils.bedrock as client
 import utils.stlib as stlib
 
 
+bedrock = boto3.client(service_name='bedrock', region_name='us-east-1')
+bedrock_runtime = boto3.client(service_name='bedrock-runtime', region_name='us-east-1')
+
 params = {
 	"cfg_scale":8.0,
 	"seed":randint(10,2147483646),
@@ -29,6 +32,24 @@ def load_jsonl(file_path):
 	return d
 
 
+def getmodelIds():
+	models = []
+	available_models = bedrock.list_foundation_models()
+
+	for model in available_models['modelSummaries']:
+		if "amazon.titan-image" in model['modelId']:
+			models.append(model['modelId'])
+
+	return models
+
+
+def image_model():
+	models = getmodelIds()
+	model = st.selectbox(
+		'model', models, index=models.index("amazon.titan-image-generator-v1"))  
+ 
+	return model
+
 def render_titan_image_code(templatePath,suffix):
 	env = Environment(loader=FileSystemLoader('templates'))
 	template = env.get_template(templatePath)
@@ -44,81 +65,75 @@ def render_titan_image_code(templatePath,suffix):
 		model = st.session_state[suffix]['model'])
 	return output
 
-def image_parameters(provider, suffix, index=0):
-	size = ["512x512","1024x1024","768x768","768x1152", "384x576","1152x768","576x384","768x1280","384x640","1280x768","640x384"]
-	st.subheader("Parameters")
-	with st.form("image-form"):
-		models = client.getmodelIds(provider)
-		model  = st.selectbox('model', models,index=index)
-		cfg_scale= st.slider('cfg_scale',value = 8.0,min_value = 1.1, max_value = 10.0, step = 1.0, help="Specifies how strongly the generated image should adhere to the prompt.")
-		seed=st.number_input('seed', value = None, help="Use to control and reproduce results. (min=0, max=2,147,483,646)")
-		quality=st.radio('quality',["premium", "standard"], horizontal=True)
-		selected_size=st.selectbox('size',size, index=1, help="The WxH of the image in pixels.")
-		width = int(selected_size.split('x')[0])
-		height = int(selected_size.split('x')[1])
-		numberOfImages=st.selectbox('numberOfImages',[1], disabled=True)
-  
-		if seed is None:
-			seed = randint(10, 2147483646)
-		params = {"model":model ,"cfg_scale":cfg_scale, "seed":seed,"quality":quality,
-					"width":width,"height":height,"numberOfImages":numberOfImages}
-		col1, col2 = st.columns([0.5,0.5])
-		with col1:
-			st.form_submit_button(label = 'Tune Parameters', on_click=stlib.update_parameters, args=(suffix,), kwargs=(params))
-		# with col2:
-		# 	stlib.reset_session() 
+def image_parameters():
+    size = ["512x512", "1024x1024", "768x768", "768x1152", "384x576",
+            "1152x768", "576x384", "768x1280", "384x640", "1280x768", "640x384"]
+
+    cfgScale = st.slider(
+        'cfgScale', value=8.0, min_value=1.1, max_value=10.0, step=1.0)
+    seed = st.number_input('seed', value=10000)
+    quality = st.radio('quality', ["premium", "standard"], horizontal=True)
+    selected_size = st.selectbox('size', size, index=1)
+    width = int(selected_size.split('x')[0])
+    height = int(selected_size.split('x')[1])
+    numberOfImages = st.selectbox('numberOfImages', [1], disabled=True)
+    params = {
+              "cfgScale": cfgScale,
+              "seed": seed,
+              "quality": quality,
+              "width": width,
+              "height": height,
+              "numberOfImages": numberOfImages
+              }
+
+    return params
 
 
-#get the stringified request body for the InvokeModel API call
-def get_titan_image_generation_request_body(prompt, negative_prompt,numberOfImages,quality, height, width,cfgScale,seed):
-	
-	body = { #create the JSON payload to pass to the InvokeModel API
-		"taskType": "TEXT_IMAGE",
-		"textToImageParams": {
-			"text": prompt,
-			"negativeText": negative_prompt
-		},
-		"imageGenerationConfig": {
-			"numberOfImages": numberOfImages,  # Number of images to generate
-			"quality": quality,
-			"height": height,
-			"width": width,
-			"cfgScale": cfgScale,
-			"seed": seed
-		}
-	}
-	
-	# if negative_prompt:
-	#     body['textToImageParams']['negativeText'] = negative_prompt
-	
-	return json.dumps(body)
+# get the stringified request body for the InvokeModel API call
+def get_titan_image_generation_request_body(prompt, negative_prompt=None, **params):
+
+    body = {  # create the JSON payload to pass to the InvokeModel API
+        "taskType": "TEXT_IMAGE",
+        "textToImageParams": {
+            "text": prompt,
+                    "negativeText": negative_prompt
+        },
+        "imageGenerationConfig": params
+    }
+
+    if negative_prompt:
+        body['textToImageParams']['negativeText'] = negative_prompt
+
+    return json.dumps(body)
 
 
-#get a BytesIO object from the Titan Image Generator response
+# get a BytesIO object from the Titan Image Generator response
 def get_titan_response_image(response):
 
-	response = json.loads(response.get('body').read())
-	
-	images = response.get('images')
-	
-	image_data = base64.b64decode(images[0])
+    response = json.loads(response.get('body').read())
 
-	return BytesIO(image_data)
+    images = response.get('images')
+
+    image_data = base64.b64decode(images[0])
+
+    return BytesIO(image_data)
 
 
-#generate an image using Amazon Titan Image Generator
-def get_image_from_model(prompt_content, negative_prompt, numberOfImages, quality, height, width, cfgScale, seed):
+# generate an image using Amazon Titan Image Generator
+def get_image_from_model(model, prompt_content, negative_prompt=None, **params):
 
-	bedrock = boto3.client(
-	service_name='bedrock-runtime',
-	region_name='us-east-1', 
-	)
-	
-	body = get_titan_image_generation_request_body(prompt=prompt_content, negative_prompt=negative_prompt,numberOfImages=numberOfImages,quality=quality, height=height, width=width,cfgScale=cfgScale,seed=seed)
-	
-	response = bedrock.invoke_model(body=body, modelId="amazon.titan-image-generator-v1", contentType="application/json", accept="application/json")
-	
-	output = get_titan_response_image(response)
-	
-	return output
+    bedrock = boto3.client(
+        service_name='bedrock-runtime',
+        region_name='us-east-1',
+    )
+
+    body = get_titan_image_generation_request_body(prompt=prompt_content, negative_prompt=negative_prompt, **params)
+
+    response = bedrock.invoke_model(body=body, modelId=model,
+                                    contentType="application/json", accept="application/json")
+
+    output = get_titan_response_image(response)
+
+    return output
+
 
