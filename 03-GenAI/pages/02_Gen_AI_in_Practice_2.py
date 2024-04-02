@@ -1,6 +1,6 @@
 import re
 import boto3
-from IPython import display
+import utils.helpers as helpers
 from base64 import b64decode
 from PIL import Image
 from io import BytesIO
@@ -14,10 +14,6 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 bedrock_runtime = boto3.client(service_name='bedrock-runtime',region_name='us-east-1' )
-
-
-accept = 'application/json'
-contentType = 'application/json'
 
 
 image_gen_system_prompt = ("You are Claude, a helpful, honest, harmless AI assistant. "
@@ -92,6 +88,9 @@ If you decide to make a function call:
 - please place the call after your text response (if any)."""
 
 
+accept = 'application/json'
+contentType = 'application/json'
+
 def gen_image(prompt, height=1024, width=1024, num_samples=1):
     engine_id = "stability.stable-diffusion-xl-v1"
 
@@ -122,20 +121,17 @@ def parse_response_and_gen_image(claude_response):
     return (function_free_claude_response, image_prompt, base64)
 
 
-def illustrator_claude(prompt):
+def illustrator_claude(prompt,**params):
     
     messages_list = [
         {"role": "user", "content": prompt}
     ]
     
-    body = {"max_tokens": max_tokens_to_sample, 
-            "temperature": temperature,
-            "top_k": top_k,
-            "top_p": top_p,
-            "stop_sequences": ["\\n\\nHuman:"],
+    body = {"stop_sequences": ["\\n\\nHuman:"],
             "anthropic_version": "bedrock-2023-05-31",
             "messages": messages_list,
             "system":image_gen_system_prompt}     
+    body.update(params)
     
     response = bedrock_runtime.invoke_model(body=json.dumps(body), # Encode to bytes
                                     modelId=model, 
@@ -185,9 +181,19 @@ Product details:
 Create a social media post for a T-shirt with the following description. Write the word "Gen AI" in the center of the T-shirt.
 """
 
-options = [{"id":1,"prompt": prompt1,"height":300},
-           {"id":2,"prompt": prompt2,"height":350},
-           {"id":3,"prompt": prompt3,"height":300},
+prompt4 = """Your task is to create a comprehensive design brief for a holistic brand identity based on the given specifications. The brand identity should encompass various elements such as suggestions for the brand name, logo, color palette, typography, visual style, tone of voice, and overall brand personality. Ensure that all elements work together harmoniously to create a cohesive and memorable brand experience that effectively communicates the brand's values, mission, and unique selling proposition to its target audience. Be detailed and comprehensive and provide enough specific details for someone to create a truly unique brand identity.\n\n Brand specs:\n This is a brand that focuses on creating high-quality, stylish clothing and accessories using eco-friendly materials and ethical production methods\n The brand targets environmentally conscious consumers aged 25-40 who value fashion, sustainability, and social responsibility.\n The brand identity should achieve the following goals:\n\n 1. Reflect the brand's commitment to sustainability, ethical practices, and environmental stewardship.\n 2. Appeal to the target audience by conveying a sense of style, quality, and trendiness.\n 3. Differentiate the brand from competitors in the sustainable fashion market.\n 4. Create a strong emotional connection with consumers and inspire them to make more environmentally friendly choices.\n"""
+
+prompt5= """Your task is to generate creative, memorable, and marketable product names based on the provided description and keywords. The product names should be concise (2-4 words), evocative, and easily understood by the target audience. Avoid generic or overly literal names. Instead, aim to create a name that stands out, captures the essence of the product, and leaves a lasting impression.\n\nDescription: A noise-canceling, wireless, over-ear headphone with a 20-hour battery life and touch controls. Designed for audiophiles and frequent travelers.\n\nKeywords: immersive, comfortable, high-fidelity, long-lasting, convenient"""
+
+prompt6 = """Your task is to suggest avant-garde fashion trends and styles tailored to the user's preferences. If the user doesn't provide this information, ask the user about their personal style, favorite colors, preferred materials, body type, and any specific fashion goals or occasions they have in mind. Use this information to generate creative, bold, and unconventional fashion suggestions that push the boundaries of traditional style while still considering the user's individual taste and needs. For each suggestion, provide a detailed description of the outfit or style, including key pieces, color combinations, materials, and accessories. Explain how the suggested avant-garde fashion choices can be incorporated into the user's wardrobe and offer tips on styling, layering, and mixing patterns or textures to create unique, eye-catching looks.\n\nPersonal style: Edgy, minimal, with a touch of androgyny\nFavorite colors: Black, white, and deep red\nPreferred materials: Leather, denim, and high-quality cotton\nBody type: Tall and lean\nFashion goals: To create a striking, fearless look for an art gallery opening"""
+
+options = [{"id":1,"title":"Sunglass","prompt": prompt1,"height":300},
+           {"id":2,"title":"Walking Shoe","prompt": prompt2,"height":350},
+           {"id":3,"title":"T-Shirt","prompt": prompt3,"height":300},
+           {"id":4,"title":"Brand builder","prompt": prompt4,"height":400},
+           {"id":5,"title":"Product naming pro","prompt": prompt5,"height":250},
+           {"id":6,"title":"Futuristic fashion advisor","prompt": prompt6,"height":350}
+           
            ]
 
 
@@ -202,13 +208,14 @@ def prompt_box(prompt,key,height):
     
     return submit, prompt_data
          
-def generate_image(prompt_data):
+def generate_image(prompt_data,**params):
     with st.spinner("Generating..."):
-        function_free_response_dino, image_prompt_dino, b64_dino = illustrator_claude(prompt_data)
+        function_free_response_dino, image_prompt_dino, b64_dino = illustrator_claude(prompt_data,**params)
         st.write(function_free_response_dino)
         st.image('generated_image.png', caption="Generated Image")
         st.write(image_prompt_dino)
         
+       
 def getmodelIds_claude3(providername='Anthropic'):
 	models =[]
 	bedrock = boto3.client(service_name='bedrock',region_name='us-east-1' )
@@ -223,31 +230,28 @@ def getmodelIds_claude3(providername='Anthropic'):
 prompt_col, paramaters = st.columns([0.7,0.3])
 
 with paramaters:
-    with st.form('Param-form'):
+    with st.container(border=True):
         provider = st.selectbox('provider', ['Anthropic'])
-        models = getmodelIds_claude3(provider)
-        model = st.selectbox('model', models)
-        temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.5, step = 0.1)
-        top_k=st.slider('top_k',min_value = 0, max_value = 300, value = 250, step = 1)
-        top_p=st.slider('top_p',min_value = 0.0, max_value = 1.0, value = 0.9, step = 0.1)
-        max_tokens_to_sample=st.number_input('max_tokens',min_value = 50, max_value = 4096, value = 2048, step = 1)
-        submitted1 = st.form_submit_button(label = 'Tune Parameters') 
+        models = helpers.getmodelIds_claude3(providername='Anthropic')
+        model = st.selectbox(
+            'model', models, index=models.index("anthropic.claude-3-sonnet-20240229-v1:0"))
+
+    with st.container(border=True):
+        params = helpers.tune_parameters("Claude 3")
 
 
 with prompt_col:
-    tab1, tab2, tab3 = st.tabs(["Sunglass", "Walking Shoe", "T-Shirt"])
-    with tab1:
-        submit, prompt_data = prompt_box(options[0]["prompt"], options[0]["id"], options[0]["height"])
-        if submit:
-            generate_image(prompt_data)
-    with tab2:
-        submit, prompt_data = prompt_box(options[1]["prompt"], options[1]["id"], options[1]["height"])
-        if submit:
-            generate_image(prompt_data)
-    with tab3:
-        submit, prompt_data = prompt_box(options[2]["prompt"], options[2]["id"], options[2]["height"])
-        if submit:
-            generate_image(prompt_data)
+
+    tab_names = [option['title'] for option in options]
+
+    tabs = st.tabs(tab_names)
+
+    for tab, content in zip(tabs, options):
+        with tab:
+            submit, prompt_data = prompt_box(content["prompt"], content["id"], content["height"])
+            if submit:
+                generate_image(prompt_data,**params)
+
 
 
 

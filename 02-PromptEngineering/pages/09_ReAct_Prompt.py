@@ -10,7 +10,7 @@ from langchain.agents import Tool
 from langchain.chains import LLMMathChain
 
 import utils.helpers as helpers
-bedrock = helpers.bedrock_runtime_client()
+bedrock = helpers.runtime_client()
 helpers.set_page_config()
 
 

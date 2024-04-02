@@ -1,10 +1,11 @@
 from langchain_community.llms import Bedrock
+from langchain_community.chat_models import BedrockChat
 import streamlit as st
 import utils.helpers as helpers
 import threading
 
 helpers.set_page_config()
-bedrock_runtime = helpers.bedrock_runtime_client()
+bedrock_runtime = helpers.runtime_client()
 
 def form_callback():
     for key in st.session_state.keys():
@@ -51,27 +52,32 @@ with st.container():
         st.markdown(t)
     with col2:
         with st.container(border=True):
-            provider = st.selectbox('Provider',['Amazon','Anthropic','AI21','Cohere','Meta'])
-            model_id=st.text_input('model_id',helpers.getmodelId(provider))        
+            provider = st.selectbox('Provider',helpers.list_providers, index=4)
+            models = helpers.getmodelIds(provider)
+            model_id = st.selectbox(
+                'model', models, index=models.index(helpers.getmodelId(provider)))         
 
 with st.expander("Few-Shot- Chain-of-thought (CoT)"):
     st.image("images/few_shot_cot.png")
 
 #Create the connection to Bedrock
-llm = Bedrock(
-    model_id=model_id,
-    client=bedrock_runtime,
-    model_kwargs=helpers.getmodelparams(provider),
-)
+def call_llm(prompt):
+    llm = Bedrock(model_id=model_id,client=bedrock_runtime,model_kwargs=helpers.getmodelparams(provider))
+    response = llm.invoke(prompt)
+    # Print results
+    return st.info(response)
+
+def call_llm_chat(prompt):
+    params = helpers.getmodelparams(provider)
+    params.update({'messages':[{"role": "user", "content": prompt}]})
+    
+    llm = BedrockChat(model_id=model_id, client=bedrock_runtime, model_kwargs=params)
+    response = llm.invoke(prompt)
+    
+    return st.info(response.content)
 
 options = [{"prompt_type":"Few-shot-CoT", "prompt": prompt2, "height":250,},
             {"prompt_type":"Few-shot", "prompt": prompt1, "height":250}]
-
-    
-def call_llm(prompt_data):
-    response = llm.invoke(prompt_data)
-    st.write("### Answer")
-    st.info(response)
 
 col1, col2 = st.columns(2)
 
@@ -91,16 +97,16 @@ if submit:
         col1, col2 = st.columns(2)
         
         with col1:
-            t1 = threading.Thread(target=call_llm(prompt_data1))
+            if provider == "Claude 3":
+                call_llm_chat(prompt_data1)
+            else:
+                # call_llm_chat(text_prompt)
+                call_llm(prompt_data1)
         with col2:
-            t2 = threading.Thread(target=call_llm(prompt_data2))
-
-
-        t1.start()
-        t2.start()
-        
-        t2.join()
-        t1.join()
-        #print(response)
+            if provider == "Claude 3":
+                call_llm_chat(prompt_data2)
+            else:
+                # call_llm_chat(text_prompt)
+                call_llm(prompt_data2)
 
         

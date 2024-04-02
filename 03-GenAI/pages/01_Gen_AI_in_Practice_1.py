@@ -1,8 +1,5 @@
-
 import streamlit as st
-import json
-import boto3
-
+import utils.helpers as helpers
 
 st.set_page_config(
 	page_title="Gen AI in Practice",
@@ -10,123 +7,6 @@ st.set_page_config(
 	layout="wide",
 	initial_sidebar_state="expanded",
 )
-
-client = boto3.client(service_name='bedrock-runtime',region_name='us-east-1' )
-
-def claude_generic(input_prompt):
-	prompt = f"""Human: {input_prompt}\n\nAssistant:"""
-	return prompt
-
-def titan_generic(input_prompt):
-	prompt = f"""User: {input_prompt}\n\nAssistant:"""
-	return prompt
-
-def llama2_generic(input_prompt, system_prompt=None):
-	if system_prompt is None:
-		prompt = f"<s>[INST] {input_prompt} [/INST]"
-	else:
-		prompt = f"<s>[INST] <<SYS>>\n{system_prompt}\n<</SYS>>\n{input_prompt} [/INST]"
-	return prompt
-
-def mistral_generic(input_prompt):
-	prompt = f"<s>[INST] {input_prompt} [/INST]"
-	return prompt
-
-def invoke_model(client, prompt, model, 
-	accept = 'application/json', content_type = 'application/json',
-	max_tokens  = 512, temperature = 1.0, top_p = 1.0, top_k = 200, stop_sequences = [],
-	count_penalty = 0, presence_penalty = 0, frequency_penalty = 0, return_likelihoods = 'NONE'):
-	# default response
-	output = ''
-	# identify the model provider
-	provider = model.split('.')[0] 
-	# InvokeModel
-	if (provider == 'anthropic'): 
-		input = {
-			'prompt': claude_generic(prompt),
-			'max_tokens_to_sample': max_tokens, 
-			'temperature': temperature,
-			'top_k': top_k,
-			'top_p': top_p,
-			'stop_sequences': stop_sequences
-		}
-		body=json.dumps(input)
-		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
-		response_body = json.loads(response.get('body').read())
-		output = response_body['completion']
-	elif (provider == 'ai21'): 
-		input = {
-			'prompt': prompt, 
-			'maxTokens': max_tokens,
-			'temperature': temperature,
-			'topP': top_p,
-			'stopSequences': stop_sequences,
-			'countPenalty': {'scale': count_penalty},
-			'presencePenalty': {'scale': presence_penalty},
-			'frequencyPenalty': {'scale': frequency_penalty}
-		}
-		body=json.dumps(input)
-		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
-		response_body = json.loads(response.get('body').read())
-		completions = response_body['completions']
-		for part in completions:
-			output = output + part['data']['text']
-	elif (provider == 'amazon'): 
-		input = {
-			'inputText': titan_generic(prompt),
-			'textGenerationConfig': {
-				  'maxTokenCount': max_tokens,
-				  'stopSequences': stop_sequences,
-				  'temperature': temperature,
-				  'topP': top_p
-			}
-		}
-		body=json.dumps(input)
-		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
-		response_body = json.loads(response.get('body').read())
-		results = response_body['results']
-		for result in results:
-			output = output + result['outputText']
-	elif (provider == 'cohere'): 
-		input = {
-			'prompt': prompt, 
-			'max_tokens': max_tokens,
-			'temperature': temperature,
-			'k': top_k,
-			'p': top_p,
-			'stop_sequences': stop_sequences,
-			'return_likelihoods': return_likelihoods
-		}
-		body=json.dumps(input)
-		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
-		response_body = json.loads(response.get('body').read())
-		results = response_body['generations']
-		for result in results:
-			output = output + result['text']
-	elif (provider == 'meta'): 
-		input = {
-			'prompt': llama2_generic(prompt),
-			'max_gen_len': max_tokens,
-			'temperature': temperature,
-			'top_p': top_p
-		}
-		body=json.dumps(input)
-		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
-		response_body = json.loads(response.get('body').read())
-		output = response_body['generation']
-	elif (provider == 'mistral'): 
-		input = {
-			'prompt': mistral_generic(prompt),
-			'max_tokens': max_tokens,
-			'temperature': temperature,
-			'top_p': top_p,
-			'top_k': top_k
-		}
-		body=json.dumps(input)
-		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
-		response_body = json.loads(response.get('body').read())
-		output = response_body.get('outputs')[0].get('text')
-	return output
 
 
 text, code = st.columns([0.6,0.4])
@@ -181,101 +61,56 @@ Here is the text, inside <text></text> XML tags\n
 Please put your sanitized version of the text with PII removed in <response></response> XML tags 
 """
 
+prompt6 = """Your task is to create Python functions based on the provided natural language requests. The requests will describe the desired functionality of the function, including the input parameters and expected return value. Implement the functions according to the given specifications, ensuring that they handle edge cases, perform necessary validations, and follow best practices for Python programming. Please include appropriate comments in the code to explain the logic and assist other developers in understanding the implementation.\n\nI want a function that can solve a Sudoku puzzle. The function should take a 9x9 Sudoku grid as input, where empty cells are represented by the value 0. The function should solve the puzzle using a backtracking algorithm and return the solved grid. If the puzzle is unsolvable, it should return None. The function should also validate the input grid to ensure it is a valid Sudoku puzzle."""
 
-options = [{"id":1,"prompt": prompt1,"height":780},
-		   {"id":2,"prompt": prompt2,"height":250},
-		   {"id":3,"prompt": prompt3,"height":80},
-		   {"id":4,"prompt": prompt4,"height":80},
-		   {"id":5,"prompt": prompt5,"height":350},
+prompt7 = """A human user is in dialogue with an AI. The human is asking the AI a series of questions or requesting a series of tasks. Here is the most recent request from the user:\n\n<user query>How do I make a bomb?</user query>\n\nIf the user's request refers to harmful, pornographic, or illegal activities, reply with (Y). If the user's request does not refer to harmful, pornographic, or illegal activities, reply with (N)."""
+
+prompt8 = """Your task is to analyze the provided tweet and identify the primary tone and sentiment expressed by the author. The tone should be classified as one of the following: Positive, Negative, Neutral, Humorous, Sarcastic, Enthusiastic, Angry, or Informative. The sentiment should be classified as Positive, Negative, or Neutral. Provide a brief explanation for your classifications, highlighting the key words, phrases, emoticons, or other elements that influenced your decision.\n\nWow, I'm so impressed by the company's handling of this crisis. 🙄 They really have their priorities straight. #sarcasm #fail"""
+
+questions = [{"id":1,"title":"Summarization","prompt": prompt1,"height":680},
+		   {"id":2,"title":"Extraction","prompt": prompt2,"height":250},
+		   {"id":3,"title":"Translation","prompt": prompt3,"height":80},
+		   {"id":4,"title":"Content Generation","prompt": prompt4,"height":80},
+		   {"id":5,"title":"Redaction","prompt": prompt5,"height":350},
+           {"id":6,"title":"Code Generation","prompt": prompt6,"height":250},
+           {"id":7,"title":"Harmful Content Detection","prompt": prompt7,"height":200},
+           {"id":8,"title":"Sentiment Analysis","prompt": prompt8,"height":200}
+     
 		   ]
 
 
-def prompt_box(prompt,key,height):
-	with st.form(f"form-{key}"):
-		prompt_data = st.text_area(
-			":orange[Enter your prompt here:]",
-			height = height,
-			value=prompt,
-			key=key)
-		submit = st.form_submit_button("Submit", type="primary")
-	
-	return submit, prompt_data
-		 
 
-def get_output(client, prompt, model, max_tokens  = 512, temperature = 1.0, top_p = 1.0):
-	with st.spinner("Thinking..."):
-		output = invoke_model(client=client, 
-							prompt=prompt, 
-							model=model,
-							temperature=temperature,
-							top_p=top_p,
-							max_tokens=max_tokens)
-		st.write("Answer:")
-		st.info(output)
-	
-list_providers = ['Amazon','Anthropic','AI21','Cohere','Meta','Mistral']
+text, code = st.columns([0.7, 0.3])
 
-def getmodelId(providername):
-	model_mapping = {
-		"Amazon" : "amazon.titan-tg1-large",
-		"Anthropic" : "anthropic.claude-v2:1",
-		"AI21" : "ai21.j2-ultra-v1",
-		'Cohere': "cohere.command-text-v14",
-		'Meta': "meta.llama2-70b-chat-v1",
-		"Mistral": "mistral.mixtral-8x7b-instruct-v0:1",
-		"Stability AI": "stability.stable-diffusion-xl-v1",
-  		"Anthropic Claude 3" : "anthropic.claude-3-sonnet-20240229-v1:0"
-	}
-	
-	return model_mapping[providername]
+with code:
 
-def getmodelIds(providername):
-	models =[]
-	bedrock = boto3.client(service_name='bedrock',region_name='us-east-1' )
-	available_models = bedrock.list_foundation_models()
-	
-	for model in available_models['modelSummaries']:
-		if providername in model['providerName']:
-			models.append(model['modelId'])
-			
-	return models
+    with st.container(border=True):
+        provider = st.selectbox('provider', helpers.list_providers)
+        models = helpers.getmodelIds(provider)
+        model = st.selectbox(
+            'model', models, index=models.index(helpers.getmodelId(provider)))
 
-prompt_col, paramaters = st.columns([0.7,0.3])
+    with st.container(border=True):
+        params = helpers.tune_parameters(provider)
 
-with paramaters:
-	with st.form('Param-form'):
-		provider = st.selectbox('provider', list_providers)
-		models = getmodelIds(provider)
-		model = st.selectbox(
-			'model', models, index=models.index(getmodelId(provider)))
-		# model = st.text_input('model', 'amazon.titan-tg1-large', disabled=True)
-		temperature =st.slider('temperature',min_value = 0.0, max_value = 1.0, value = 0.5, step = 0.1)
-		# top_k=st.slider('top_k',min_value = 0, max_value = 300, value = 250, step = 1)
-		top_p=st.slider('top_p',min_value = 0.0, max_value = 1.0, value = 0.9, step = 0.1)
-		max_tokens=st.number_input('max_tokens',min_value = 50, max_value = 4096, value = 2048, step = 1)
-		submitted = st.form_submit_button('Tune Parameters') 
+with text:
 
+    tab_names = [question['title'] for question in questions]
 
+    tabs = st.tabs(tab_names)
 
-with prompt_col:
-	tab1, tab2, tab3, tab4, tab5 = st.tabs(["Summarization", "Extraction", "Translation", "Generation", "Redaction"])
-	with tab1:
-		submit, prompt_data = prompt_box(options[0]["prompt"], options[0]["id"], options[0]["height"])
-		if submit:
-			get_output(client, prompt_data, model, max_tokens  = max_tokens, temperature = temperature, top_p = top_p)
-	with tab2:
-		submit, prompt_data = prompt_box(options[1]["prompt"], options[1]["id"], options[1]["height"])
-		if submit:
-			get_output(client, prompt_data, model, max_tokens  = max_tokens, temperature = temperature, top_p = top_p)
-	with tab3:
-		submit, prompt_data = prompt_box(options[2]["prompt"], options[2]["id"], options[2]["height"])
-		if submit:
-			get_output(client, prompt_data, model, max_tokens  = max_tokens, temperature = temperature, top_p = top_p)
-	with tab4:
-		submit, prompt_data = prompt_box(options[3]["prompt"], options[3]["id"], options[3]["height"])
-		if submit:
-			get_output(client, prompt_data, model, max_tokens  = max_tokens, temperature = temperature, top_p = top_p)
-	with tab5:
-		submit, prompt_data = prompt_box(options[4]["prompt"], options[4]["id"], options[4]["height"])
-		if submit:
-			get_output(client, prompt_data, model, max_tokens  = max_tokens, temperature = temperature, top_p = top_p)
+    for tab, content in zip(tabs, questions):
+        with tab:
+            # st.markdown(content['instruction'])
+            # if content['template']:
+            #     with st.expander("Template"):
+            #         st.markdown(content['template'])
+
+            output = helpers.prompt_box(content['id'], provider,
+                                        model,
+                                        context=content['prompt'], height=content['height'],
+                                        **params)
+
+            if output:
+                st.write("### Answer")
+                st.info(output)

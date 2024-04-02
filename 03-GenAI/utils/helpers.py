@@ -215,17 +215,17 @@ def update_parameters(suffix,**args):
 	return st.session_state[suffix]
 
 
-def prompt_box(key,provider,model,context=None,**params):
+def prompt_box(key,provider,model,context=None,height=100,**params):
 	response = ''
 	with st.container(border=True):
-		prompt = st.text_area("Enter your prompt here",
-							  height=100,
+		prompt_data = st.text_area("Enter your prompt here", value = context, 
+                             height=height,
 							  key=f"Q{key}")
 		submit = st.button("Submit", type="primary", key=f"S{key}")
 
 	if submit:
 		if context is not None:
-			prompt = context + "\n\n" + prompt
+			prompt = context + "\n\n" + prompt_data
 			match provider:
 				case "Amazon":
 					prompt = titan_generic(prompt)

@@ -1,4 +1,5 @@
 from langchain_community.llms import Bedrock
+from langchain_community.chat_models import BedrockChat
 import streamlit as st
 import utils.helpers as helpers
 
@@ -63,8 +64,10 @@ with st.container():
             submit = st.form_submit_button("Submit", type="primary")
     with col2:
         with st.container(border=True):
-            provider = st.selectbox('Provider',['Amazon','Anthropic','AI21','Cohere','Meta'])
-            model_id=st.text_input('model_id',helpers.getmodelId(provider))
+            provider = st.selectbox('Provider',helpers.list_providers, index=1)
+            models = helpers.getmodelIds(provider)
+            model_id = st.selectbox(
+                'model', models, index=models.index(helpers.getmodelId(provider)))  
         with st.container(border=True):
             tab1, tab2 = st.tabs(["Good Prompt", "Bad Prompt"])
             with tab1:
@@ -73,23 +76,30 @@ with st.container():
                 load_options(item_num=1)
 
 #Create the connection to Bedrock
-bedrock_runtime = helpers.bedrock_runtime_client()
+bedrock_runtime = helpers.runtime_client()
 
 
-llm = Bedrock(
-    model_id=model_id,
-    client=bedrock_runtime,
-    model_kwargs=helpers.getmodelparams(provider),
-)
+def call_llm(prompt):
+    llm = Bedrock(model_id=model_id,client=bedrock_runtime,model_kwargs=helpers.getmodelparams(provider))
+    response = llm.invoke(prompt)
+    # Print results
+    return st.info(response)
 
+def call_llm_chat(prompt):
+    params = helpers.getmodelparams(provider)
+    params.update({'messages':[{"role": "user", "content": prompt}]})
+    
+    llm = BedrockChat(model_id=model_id, client=bedrock_runtime, model_kwargs=params)
+    response = llm.invoke(prompt)
+    
+    return st.info(response.content)
 
 if submit:
     col1, col2 = st.columns([0.7, 0.3])
     with col1:
         with st.spinner("Thinking..."):
-            response = llm.invoke(prompt_data)
-
-            #print(response)
-            st.write("### Answer")
-            st.info(response)
-  
+            if provider == "Claude 3":
+                call_llm_chat(prompt_data)
+            else:
+                # call_llm_chat(text_prompt)
+                call_llm(prompt_data)
