@@ -10,6 +10,13 @@ import uuid
 import utils.helpers as u_bedrock
 
 
+
+bedrock = boto3.client(service_name='bedrock', region_name='us-east-1')
+bedrock_runtime = boto3.client(service_name='bedrock-runtime', region_name='us-east-1')
+
+accept = 'application/json'
+content_type = 'application/json'
+
 def getmodelId(providername):
     model_mapping = {
         "Amazon": "amazon.titan-tg1-large",
@@ -112,8 +119,8 @@ def image_parameters():
     cfgScale = st.slider(
         'cfgScale', value=8.0, min_value=1.1, max_value=10.0, step=1.0)
     seed = st.number_input('seed', value=10000)
-    quality = st.radio('quality', ["premium", "standard"], horizontal=True)
-    selected_size = st.selectbox('size', size, index=1)
+    quality = st.radio('quality', ["standard","premium"], horizontal=True)
+    selected_size = st.selectbox('size', size, index=0)
     width = int(selected_size.split('x')[0])
     height = int(selected_size.split('x')[1])
     numberOfImages = st.selectbox('numberOfImages', [1], disabled=True)
@@ -136,8 +143,7 @@ def get_titan_image_generation_request_body(prompt, negative_prompt=None, **para
     body = {  # create the JSON payload to pass to the InvokeModel API
         "taskType": "TEXT_IMAGE",
         "textToImageParams": {
-            "text": prompt,
-                    "negativeText": negative_prompt
+            "text": prompt
         },
         "imageGenerationConfig": params
     }
@@ -163,15 +169,9 @@ def get_titan_response_image(response):
 # generate an image using Amazon Titan Image Generator
 def get_image_from_model(model, prompt_content, negative_prompt=None, **params):
 
-    bedrock = boto3.client(
-        service_name='bedrock-runtime',
-        region_name='us-east-1',
-    )
-
     body = get_titan_image_generation_request_body(prompt=prompt_content, negative_prompt=negative_prompt, **params)
 
-    response = bedrock.invoke_model(body=body, modelId=model,
-                                    contentType="application/json", accept="application/json")
+    response = bedrock_runtime.invoke_model(body=body, modelId=model)
 
     output = get_titan_response_image(response)
 

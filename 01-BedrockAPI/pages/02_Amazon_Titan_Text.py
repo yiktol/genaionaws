@@ -1,6 +1,5 @@
 import streamlit as st
 import utils.helpers as helpers
-import utils.bedrock as bedrock
 import utils.stlib as stlib
 import utils.titan_text as titan_text
 
@@ -24,7 +23,7 @@ with code:
 	with st.container(border=True):
 		provider = st.selectbox('provider', ['Amazon'])
 		model = titan_text.modelId()
-		streaming = st.checkbox('Streaming')
+		streaming = st.checkbox('Streaming',value=True)
 		
 	with st.container(border=True):
 		params = titan_text.tune_parameters()

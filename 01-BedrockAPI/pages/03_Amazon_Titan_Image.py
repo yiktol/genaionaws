@@ -53,5 +53,7 @@ It can also generate variations of an image.""")
 			if generate_button:
 				st.subheader("Result")
 				with st.spinner("Drawing..."):
-					image = titan_image.get_image_from_model(model, prompt_text,negative_prompt,**params)
-				st.image(image)
+					images = titan_image.get_image_from_model(model, prompt_text,negative_prompt,**params)
+					for image in images:
+						st.image(image)
+

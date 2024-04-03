@@ -22,7 +22,7 @@ with code:
 	with st.container(border=True):
 		provider = st.selectbox('provider', ['Meta'])
 		model = llama.modelId()
-		streaming = st.checkbox('Streaming')
+		streaming = st.checkbox('Streaming',value=True)
 	with st.container(border=True):
 		params = llama.tune_parameters()
 

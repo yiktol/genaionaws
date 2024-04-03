@@ -20,9 +20,9 @@ text, code = st.columns([0.7, 0.3])
 with code:
 
     with st.container(border=True):
-        provider = st.selectbox('provider', ['Meta'])
+        provider = st.selectbox('provider', ['Mistral'])
         model = mistral.modelId()
-        streaming = st.checkbox('Streaming')
+        streaming = st.checkbox('Streaming',value=True)
     with st.container(border=True):
         params = mistral.tune_parameters()
 

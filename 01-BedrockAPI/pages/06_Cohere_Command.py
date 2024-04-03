@@ -21,7 +21,7 @@ with code:
 	with st.container(border=True):
 		provider = st.selectbox('provider', ['Cohere'])
 		model = cohere.modelId()
-		streaming = st.checkbox('Streaming')
+		streaming = st.checkbox('Streaming',value=True)
 		
 	with st.container(border=True):
 		params = cohere.tune_parameters()

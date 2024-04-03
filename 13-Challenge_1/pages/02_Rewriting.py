@@ -57,6 +57,10 @@ with code:
 		models = helpers.getmodelIds(provider)
 		model = st.selectbox(
 			'model', models, index=models.index(helpers.getmodelId(provider)))
+		if 'AI21' not in provider:
+			streaming = st.checkbox('Streaming',value=True)
+		else:
+			streaming = False
 		
 	with st.container(border=True):
 		params = helpers.tune_parameters(provider)
@@ -74,10 +78,10 @@ with text:
 
 			output = helpers.prompt_box(content['id'], provider,
 								model,
-								context=content['context'],
+								context=content['context'],streaming=streaming,
 								**params)
 			
-			if output:
+			if output and not streaming:
 				st.write("### Answer")
 				st.info(output)
 

@@ -13,6 +13,12 @@ import utils.titan_image as titan_image
 import utils.sdxl as sdxl
 
 
+bedrock = boto3.client(service_name='bedrock', region_name='us-east-1')
+bedrock_runtime = boto3.client(service_name='bedrock-runtime', region_name='us-east-1')
+
+accept = 'application/json'
+content_type = 'application/json'
+
 def tune_parameters(provider):
 	match provider:
 		case "Anthropic":
@@ -215,7 +221,7 @@ def update_parameters(suffix,**args):
 	return st.session_state[suffix]
 
 
-def prompt_box(key,provider,model,context=None,**params):
+def prompt_box(key,provider,model,context=None,streaming=None,**params):
 	response = ''
 	with st.container(border=True):
 		prompt = st.text_area("Enter your prompt here",
@@ -239,18 +245,17 @@ def prompt_box(key,provider,model,context=None,**params):
 					prompt = prompt
 			
 		with st.spinner("Generating..."):
-			response = invoke_model(
-				runtime_client(), 
-				prompt, 
-				model=model, 
-				**params)
+			if streaming:
+				response = invoke_model_streaming(prompt,model,**params)
+			else:
+				response = invoke_model(prompt,model,**params)
 				
 	return response
 
 
 list_providers = ['Amazon','Anthropic','AI21','Claude 3','Cohere','Meta','Mistral']
 
-def invoke_model(client, prompt, model, accept = 'application/json', content_type = 'application/json',**params):
+def invoke_model(prompt, model,**params):
 	# default response
 	output = ''
 	# identify the model provider
@@ -264,7 +269,7 @@ def invoke_model(client, prompt, model, accept = 'application/json', content_typ
 
 		input.update(params)
 		body=json.dumps(input)
-		response = client.invoke_model(body=body, modelId=model, accept=accept, contentType=content_type)
+		response = bedrock_runtime.invoke_model(body=body, modelId=model, accept=accept, contentType=content_type)
 		response_body = json.loads(response.get('body').read())
 		output = response_body.get('content')[0]['text']
  
@@ -274,7 +279,7 @@ def invoke_model(client, prompt, model, accept = 'application/json', content_typ
 		}
 		input.update(params)
 		body=json.dumps(input)
-		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
+		response = bedrock_runtime.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
 		response_body = json.loads(response.get('body').read())
 		output = response_body['completion']
 	elif (provider == 'ai21'): 
@@ -283,7 +288,7 @@ def invoke_model(client, prompt, model, accept = 'application/json', content_typ
 		}
 		input.update(params)
 		body=json.dumps(input)
-		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
+		response = bedrock_runtime.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
 		response_body = json.loads(response.get('body').read())
 		completions = response_body['completions']
 		for part in completions:
@@ -294,7 +299,7 @@ def invoke_model(client, prompt, model, accept = 'application/json', content_typ
 			'textGenerationConfig': params
 		}
 		body=json.dumps(input)
-		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
+		response = bedrock_runtime.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
 		response_body = json.loads(response.get('body').read())
 		results = response_body['results']
 		for result in results:
@@ -305,7 +310,7 @@ def invoke_model(client, prompt, model, accept = 'application/json', content_typ
 		}
 		input.update(params)
 		body=json.dumps(input)
-		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
+		response = bedrock_runtime.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
 		response_body = json.loads(response.get('body').read())
 		results = response_body['generations']
 		for result in results:
@@ -316,7 +321,7 @@ def invoke_model(client, prompt, model, accept = 'application/json', content_typ
 		}
 		input.update(params)
 		body=json.dumps(input)
-		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
+		response = bedrock_runtime.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
 		response_body = json.loads(response.get('body').read())
 		output = response_body['generation']
 	elif (provider == 'mistral'): 
@@ -325,9 +330,136 @@ def invoke_model(client, prompt, model, accept = 'application/json', content_typ
 		}
 		input.update(params)
 		body=json.dumps(input)
-		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
+		response = bedrock_runtime.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
 		response_body = json.loads(response.get('body').read())
 		output = response_body.get('outputs')[0].get('text')
+
+	 
+	return output	
+
+
+def invoke_model_streaming(prompt, model,**params):
+	# default response
+	output = ''
+	# identify the model provider
+	provider = model.split('.')[0] 
+	# InvokeModel
+	if ('anthropic.claude-3' in model): 
+		input = {
+			"anthropic_version": "bedrock-2023-05-31",
+			"messages": [{"role": "user", "content": prompt}]
+		}
+
+		input.update(params)
+		body=json.dumps(input)
+		response = bedrock_runtime.invoke_model_with_response_stream(body=body, modelId=model, accept=accept, contentType=content_type)
+		placeholder = st.empty()
+		full_response = ''
+
+		for event in response.get("body"):
+			chunk = json.loads(event["chunk"]["bytes"])
+
+			if chunk['type'] == 'content_block_delta':
+				if chunk['delta']['type'] == 'text_delta':
+					part = chunk['delta']['text']
+					full_response += part
+					placeholder.info(full_response)
+				placeholder.info(full_response)
+ 
+	elif ('anthropic.claude' in model): 
+		input = {
+			'prompt': prompt,
+		}
+		input.update(params)
+		body=json.dumps(input)
+		response = bedrock_runtime.invoke_model_with_response_stream(body=body, modelId=model, accept=accept,contentType=content_type)
+		placeholder = st.empty()
+		full_response = ''
+	
+		for event in response['body']:
+			data = json.loads(event['chunk']['bytes'])
+			chuck = data['completion']
+			full_response += chuck
+			placeholder.info(full_response)
+		placeholder.info(full_response)
+  
+	elif (provider == 'ai21'): 
+		input = {
+			'prompt': prompt, 
+		}
+		input.update(params)
+		body=json.dumps(input)
+		response = bedrock_runtime.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
+		response_body = json.loads(response.get('body').read())
+		completions = response_body['completions']
+		for part in completions:
+			output = output + part['data']['text']
+	elif (provider == 'amazon'): 
+		input = {
+			'inputText': prompt,
+			'textGenerationConfig': params
+		}
+		body=json.dumps(input)
+		response = bedrock_runtime.invoke_model_with_response_stream(body=body, modelId=model, accept=accept,contentType=content_type)
+		placeholder = st.empty()
+		full_response = ''
+		for event in response['body']:
+			data = json.loads(event['chunk']['bytes'])
+			chuck = data['outputText']
+			full_response += chuck
+			placeholder.info(full_response)
+		placeholder.info(full_response)
+  
+	elif (provider == 'cohere'): 
+		input = {
+			"prompt": prompt, 
+			"stream": True
+		}
+		input.update(params)
+		body=json.dumps(input)
+		response = bedrock_runtime.invoke_model_with_response_stream(body=body, modelId=model, accept=accept,contentType=content_type)
+		placeholder = st.empty()
+		full_response = ''
+		for event in response['body']:
+			# print(event)
+			data = json.loads(event['chunk']['bytes'])
+			if not data["is_finished"]:
+				chunk = data["text"]
+			full_response += chunk
+			placeholder.info(full_response)
+		placeholder.info(full_response)
+		
+	elif (provider == 'meta'): 
+		input = {
+			'prompt': prompt,
+		}
+		input.update(params)
+		body=json.dumps(input)
+		response = bedrock_runtime.invoke_model_with_response_stream(body=body, modelId=model, accept=accept,contentType=content_type)
+		placeholder = st.empty()
+		full_response = ''
+		for event in response['body']:
+			data = json.loads(event['chunk']['bytes'])
+			chunk = data['generation']
+			full_response += chunk
+			placeholder.info(full_response)
+		placeholder.info(full_response)
+	
+	elif (provider == 'mistral'): 
+		input = {
+			'prompt': prompt,
+		}
+		input.update(params)
+		body=json.dumps(input)
+		response = bedrock_runtime.invoke_model_with_response_stream(body=body, modelId=model, accept=accept,contentType=content_type)
+		placeholder = st.empty()
+		full_response = ''
+		for event in response['body']:
+			data = json.loads(event['chunk']['bytes'])
+			chunk = data["outputs"][0]["text"]
+			full_response += chunk
+			placeholder.info(full_response)
+		placeholder.info(full_response)
 
 	 
 	return output	

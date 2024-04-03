@@ -85,8 +85,7 @@ def prompt_box(key, model, context=None, height=100, streaming=False,**params):
 	response = ''
 	with st.container(border=True):
 		prompt = st.text_area("Enter your prompt here", value=context,
-							  height=height,
-							  key=f"Q{key}")
+							  height=height,key=f"Q{key}")
 		submit = st.button("Submit", type="primary", key=f"S{key}")
 
 	if submit:

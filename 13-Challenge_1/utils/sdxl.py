@@ -11,6 +11,12 @@ from jinja2 import Environment, FileSystemLoader
 import uuid
 
 
+bedrock = boto3.client(service_name='bedrock', region_name='us-east-1')
+bedrock_runtime = boto3.client(service_name='bedrock-runtime', region_name='us-east-1')
+
+accept = 'application/json'
+content_type = 'application/json'
+
 params = {"model": "stability.stable-diffusion-xl-v1",
           "cfg_scale": 10,
           "seed": randint(10, 200000),
@@ -113,7 +119,7 @@ def getmodelIds_claude3(providername='Anthropic'):
 
 
 def image_parameters():
-    size = ["1024x1024", "1152x896", "1216x832", "1344x768",
+    size = ["512x512","1024x1024", "1152x896", "1216x832", "1344x768",
             "1536x640", "640x1536", "768x1344", "832x1216", "896x1152"]
     cfg_scale = st.slider(
         'cfg_scale', value=8, min_value=1, max_value=35, step=1)
@@ -140,12 +146,18 @@ def image_parameters():
 # get the stringified request body for the InvokeModel API call
 def get_sdxl_image_generation_request_body(prompt, negative_prompt=None, **params):
 
-    body = {"text_prompts": 
-        [
+    if negative_prompt:
+        body = {"text_prompts": [
             {"text": prompt, "weight": 1},
             {"text": negative_prompt, "weight": -1}
         ],
-    }
+        }
+    else:
+        body = {"text_prompts": [
+            {"text": prompt, "weight": 1}
+        ],
+        }
+
 
     body.update(params)
 
@@ -168,18 +180,12 @@ def get_sdxl_response_image(response):
 # generate an image using Amazon sdxl Image Generator
 def get_image_from_model(model,prompt, negative_prompt=None, **params):
 
-    bedrock = boto3.client(
-        service_name='bedrock-runtime',
-        region_name='us-east-1',
-    )
-
     body = get_sdxl_image_generation_request_body(prompt=prompt,
                                                   negative_prompt=negative_prompt,
                                                   **params
                                                   )
 
-    response = bedrock.invoke_model(body=body, modelId=model,
-                                    contentType="application/json", accept="application/json")
+    response = bedrock_runtime.invoke_model(body=body, modelId=model)
 
     output = get_sdxl_response_image(response)
 

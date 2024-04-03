@@ -45,7 +45,9 @@ with text:
 				generate_button = st.form_submit_button("Generate", type="primary")
 
 			if generate_button:
+				if not negative_prompt:
+					negative_prompt = None
 				st.subheader("Result")
 				with st.spinner("Drawing..."):
-					image = sdxl.get_image_from_model(prompt_text,negative_prompt,model,**params)
+					image = sdxl.get_image_from_model(prompt_text,model,negative_prompt,**params)
 				st.image(image)

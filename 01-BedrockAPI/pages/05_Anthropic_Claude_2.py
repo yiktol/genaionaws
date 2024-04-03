@@ -26,7 +26,7 @@ with code:
 	with st.container(border=True):
 		provider = st.selectbox('provider', ['Anthropic'])
 		model = claude2.modelId()
-		streaming = st.checkbox('Streaming')
+		streaming = st.checkbox('Streaming',value=True)
 	with st.container(border=True):
 		params = claude2.tune_parameters()
 

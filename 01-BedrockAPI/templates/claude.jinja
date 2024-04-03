@@ -10,7 +10,7 @@ prompt = """{{prompt}}"""
 
 body = json.dumps(
         {
-        "prompt": "{{prompt}}",
+        "prompt": prompt,
         "max_tokens_to_sample": {{max_tokens_to_sample}}, 
         "temperature": {{temperature}},
         "top_k": {{top_k}},
