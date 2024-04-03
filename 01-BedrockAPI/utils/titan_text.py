@@ -8,6 +8,9 @@ from jinja2 import Environment, FileSystemLoader
 bedrock = boto3.client(service_name='bedrock', region_name='us-east-1')
 bedrock_runtime = boto3.client(service_name='bedrock-runtime', region_name='us-east-1')
 
+accept = 'application/json'
+content_type = 'application/json'
+
 params = {
 	"model": "amazon.titan-tg1-large",
 	"temperature":0.1, 
@@ -78,40 +81,35 @@ def tune_parameters():
 	return params
 
 
-def prompt_box(key, model, context=None, height=100, **params):
-    response = ''
-    with st.container(border=True):
-        prompt = st.text_area("Enter your prompt here", value=context,
-                              height=height,
-                              key=f"Q{key}")
-        submit = st.button("Submit", type="primary", key=f"S{key}")
+def prompt_box(key, model, context=None, height=100, streaming=False,**params):
+	response = ''
+	with st.container(border=True):
+		prompt = st.text_area("Enter your prompt here", value=context,
+							  height=height,
+							  key=f"Q{key}")
+		submit = st.button("Submit", type="primary", key=f"S{key}")
 
-    if submit:
-        if context is not None:
-            prompt = context + "\n\n" + prompt
-            
-        prompt = titan_generic(prompt)
+	if submit:
+		if context is not None:
+			prompt = context + "\n\n" + prompt
+			
+		prompt = titan_generic(prompt)
+		with st.spinner("Generating..."):
+			if streaming:
+				response = invoke_model_streaming(prompt,model,**params)
+			else:
+				response = invoke_model(prompt,model,**params)
+			
+	return response
 
-        with st.spinner("Generating..."):
-            response = invoke_model(
-                bedrock_runtime,
-                prompt,
-                model=model,
-                **params)
-
-    return response
-
-def invoke_model(client, prompt, model, 
-				 accept = 'application/json', 
-				 content_type = 'application/json',
-				**params):
+def invoke_model(prompt, model, **params):
 	output = ''
 	input = {
 		'inputText': titan_generic(prompt),
 		'textGenerationConfig': params
 	}
 	body=json.dumps(input)
-	response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
+	response = bedrock_runtime.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
 	response_body = json.loads(response.get('body').read())
 	results = response_body['results']
 	for result in results:
@@ -120,4 +118,28 @@ def invoke_model(client, prompt, model,
 	return output
 
 
+def invoke_model_streaming(prompt, model,**params):
+	
+	input = {
+		'inputText': titan_generic(prompt),
+		'textGenerationConfig': params
+	}
+	body=json.dumps(input)
+	response = bedrock_runtime.invoke_model_with_response_stream(
+				body=body, 
+				modelId=model, 
+				accept=accept, 
+				contentType=content_type
+			)
+
+	placeholder = st.empty()
+	full_response = ''
+	for event in response['body']:
+		data = json.loads(event['chunk']['bytes'])
+		chuck = data['outputText']
+		full_response += chuck
+		placeholder.info(full_response)
+	placeholder.info(full_response)
+		
+	return response
 

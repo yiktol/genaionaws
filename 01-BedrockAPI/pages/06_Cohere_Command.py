@@ -21,6 +21,7 @@ with code:
 	with st.container(border=True):
 		provider = st.selectbox('provider', ['Cohere'])
 		model = cohere.modelId()
+		streaming = st.checkbox('Streaming')
 		
 	with st.container(border=True):
 		params = cohere.tune_parameters()
@@ -41,9 +42,10 @@ with text:
 			generations = cohere.prompt_box(content['id'],
 								model=model,
 								context=content['prompt'],height=content['height'],
+								streaming=streaming,
 								**params)
 			
-			if generations:
+			if generations and not streaming:
 				st.write("### Answer")
 				for index, generation in enumerate(generations):
 

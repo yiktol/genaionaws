@@ -29,6 +29,7 @@ def get_models(provider):
 
     bedrock = bedrock_client(region=Region)
     available_models = bedrock.list_foundation_models()
+    # print(available_models)
 
     models = [{}]
 

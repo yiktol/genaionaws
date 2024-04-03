@@ -16,6 +16,9 @@ params = {
 	'top_p': 0.9
 }
 
+accept = 'application/json'
+content_type = 'application/json'
+
 def render_meta_code(templatePath, suffix):
 	env = Environment(loader=FileSystemLoader('templates'))
 	template = env.get_template(templatePath)
@@ -85,10 +88,10 @@ def tune_parameters():
 		"top_p":top_p,
 		"max_gen_len":max_gen_len
 		}
-      
+	  
 	return params
 
-def prompt_box(key, model, context=None, height=100, **params):
+def prompt_box(key, model, context=None, height=100, streaming=False,**params):
 	response = ''
 	with st.container(border=True):
 		prompt = st.text_area("Enter your prompt here", value=context,
@@ -98,25 +101,21 @@ def prompt_box(key, model, context=None, height=100, **params):
 
 	if submit:
 		with st.spinner("Generating..."):
-			response = invoke_model(
-				bedrock_runtime,
-				prompt,
-				model=model,
-				**params)
+			if streaming:
+				response = invoke_model_streaming(prompt, model, **params)
+			else:
+				response = invoke_model(prompt, model, **params)
 
 	return response
 
-def invoke_model(client, prompt, model, 
-				 accept = 'application/json', 
-				 content_type = 'application/json',
-				 **params):
+def invoke_model(prompt, model, **params):
 	output = ''
 	input = {
 		'prompt': llama2_generic(prompt),
 	}
 	input.update(params)
 	body=json.dumps(input)
-	response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
+	response = bedrock_runtime.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
 	response_body = json.loads(response.get('body').read())
 	output = response_body['generation']
 
@@ -124,3 +123,25 @@ def invoke_model(client, prompt, model,
 
 
 
+def invoke_model_streaming(prompt, model, **params):
+	output = ''
+	input = {
+		'prompt': llama2_generic(prompt),
+	}
+	input.update(params)
+	body=json.dumps(input)
+	response = bedrock_runtime.invoke_model_with_response_stream(body=body, modelId=model, accept=accept,contentType=content_type)
+	# response_body = json.loads(response.get('body').read())
+	# output = response_body['generation']
+
+	placeholder = st.empty()
+	full_response = ''
+	for event in response['body']:
+		data = json.loads(event['chunk']['bytes'])
+		chunk = data['generation']
+		full_response += chunk
+		placeholder.info(full_response)
+	placeholder.info(full_response)
+
+
+	# return response_body

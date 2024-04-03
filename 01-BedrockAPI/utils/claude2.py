@@ -24,44 +24,48 @@ params = {  "model": "anthropic.claude-v2:1",
 			"stop_sequences": ["\n\nHuman"],
 			}
 
+
+accept = 'application/json'
+content_type = 'application/json'
+	 
 def initsessionkeys(params, suffix):
-    if suffix not in st.session_state:
-        st.session_state[suffix] = {}
-    for key in params.keys():
-        if key not in st.session_state[suffix]:
-            st.session_state[suffix][key] = params[key]
-    return st.session_state[suffix]
+	if suffix not in st.session_state:
+		st.session_state[suffix] = {}
+	for key in params.keys():
+		if key not in st.session_state[suffix]:
+			st.session_state[suffix][key] = params[key]
+	return st.session_state[suffix]
 
 def reset_session():
-    def form_callback():
-        for key in st.session_state.keys():
-            del st.session_state[key]
+	def form_callback():
+		for key in st.session_state.keys():
+			del st.session_state[key]
 
 
-    st.button(label='Reset', on_click=form_callback, key=uuid.uuid1())
+	st.button(label='Reset', on_click=form_callback, key=uuid.uuid1())
 
 def getmodelId(providername):
-    model_mapping = {
-        "Amazon" : "amazon.titan-tg1-large",
-        "Anthropic" : "anthropic.claude-v2:1",
-        "AI21" : "ai21.j2-ultra-v1",
-        'Cohere': "cohere.command-text-v14",
-        'Meta': "meta.llama2-70b-chat-v1",
-        "Mistral": "mistral.mixtral-8x7b-instruct-v0:1",
-        "Stability AI": "stability.stable-diffusion-xl-v1"
-    }
-    
-    return model_mapping[providername]
+	model_mapping = {
+		"Amazon" : "amazon.titan-tg1-large",
+		"Anthropic" : "anthropic.claude-v2:1",
+		"AI21" : "ai21.j2-ultra-v1",
+		'Cohere': "cohere.command-text-v14",
+		'Meta': "meta.llama2-70b-chat-v1",
+		"Mistral": "mistral.mixtral-8x7b-instruct-v0:1",
+		"Stability AI": "stability.stable-diffusion-xl-v1"
+	}
+	
+	return model_mapping[providername]
 
 def getmodelIds():
-    models =[]
-    available_models = bedrock.list_foundation_models()
-    
-    for model in available_models['modelSummaries']:
-        if "anthropic.claude-v2" in model['modelId']  or "anthropic.claude-instant" in model['modelId']:
-            models.append(model['modelId'])
-            
-    return models
+	models =[]
+	available_models = bedrock.list_foundation_models()
+	
+	for model in available_models['modelSummaries']:
+		if "anthropic.claude-v2" in model['modelId']  or "anthropic.claude-instant" in model['modelId']:
+			models.append(model['modelId'])
+			
+	return models
 
 def modelId():
 	models = getmodelIds()
@@ -111,34 +115,31 @@ def tune_parameters():
 	return params
 
 
-def prompt_box(key, model, context=None, height=100, **params):
-    response = ''
-    with st.container(border=True):
-        prompt = st.text_area("Enter your prompt here", value=context,
-                              height=height,
-                              key=f"Q{key}")
-        submit = st.button("Submit", type="primary", key=f"S{key}")
+def prompt_box(key, model, context=None, height=100, streaming=False,**params):
+	response = ''
+	with st.container(border=True):
+		prompt = st.text_area("Enter your prompt here", value=context,
+							  height=height,
+							  key=f"Q{key}")
+		submit = st.button("Submit", type="primary", key=f"S{key}")
 
-    if submit:
-        if context is not None:
-            prompt = context + "\n\n" + prompt
-            
-        prompt = claude_generic(prompt)
+	if submit:
+		if context is not None:
+			prompt = context + "\n\n" + prompt
+			
+		prompt = claude_generic(prompt)
 
-        with st.spinner("Generating..."):
-            response = invoke_model(
-                bedrock_runtime,
-                prompt,
-                model=model,
-                **params)
+		with st.spinner("Generating..."):
+			if streaming:
+				response = invoke_model_streaming(prompt,model,**params)
+			else:
+				response = invoke_model(prompt,model,**params)
 
-    return response
+	return response
 
-def invoke_model(client, prompt, model, 
-				 accept = 'application/json', 
-				 content_type = 'application/json',
-     			system = None,
-        		**params):
+def invoke_model(prompt, model, 
+	 			system = None,
+				**params):
 	output = ''
  
 	if system:
@@ -151,10 +152,10 @@ def invoke_model(client, prompt, model,
 		input.update(params)
   
 		body=json.dumps(input)
-		response = client.invoke_model(body=body, modelId=model, accept=accept, contentType=content_type)
+		response = bedrock_runtime.invoke_model(body=body, modelId=model, accept=accept, contentType=content_type)
 		response_body = json.loads(response.get('body').read())
 		output = response_body.get('content')[0]['text']
-     
+	 
 	else:
 		input = {
 			'prompt': claude_generic(prompt),
@@ -162,9 +163,65 @@ def invoke_model(client, prompt, model,
 			}
 		input.update(params)
 		body=json.dumps(input)
-		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
+		response = bedrock_runtime.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type)
 		response_body = json.loads(response.get('body').read())
 		output = response_body['completion']
+		st.info(output)
 
 	return output
 
+
+def invoke_model_streaming(prompt, model,system = None,**params):
+	
+ 
+	if system:
+		input = {
+		"anthropic_version": "bedrock-2023-05-31",
+  		"messages": [{"role": "user", "content": prompt}],
+		"system": system,
+		}
+  
+		input.update(params)
+		body=json.dumps(input)
+		response = bedrock_runtime.invoke_model_with_response_stream(
+					body=body, 
+					modelId=model, 
+					accept=accept, 
+					contentType=content_type
+				)
+
+		placeholder = st.empty()
+		full_response = ''
+	
+		for event in response['body']:
+			data = json.loads(event['chunk']['bytes'])
+			chuck = data['completion']
+			full_response += chuck
+			placeholder.info(full_response)
+		placeholder.info(full_response)
+  
+	else:
+		input = {
+			'prompt': claude_generic(prompt),
+			"anthropic_version": "bedrock-2023-05-31"
+			}
+		input.update(params)
+		body=json.dumps(input)
+		response = bedrock_runtime.invoke_model_with_response_stream(
+					body=body, 
+					modelId=model, 
+					accept=accept, 
+					contentType=content_type
+				)
+
+		placeholder = st.empty()
+		full_response = ''
+	
+		for event in response['body']:
+			data = json.loads(event['chunk']['bytes'])
+			chuck = data['completion']
+			full_response += chuck
+			placeholder.info(full_response)
+		placeholder.info(full_response)
+	
+	return response

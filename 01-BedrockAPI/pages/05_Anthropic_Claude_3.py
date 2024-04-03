@@ -24,6 +24,7 @@ with code:
 	with st.container(border=True):
 		provider = st.selectbox('provider', ['Anthropic'])
 		model = claude3.modelId()
+		streaming = st.checkbox('Streaming')
 	with st.container(border=True):
 		params = claude3.tune_parameters()
 
@@ -55,8 +56,9 @@ All of the latest Claude models have vision capabilities that enable them to pro
 									media_type=media_type,
 									image_data=image_data,
 									height=content['height'], 
+									streaming=streaming,
 									**params)
 	
-			if response:
-				st.write("### Answer")
-				st.info(response)
+			# if response:
+			# 	st.write("### Answer")
+			# 	st.info(response)

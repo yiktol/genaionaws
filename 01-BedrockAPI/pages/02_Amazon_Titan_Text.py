@@ -24,6 +24,7 @@ with code:
 	with st.container(border=True):
 		provider = st.selectbox('provider', ['Amazon'])
 		model = titan_text.modelId()
+		streaming = st.checkbox('Streaming')
 		
 	with st.container(border=True):
 		params = titan_text.tune_parameters()
@@ -41,13 +42,17 @@ with text:
 
 	for tab, content in zip(tabs,dataset):
 		with tab:
+			
 			output = titan_text.prompt_box(content['id'],
 								model=model,
 								context=content['prompt'],height=content['height'],
+								streaming=streaming,
 								**params)
 			
-			if output:
+			if output and not streaming:
+			
 				st.write("### Answer")
 				st.info(output)
+
 
 
