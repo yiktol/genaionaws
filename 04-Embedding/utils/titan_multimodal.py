@@ -82,8 +82,8 @@ def embedding(
     if description:
         payload_body["inputText"] = description
 
-    assert payload_body, "please provide either an image and/or a text description"
-    print("\n".join(payload_body.keys()))
+    # assert payload_body, "please provide either an image and/or a text description"
+    # print("\n".join(payload_body.keys()))
 
     response = bedrock_client.invoke_model(
         body=json.dumps({**payload_body, **embedding_config}), 

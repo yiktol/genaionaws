@@ -17,8 +17,8 @@ set_page_config()
 
 def form_callback():
     st.session_state.messages = []
-    st.session_state.memory.clear()
-    del st.session_state.memory
+    # st.session_state.memory.clear()
+    # del st.session_state.memory
 
 st.sidebar.button(label='Clear Chat Messages', on_click=form_callback)
 
