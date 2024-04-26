@@ -315,7 +315,7 @@ with param_col:
 
 with prompt_col:
 
-	sample1, sample2 = st.tabs(['Denied Topic','PII Reduction'])
+	sample1, sample2, sample3 = st.tabs(['Denied Topic','PII Reduction', 'Try your own prompt'])
 
 	with sample1:
 		with st.form("my_form1"):
@@ -335,6 +335,14 @@ with prompt_col:
 			get_output(prompt, model, max_tokens=max_tokens,
 					   temperature=temperature, top_p=top_p)
 
+	with sample3:
+		with st.form("my_form3"):
+			prompt = st.text_area(":orange[Enter your prompt here:]",
+								value='', height=100)
+			submit_button = st.form_submit_button("Submit", type="primary")
+		if submit_button:
+			get_output(prompt, model, max_tokens=max_tokens,
+					   temperature=temperature, top_p=top_p)
     
     
     
