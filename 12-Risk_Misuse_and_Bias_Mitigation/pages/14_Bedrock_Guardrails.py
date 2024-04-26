@@ -129,7 +129,7 @@ def claude_generic(input_prompt):
 	return prompt
 
 def titan_generic(input_prompt):
-	prompt = f"""User: {input_prompt}\n\nAssistant:"""
+	prompt = f"""User: {input_prompt}\n\nBot:"""
 	return prompt
 
 def llama2_generic(input_prompt, system_prompt=None):
@@ -153,10 +153,11 @@ def invoke_model(client, prompt, model,
 	# default response
 	output = ''
 	response_body = ''
+	model_output = None
 	# identify the model provider
 	provider = model.split('.')[0] 
 	# InvokeModel
-	if ('claude-3' in model.split('.')[1] ): 
+	if (provider == 'anthropic'): 
 		input = {
 			'max_tokens': max_tokens,
 			'stop_sequences': stop_sequences,
@@ -167,25 +168,13 @@ def invoke_model(client, prompt, model,
 			"messages": [{"role": "user", "content": prompt}]
 		}
 		body=json.dumps(input)
-		response = client.invoke_model(body=body, modelId=model, accept=accept, contentType=content_type, 
+		response = client.invoke_model(body=body, modelId=model, accept=accept, contentType=content_type,
                                  guardrailIdentifier=guardrailIdentifier,guardrailVersion=guardrailVersion,trace=trace)
 		response_body = json.loads(response.get('body').read())
+		if response_body["amazon-bedrock-trace"]["guardrail"].get("modelOutput") is not None:
+			model_output = response_body["amazon-bedrock-trace"]["guardrail"]["modelOutput"][0]
+			model_output = json.loads(model_output)["content"][0]['text']
 		output = response_body.get('content')[0]['text']
- 
-	elif (provider == 'anthropic'): 
-		input = {
-			'prompt': claude_generic(prompt),
-			'max_tokens_to_sample': max_tokens, 
-			'temperature': temperature,
-			'top_k': top_k,
-			'top_p': top_p,
-			'stop_sequences': stop_sequences
-		}
-		body=json.dumps(input)
-		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type,
-                                 guardrailIdentifier=guardrailIdentifier,guardrailVersion=guardrailVersion,trace=trace)
-		response_body = json.loads(response.get('body').read())
-		output = response_body['completion']
 	elif (provider == 'ai21'): 
 		input = {
 			'prompt': prompt, 
@@ -201,6 +190,9 @@ def invoke_model(client, prompt, model,
 		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type,
                                  guardrailIdentifier=guardrailIdentifier,guardrailVersion=guardrailVersion,trace=trace)
 		response_body = json.loads(response.get('body').read())
+		if response_body["amazon-bedrock-trace"]["guardrail"].get("modelOutput") is not None:
+			model_output = response_body["amazon-bedrock-trace"]["guardrail"]["modelOutput"][0]
+			model_output = json.loads(model_output)["prompt"]['text']
 		completions = response_body['completions']
 		for part in completions:
 			output = output + part['data']['text']
@@ -218,6 +210,9 @@ def invoke_model(client, prompt, model,
 		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type,
                                  guardrailIdentifier=guardrailIdentifier,guardrailVersion=guardrailVersion,trace=trace)
 		response_body = json.loads(response.get('body').read())
+		if response_body["amazon-bedrock-trace"]["guardrail"].get("modelOutput") is not None:
+			model_output = response_body["amazon-bedrock-trace"]["guardrail"]["modelOutput"][0]
+			model_output = json.loads(model_output)['results'][0]['outputText']
 		results = response_body['results']
 		for result in results:
 			output = output + result['outputText']
@@ -235,6 +230,9 @@ def invoke_model(client, prompt, model,
 		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type,
                                  guardrailIdentifier=guardrailIdentifier,guardrailVersion=guardrailVersion,trace=trace)
 		response_body = json.loads(response.get('body').read())
+		if response_body["amazon-bedrock-trace"]["guardrail"].get("modelOutput") is not None:
+			model_output = response_body["amazon-bedrock-trace"]["guardrail"]["modelOutput"][0]
+			model_output = json.loads(model_output)['generations'][0]['text']
 		results = response_body['generations']
 		for result in results:
 			output = output + result['text']
@@ -249,6 +247,9 @@ def invoke_model(client, prompt, model,
 		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type,
                                  guardrailIdentifier=guardrailIdentifier,guardrailVersion=guardrailVersion,trace=trace)
 		response_body = json.loads(response.get('body').read())
+		if response_body["amazon-bedrock-trace"]["guardrail"].get("modelOutput") is not None:
+			model_output = response_body["amazon-bedrock-trace"]["guardrail"]["modelOutput"][0]
+			model_output = json.loads(model_output)['generation']
 		output = response_body['generation']
 	elif (provider == 'mistral'): 
 		input = {
@@ -262,22 +263,25 @@ def invoke_model(client, prompt, model,
 		response = client.invoke_model(body=body, modelId=model, accept=accept,contentType=content_type,
                                  guardrailIdentifier=guardrailIdentifier,guardrailVersion=guardrailVersion,trace=trace)
 		response_body = json.loads(response.get('body').read())
+		if response_body["amazon-bedrock-trace"]["guardrail"].get("modelOutput") is not None:
+			model_output = response_body["amazon-bedrock-trace"]["guardrail"]["modelOutput"][0]
+			model_output = json.loads(model_output).get('outputs')[0].get('text')
 		output = response_body.get('outputs')[0].get('text')
-	return output, response_body
-
+	return output, response_body, model_output
 
 
 def prompt_box(prompt, height, key):
 	with st.form(f'form-{key}'):
-		prompt_data = st.text_area(":orange[User Prompt:]", prompt, height=height)
+		prompt_data = st.text_area(":orange[User Prompt:]", value=prompt, height=height)
 		submit = st.form_submit_button("Submit", type='primary')
 
 	return submit, prompt_data
 
 
+
 def get_output(prompt, model, max_tokens, temperature, top_p):
 	with st.spinner("Thinking..."):
-		output, response_body = invoke_model(
+		output, response_body, model_output = invoke_model(
 			client=bedrock_runtime,
 			prompt=prompt,
 			model=model,
@@ -285,16 +289,15 @@ def get_output(prompt, model, max_tokens, temperature, top_p):
 			top_p=top_p,
 			max_tokens=max_tokens,
 		)
-		# print(output)
-  
 		with st.expander("See Guardtrail Trace:"):
 			st.json(response_body)
-
-		st.write("Answer:")
-		st.info(output)
-
-
-
+   
+		if model_output is not None:
+			st.write("Model Response:")
+			st.info(model_output)
+   
+		st.write("Final Response:")
+		st.success(output)
 
 
 prompt_col, param_col = st.columns([0.7,0.3])
@@ -318,30 +321,23 @@ with prompt_col:
 	sample1, sample2, sample3 = st.tabs(['Denied Topic','PII Reduction', 'Try your own prompt'])
 
 	with sample1:
-		with st.form("my_form1"):
-			prompt = st.text_area(":orange[Enter your prompt here:]",
-								value="How should I invest for my retirement? I want to be able to generate $5,000 a month")
-			submit_button = st.form_submit_button("Submit", type="primary")
-		if submit_button:
-			get_output(prompt, model, max_tokens=max_tokens,
+		prompt1 = "How should I invest for my retirement? I want to be able to generate $5,000 a month"
+		submit, prompt_data = prompt_box(prompt1, 100, 1)
+		if submit:
+			get_output(prompt_data, model, max_tokens=max_tokens,
 					   temperature=temperature, top_p=top_p)
 		
 	with sample2:
-		with st.form("my_form2"):
-			prompt = st.text_area(":orange[Enter your prompt here:]",
-								value=prompt2, height=300)
-			submit_button = st.form_submit_button("Submit", type="primary")
-		if submit_button:
-			get_output(prompt, model, max_tokens=max_tokens,
+		submit, prompt_data = prompt_box(prompt2, 300, 2)
+		if submit:
+			get_output(prompt_data, model, max_tokens=max_tokens,
 					   temperature=temperature, top_p=top_p)
 
 	with sample3:
-		with st.form("my_form3"):
-			prompt = st.text_area(":orange[Enter your prompt here:]",
-								value='', height=100)
-			submit_button = st.form_submit_button("Submit", type="primary")
-		if submit_button:
-			get_output(prompt, model, max_tokens=max_tokens,
+		prompt3 = None
+		submit, prompt_data = prompt_box(prompt3, 100, 3)
+		if submit and prompt_data is not None:
+			get_output(prompt_data, model, max_tokens=max_tokens,
 					   temperature=temperature, top_p=top_p)
     
     
