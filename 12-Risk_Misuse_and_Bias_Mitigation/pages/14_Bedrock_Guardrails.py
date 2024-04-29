@@ -289,7 +289,7 @@ def get_output(prompt, model, max_tokens, temperature, top_p):
 			top_p=top_p,
 			max_tokens=max_tokens,
 		)
-		with st.expander("See Guardtrail Trace:"):
+		with st.expander("See Guardrail Trace:"):
 			st.json(response_body)
    
 		if model_output is not None:
