@@ -293,10 +293,10 @@ def get_output(prompt, model, max_tokens, temperature, top_p):
 			st.json(response_body)
    
 		if model_output is not None:
-			st.write("Model Response:")
+			st.write(":orange[Model Response:]")
 			st.info(model_output)
    
-		st.write("Final Response:")
+		st.write(":orange[Final Response:]")
 		st.success(output)
 
 

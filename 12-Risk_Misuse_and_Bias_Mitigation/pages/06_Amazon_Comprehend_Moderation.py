@@ -115,7 +115,6 @@ def prompt_box(prompt,height,key):
 
 def invoke_chain(prompt_data, model):
 	with st.spinner("Analyzing..."):
-		bedrock = boto3.client(service_name='bedrock-runtime', region_name='us-east-1')
 		llm = Bedrock(client=bedrock, model_id=model)
 
 		chain = (
@@ -124,16 +123,22 @@ def invoke_chain(prompt_data, model):
 			| {"input": (lambda x: x["output"]) | llm}
 			| comp_moderation_with_config
 		)
-			
-		response = chain.invoke(
-			{
-				"question": prompt_data
-			}
-		)
-		st.info(prompt)
-		st.info(comp_moderation_with_config)
-		st.write("Answer")
-		st.info(response[ 'output'])
+		
+		try:	
+			response = chain.invoke(
+				{
+					"question": prompt_data
+				}
+			)
+   
+		except ModerationPiiError as e:
+			st.error(str(e))
+		else:
+   
+			st.info(prompt)
+			st.info(comp_moderation_with_config)
+			st.write("Answer")
+			st.info(response[ 'output'])
 
 
 options = [{"id":1,"prompt": prompt3,"system": "","height":600},
