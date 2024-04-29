@@ -5,6 +5,7 @@ transformers
 langchain
 langchain_experimental
 streamlit
+streamlit_extras
 llama-index
 llama-index-llms-bedrock
 llama-index-embeddings-bedrock

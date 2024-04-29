@@ -1,6 +1,8 @@
 import boto3
 import json
 import streamlit as st
+from streamlit_extras.stylable_container import stylable_container
+
 
 st.set_page_config(
 	page_title="Bedrock Guardrails",
@@ -35,7 +37,22 @@ Agent: Thank you for confirming. I will go ahead and cancel your reservation.
 """
 
 
-with st.container(border=True):
+# with st.container(border=True):
+with stylable_container(
+        key="green_button",
+        css_styles="""
+        {border: 2px solid rgba(255, 255, 255, 0.2);
+		border-radius: 0.5rem;
+		padding: calc(1em - 1px);
+		button {
+			
+			background-color: green;
+			color: white;
+			border-radius: 20px;
+		}
+            }
+            """,
+    ):
 	st.write(":orange[Guardrail Configuration:]")
 	prompt_filter,  response_filter, profanity_topic = st.columns([0.3,0.3,0.4])
 
