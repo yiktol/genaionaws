@@ -4,6 +4,7 @@ faiss-cpu
 transformers
 langchain
 langchain_experimental
+langchain-aws
 streamlit
 streamlit_extras
 llama-index
