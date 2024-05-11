@@ -1,7 +1,7 @@
 
-chown ubuntu:root /home/ubuntu/ -R
+# chown ubuntu:root /home/ubuntu/environment/ -R
 
-git config --global --add safe.directory /home/ubuntu/environment/genaionaws/
+# git config --global --add safe.directory /home/ubuntu/environment/genaionaws/
 
 cd /home/ubuntu/environment/genaionaws
 
@@ -46,5 +46,7 @@ streamlit run Home.py --server.port 8091 &
 cd /home/ubuntu/environment/genaionaws/13-Challenge_1
 streamlit run Home.py --server.port 8092 &
 
+cd /home/ubuntu/environment/genaionaws/15_sales_essentials
+streamlit run Home.py --server.port 8093 &
 
 

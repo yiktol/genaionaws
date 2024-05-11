@@ -1,0 +1,391 @@
+
+What is Amazon Elastic File System?
+
+Amazon Elastic File System (EFS) is designed to provide serverless, fully elastic file storage that lets you share file data without provisioning or managing storage capacity and performance. With a few selections in the AWS Management Console, you can create file systems that are accessible to Amazon Elastic Compute Cloud (EC2) instances, Amazon container services (Amazon Elastic Container Service  [ECS], Amazon Elastic Kubernetes Service  [EKS], and AWS Fargate ), and AWS Lambda  functions through a file system interface (using standard operating system file I/O APIs). They also support full file system access semantics, such as strong consistency and file locking.
+
+Amazon EFS file systems can automatically scale from gigabytes to petabytes of data without needing to provision storage. Tens, hundreds, or even thousands of compute instances can access an Amazon EFS file system at the same time, and Amazon EFS provides consistent performance to each compute instance. Amazon EFS is designed to be highly durable and highly available. With Amazon EFS, there is no minimum fee or setup costs, and you pay only for what you use.
+What use cases does Amazon EFS support?
+
+Amazon EFS provides performance for a broad spectrum of workloads and applications: big data and analytics, media processing workflows, content management, web serving, and home directories.
+
+Amazon EFS Standard storage classes are ideal for workloads that require the highest levels of durability and availability.
+
+EFS One Zone storage classes are ideal for workloads such as development, build, and staging environments. They are also ideal for analytics, simulation, and media transcoding, and for backups or replicas of on-premises data that don’t require Multi-AZ resilience.
+When should I use Amazon EFS vs. Amazon Elastic Block Store (Amazon EBS) vs. Amazon S3?
+
+AWS offers cloud storage services to support a wide range of storage workloads.
+
+EFS is a file storage service  for use with Amazon compute (EC2, containers, serverless) and on-premises servers. EFS provides a file system interface, file system access semantics (such as strong consistency and file locking), and concurrently accessible storage for up to thousands of EC2 instances.
+
+Amazon EBS  is a block-level storage service for use with EC2. EBS can deliver performance for workloads that require the lowest-latency access to data from a single EC2 instance.
+
+Amazon S3  is an object storage service. S3 makes data available through an internet API that can be accessed anywhere.
+
+Learn more  about what to evaluate when considering Amazon EFS.
+What Regions is Amazon EFS currently available in?
+
+Refer to Regional Products and Services for details of Amazon EFS service availability by Region.
+How do I start using Amazon EFS?
+
+To use Amazon EFS, you must have an AWS account. If you don’t already have one, you can sign up for an AWS account, and instantly get access to the AWS Free Tier .
+
+Once you have created an AWS account, refer to the EFS Getting started  guide to begin using EFS. You can create a file system through the console, the AWS Command Line Interface (CLI) and the EFS API (and various language-specific SDKs).
+How do I access a file system from an EC2 instance?
+
+To access your file system, mount the file system on an EC2 Linux-based instance using the standard Linux mount command and the file system’s DNS name. To simplify accessing your Amazon EFS file systems, we recommend using the Amazon EFS mount helper utility. Once mounted, you can work with the files and directories in your file system like you would with a local file system.
+
+EFS uses the Network File System version 4 (NFS v4) protocol. For a step-by-step example of how to access a file system from an EC2 instance, see the guide here .
+How do I manage a file system?
+
+Amazon EFS is a fully managed service, so all of the file storage infrastructure is managed for you. When you use Amazon EFS, you avoid the complexity of deploying and maintaining complex file system infrastructure. An Amazon EFS file system grows and shrinks automatically as you add and remove files, so you don’t need to manage storage procurement or provisioning.
+
+You can administer a file system through the console, CLI, or the EFS API (and various language-specific SDKs). The console, API, and SDK provide the ability to create and delete file systems, configure how file systems are accessed, create and edit file system tags, enable features such as Provisioned Throughput and Lifecycle Management, and display detailed information about file systems.  
+How do I load data into a file system?
+
+AWS DataSync  provides a fast way to securely sync existing file systems with Amazon EFS. DataSync works over any network connection, including with AWS Direct Connect  or AWS VPN . EFS, DataSync, and Direct Connect without Amazon or AWS. You can also use standard Linux copy tools to move data files to Amazon EFS.
+
+For more information about accessing a file system from an on-premises server, see the On-premises access  section of this FAQ.
+
+For more information about moving data to the Amazon cloud, see the Cloud Data Migration  page.
+Scale and performance
+How much data can I store?
+
+You can store petabytes of data with Amazon EFS. Amazon EFS file systems are elastic, automatically growing and shrinking as you add and remove files. There’s no need to provision file system size up front, and you pay only for what you use.
+How many EC2 instances can connect to a file system?
+
+Amazon EFS supports one to thousands of Amazon Elastic Compute Cloud (EC2) instances connecting to a file system concurrently.
+How many file systems, mount targets, or access points can I create?
+
+Please visit the Amazon EFS Limits page for more information on Amazon EFS limits.
+What latency, throughput, and IOPS performance can I expect for my Amazon EFS file system?
+
+The expected performance for your Amazon EFS file system depends on its specific configuration (for instance, storage class and thoroughput mode) and the specific file system operation type (read or write). Please see the File System Performance documentation for more information on expected latency , maximum throughput, and maximum IOPS performance for Amazon EFS file systems.
+What throughput modes are available for my file system?
+
+Elastic Throughput is the default throughput mode and is suitable for most file workloads. With the default Elastic Throughput mode, performance automatically scales with your workload activity, and you only pay for the throughput you use (data transferred for your file systems per month). Elastic Throughput is ideal if you’re unsure of your application’s peak throughput needs or if your application is very spiky, with a low baseline activity (such that it uses less than 5% of capacity on average when you provision for peak needs).
+
+You can optionally change your throughput mode to Provisioned Throughput if you know your workload’s peak throughput requirements and you expect your workload to consume a higher share (more than 5% on average) of your application’s peak throughput capacity.
+
+The amount of throughput you can deliver depends on the throughput mode you choose. Please see the documentation on File System Performance for more information.  Please visit File System Performance for more information.
+How do I monitor my Amazon EFS file system?
+
+You can monitor your file system using Amazon CloudWatch or from the Monitoring tab in the Amazon EFS Console. Please visit the documentation on Monitoring Amazon EFS for more information.
+Durability and availability
+What types of file systems does Amazon EFS offer?
+
+Amazon EFS offers two file system types that you can choose from based on your durability and availability needs. EFS Regional file systems (recommended) offer the highest levels of durability and availability by storing data with and across multiple Availability Zones (AZs). EFS One Zone file systems store data redundantly within a single AZ, so data in these file systems will be unavailable and might be lost during a disaster or other fault within the AZ.
+How durable is Amazon EFS?
+
+Amazon EFS is designed to provide 99.999999999% (11 nines) of durability over a given year. EFS Regional file systems are designed to sustain data if an AZ is lost. Because EFS One Zone file systems store data in a single AZ, data stored in these storage classes might be lost during a disaster or other fault within the AZ.  
+
+As with any environment, the best practice is to have a backup and to put in place safeguards against accidental deletion. For Amazon EFS data, the best practice includes replicating your file system across Regions using Amazon EFS Replication, and a functioning, regularly tested backup using AWS Backup. File systems using EFS One Zone storage classes are configured to automatically back up files by default at file system creation.
+How is Amazon EFS designed to provide high durability and availability?
+
+Every EFS Regional file system object (such as directory, file, and link) is redundantly stored across multiple AZs. With EFS One Zone file systems, your data is redundantly stored within a single AZ. Amazon EFS is designed to sustain concurrent device failures by quickly detecting and repairing any lost redundancy.  
+
+EFS file system data is accessed using AZ-specific EFS mount targets, which are designed to be highly available within an AZ. EFS Regional file systems support concurrent access from EFS mount targets in all AZs in the Region where they are located. That means you can architect your application to failover from one AZ to other AZs in the Region to achieve the highest level of application availability. EFS One Zone file systems support only one highly available EFS mount target in a single AZ, which means data may become unavailable during a disaster or other fault within that AZ. For more information on availability, see the Amazon EFS Service Level Agreement.
+What additional failure modes should I consider when using Amazon EFS One Zone file systems?
+
+EFS One Zone file systems are not resilient to a complete AZ outage. During an AZ outage, you will experience a loss of availability, because your file system data is not replicated to a different AZ. During a disaster or fault within an AZ affecting all copies of your data, you might experience loss of data that has not been protected using EFS Backups or EFS Replication. EFS Backups are enabled by default for all EFS One Zone file systems.
+Storage classes and lifecycle management
+What storage classes does Amazon EFS offer?
+
+Amazon EFS offers three storage classes: EFS Standard, EFS Infrequent Access, and EFS Archive. Data that is frequently accessed tends to have higher performance needs, so EFS provides an SSD-powered EFS Standard class designed to deliver sub-millisecond latencies. For data that’s infrequently accessed, you can use EFS’s two cost-optimized storage classes that provide low double-digit millisecond latencies: EFS Infrequent Access (IA), designed for data accessed only a few times a quarter, and EFS Archive, designed for data accessed a few times a year or less. EFS IA offers an up to 95% lower cost than EFS Standard for infrequently accessed data. Providing a more cost-optimized experience for even colder data, EFS Archive offers an up to 50% lower cost than EFS Infrequent Access, with a higher request charge when that data is accessed. EFS Archive is optimized for and supported on EFS Regional file systems using EFS’s default Elastic Throughput mode. See EFS storage classes and EFS Pricing for more information.
+How do I move files to EFS Standard, IA and Archive storage classes?
+
+By enabling EFS Lifecycle Management, you can automatically tier files between storage classes based on your access patterns. The default, recommended lifecycle policy will tier files from EFS Standard to EFS IA after 30 consecutive days without access and to EFS Archive after 90 consecutive days without access. You can also specify a custom policy for transitioning files between storage classes based on the number of days since a file’s last access.
+
+You can also enable EFS Intelligent-Tiering to promote files from EFS IA and EFS Archive back to EFS Standard when they are accessed, which provides subsequent reads of those files with the faster, sub-millisecond latencies of EFS Standard. Once promoted, these files will transition back to the appropriate IA or Archive storage class based on your lifecycle policy.
+What performance can I expect from EFS’s cost-optimized IA and Archive storage classes?
+
+Compared to the EFS Standard class, EFS IA and Archive offer the same throughput and IOPS scalability but with higher first-byte latencies (i.e., low double-digit millisecond read latencies vs. sub-millisecond read latencies on EFS Standard). For more information, see the Amazon EFS performance documentation.
+Is there a minimum storage duration for EFS’s cost-optimized storage classes, EFS IA and EFS Archive?
+
+EFS IA has no minimum storage duration. Data that is tiered to EFS Archive has a minimum storage duration of 90 days. Files deleted or truncated prior to the minimum duration will incur a pro-rated charge for the remaining days, based on the size of the file prior to the corresponding action.
+Is there a minimum file size for EFS’s cost-optimized storage classes, EFS IA and EFS Archive?
+
+EFS’s cost-optimized storage classes (IA, Archive) are designed for storing colder, inactive data, which is typically comprised of larger files. There is no minimum file size for IA or Archive, but files tiered to these storage classes that are smaller than 128 KiB will incur storage charges as if they were 128 KiB.
+Data protection
+What is Amazon EFS Replication?
+
+Amazon EFS Replication copies your file system data into a new or existing file system in the Region of your choice. It keeps the two file systems synchronized by automatically transferring only incremental changes without requiring additional infrastructure or a custom process. EFS Replication is designed to provide a recovery point objective (RPO) and a recovery time objective (RTO) of minutes, helping you meet your compliance and business continuity goals.
+Why should I use EFS Replication?
+
+You should use EFS Replication to maintain a replica of your file system many miles apart for disaster recovery, compliance, or business continuity planning. In the event of a disaster, you can failover to your replica file system, and resume operations for your business-critical applications within minutes. Once the disaster event is over, you can failback by transferring only incremental changes from your replica back to your original file system. While EFS Replication is enabled, your applications can use the replica file system in read-only mode for low network latency cross-Region access. With Amazon EFS Replication, you can configure your replica file system independent of your original file system to use cost-optimized storage classes and shorter age-off lifecycle management policy to save up to 92% on your costs. EFS Replication also makes it streamlined to monitor and alarm on your RPO status using Amazon CloudWatch.
+Is my replica file system point-in-time consistent?
+
+No. EFS Replication doesn't provide point-in-time consistent replication. EFS Replication publishes a timestamp metric on Amazon CloudWatch called TimeSinceLastSync. All changes made to your source file system at least as of the published time will be copied over to the replica. Changes to your source file system after the recorded time might not have be replicated over. You can monitor the health of your EFS Replication using Amazon CloudWatch. If you interrupt the replication process due to a disaster recovery event, files from the source file system might have transferred but are not yet copied to their final locations. These files and their contents can be found on your replica file system in a lost+found directory created by EFS Replication under the root directory.
+What is Amazon EFS Backup? 
+
+Amazon EFS Backup is powered by AWS Backup, which is a fully managed backup service that centrally manages and automates backups of your Amazon EFS file systems. It protects your file system against a data loss event by making incremental copies of your file system in a centralized location automatically, on a schedule. AWS Backup provides a centralized console, automated backup scheduling, backup retention management, and restore activity. To learn more please read the AWS Backup documentation or FAQs.
+How does Amazon EFS Backup work?
+
+Amazon EFS is natively integrated with AWS Backup. You can use the EFS console, API, and AWS Command Line Interface (AWS CLI) to enable automatic backups, which uses a default backup plan with the AWS Backup recommended settings. During the initial backup, a copy of the entire file system is made in the backup vault. All subsequent backups of that file system are incremental in nature, i.e. only files and directories that have been changed, added, or removed are copied. With each incremental backup, AWS Backup retains the necessary reference data to allow a full restore. In the event of data loss, you can perform a full or partial restore of your file system using the AWS Backup console or the CLI.   
+Security
+How do I control which Amazon EC2 instances can access my file system?
+
+You control which EC2 instances can access your file system using VPC security group rules and IAM policies. Use VPC security groups to control the network traffic to and from your file system. Attach an IAM policy to your file system to control which clients can mount your file system and with what permissions, and use EFS Access Points to manage application access. Control access to files and directories with POSIX-compliant user and group-level permissions .
+ How can I use IAM policies to manage file system access?
+
+Using the Amazon EFS console, you can apply common policies to your file system, such as disabling root access, enforcing read-only access, or enforcing that all connections to your file system are encrypted. You can also apply more advanced policies , such as granting access to specific IAM roles, including those in other AWS accounts.
+
+ 
+What is an Amazon EFS Access Point?
+
+An EFS Access Point is a network endpoint that users and applications can use to access an EFS file system and enforce file- and folder- level permissions (POSIX) based on fine-grained access control and policy-based permissions defined in IAM.
+Why should I use Amazon EFS Access Points?
+
+EFS Access Points gives you the flexibility to create and manage multi-tenant environments for your file applications in a cloud-native way, helping you simplify data sharing. Unlike traditional POSIX ACLs to control file system access, or Kerberos to control authentication, both requiring complex set-up, management, and maintenance, and which often introduce risk, EFS Access Points integrates with IAM to enable cloud native applications to use POSIX-based shared file storage. Use cases that can benefit from Amazon EFS Access Points include container-based environments where developers build and deploy their own containers, data science applications that require access to production data, and sharing a specific directory in your file system with other AWS accounts.
+How do Amazon EFS Access Points work?
+
+When you create an Amazon EFS Access Point, you can configure an operating system user and group, and a root directory for all connections that use it. If you specify the root directory’s owner, EFS will automatically create it with the permissions you provide the first time a client connects to the access point. You can also update your file system’s IAM policy to apply to your access points. For example, you can apply a policy that requires a specific IAM identity in order to connect to a given access point. For more information, see the Amazon EFS user guide.
+What is Amazon EFS Encryption?
+
+Amazon EFS offers the ability to encrypt data at rest and in transit.
+
+Data encrypted at rest is transparently encrypted while being written, and transparently decrypted while being read, so you don’t have to modify your applications. Encryption keys are managed by the AWS KMS, eliminating the need to build and maintain a secure key management infrastructure.
+
+Data encryption in transit uses industry-standard Transport Layer Security (TLS) 1.2 to encrypt data sent between your clients and EFS file systems.
+
+Encryption of data at rest and data in transit can be configured together or separately to help meet your unique security requirements.
+
+For more details, see the user documentation on Encryption.
+What is the AWS Key Management Service (KMS)?
+
+AWS KMS is a managed service that makes it easier for you to create and control the encryption keys used to encrypt your data. AWS KMS is integrated with AWS services, including EFS, EBS, and S3, making it simpler to encrypt your data with encryption keys that you manage. AWS KMS  is also integrated with AWS CloudTrail  to provide you with logs of all key usage to help meet your regulatory and compliance needs.
+How do I enable encryption for my Amazon EFS file system?
+
+You can enable encryption at rest in the EFS console by using the CLI or SDKs. When creaking a new file system in the EFS console, select “Create File System” and then select the checkbox to enable encryption.
+
+Data can be encrypted in transit between your Amazon EFS file system and its clients by using the Amazon EFS mount helper.
+
+Encryption of data at rest and data in transit can be configured together or separately to help meet your unique security requirements.
+
+For more details, see the user documentation on Encryption.
+Does encryption impact Amazon EFS performance?
+
+Encrypting your data has a minimal effect on I/O latency and throughput.
+On-premises access
+How do I access an Amazon EFS file system from servers in my on-premises datacenter?
+
+Change to To access EFS file systems from on premises, you must have a Direct Connect  or AWS VPN  connection between your on-premises datacenter and your Amazon Virtual Private Cloud (VPC).
+
+You mount an Amazon EFS file system on your on-premises Linux server using the standard Linux mount command for mounting a file system using the NFS v4.1 protocol.
+
+For more information about accessing Amazon EFS file systems from on-premises servers, see the documentation .
+What can I do by enabling access to my Amazon EFS file systems from my on-premises servers?
+
+You can mount your Amazon EFS file systems on your on-premises servers, and move file data to and from Amazon EFS using standard Linux tools and scripts or AWS DataSync. The ability to move file data to and from Amazon EFS file systems allows for three use cases.
+
+First, you can migrate data from on-premises datacenters to permanently reside in EFS file systems.
+
+Second, you can support cloud bursting workloads to off-load your application processing to the cloud. You can move data from your on-premises servers into your Amazon EFS file systems, analyze it on a cluster of EC2 instances in your Amazon VPC, and store the results permanently in your Amazon EFS file systems or move the results back to your on-premises servers.
+
+Third, you can periodically copy your on-premises file data to Amazon EFS to support backup and disaster recovery scenarios.
+Can I access my Amazon EFS file system concurrently from my on-premises datacenter servers as well as EC2 instances?
+
+Yes. You can access your Amazon EFS file system concurrently from servers in your on-premises datacenter as well as EC2 instances in your Amazon VPC. Amazon EFS provides the same file system access semantics, such as strong data consistency and file locking, across all EC2 instances and on-premises servers accessing a file system.
+What is the recommended best practice when moving file data to and from on-premises servers?
+
+Because of the propagation delay tied to data traveling over long distances, the network latency of the network connection between your on-premises datacenter and your Amazon VPC can be tens of milliseconds. If your file operations are serialized, the latency of the network connection directly impacts your read and write throughput; in essence, the volume of data you can read or write during a period of time is bounded by the amount of time it takes for each read and write operation to complete. To maximize your throughput, parallelize your file operations so that multiple reads and writes are processed by Amazon EFS concurrently. Standard tools like GNU parallel help you to parallelize the copying of file data. For more information, see the online documentation .
+How do I copy existing data from on-premises file storage to Amazon EFS?
+
+There are a number of methods to copy existing on-premises data into Amazon EFS. AWS DataSync provides a fast and simple way to securely sync existing file systems into EFS and works over any network, including AWS Direct Connect.
+
+AWS Direct Connect provides a high-bandwidth and lower-latency dedicated network connection over which you can mount your EFS file systems. Once mounted, you can use DataSync to copy data into EFS up to 10 times faster than standard Linux copy tools.
+
+For more information on AWS DataSync, see the Data transfer section of this FAQ.
+Data transfer
+ What AWS-native options do I have to transfer data into my file system?
+
+ How do I transfer data into or out of my Amazon EFS file system?
+
+ Can Amazon EFS data be transferred between Regions?
+
+ Can I access my file system with another AWS account?
+
+Compatibility
+What interoperability and compatibility is there between existing AWS services and Amazon EFS?
+
+What type of locking does Amazon EFS support?
+
+Are file system names global (like S3 bucket names)?
+
+Pricing and billing
+How much does Amazon EFS cost?
+
+With Amazon EFS, you pay only for the primary and backup storage you use and for your read, write, and tiering activity to your EFS file system. You pay for read and write access using Elastic Throughput (but you can optionally provision throughput performance up-front using Provisioned Throughput), and for tiering data to EFS’s Infrequent Access and Archive storage classes.
+
+Amazon EFS offers three storage classes: EFS Standard, which delivers sub-millisecond latency performance for actively-used data; EFS Infrequent Access (EFS IA), which is cost-optimized for data accessed only a few times a quarter; and EFS Archive, which is cost-optimized for long-lived data accessed a few times a year or less.
+
+EFS also offers data protection for your files with EFS Backup and EFS Replication. With EFS Backup, you pay only for the amount of backup storage you use and the amount of backup data you restore in the month. There is no minimum fee and there are no setup charges. Visit AWS Backup to learn more. Use EFS Replication to replicate your file system to a Region or Availability Zone (AZ) of your choice without having to manage additional infrastructure or custom processes.
+
+You can estimate your monthly bill using the Amazon EFS Pricing Calculator.
+How will I be charged for the use of Amazon EFS?
+
+There are no setup charges or commitments to begin using Amazon EFS. At the end of the month, you will automatically be charged for that month’s usage. You can view your charges for the current billing period at any time by logging into your Amazon Web Services account, and selecting the 'Billing Dashboard' associated with your console profile.
+
+With the AWS Free Usage Tier*, your usage for the Free Tier is calculated each month across all AWS Regions except the AWS GovCloud Region and automatically applied to your bill; unused monthly usage will not roll over to the next month. Upon sign up, new EFS customers receive 5 GB of Amazon EFS Standard each month for one year. The AWS Free Tier is not applicable to files stored in the EFS One Zone file system type. Restrictions apply; see offer terms for more details.
+
+Amazon EFS charges you for the following types of usage. Note that the calculations below assume there is no AWS Free Tier in place.
+
+Storage Used:
+
+The Amazon EFS amount billed in a month is based on storage, throughput, and data protection usage in a month. The storage costs are calculated based on the average storage space used throughout the month. Your storage usage is measured in "GB-Month," which are added up at the end of the month to generate your monthly charges. 
+Storage Example
+
+The following example reflects a scenario where your file access patterns change over time, and includes each of EFS IA and EFS Archive's pricing dimensions. The example assumes that the two EFS Lifecycle policies to move files between EFS Standard, EFS Infrequent Access (IA), and EFS Archive are set.
+
+Assume that your file system is located in the US East (N. Virginia) Region. At the beginning of a 31-day month, your file system stores 200 GB of files on EFS Standard, 500 GB of files on EFS IA, and 2 TB of files on EFS Archive. On the 15th day of the month, EFS Lifecycle Management, without Intelligent Tiering, moves 50% of your EFS Standard files to the EFS IA class and 10% of your EFS IA files to the EFS Archive class after 14 days of having not been accessed. On average, your client application reads 200 GB of files from your EFS IA and 100 GB of files from your EFS Archive each month.
+
+First, we calculate the pro-rated storage usage:
+
+Standard Storage:
+200 GB of EFS Standard storage for 14 days (GB-Hours): 200 GB x 14 days x (24 hours / day) = 67,200 GB-Hours
+100 GB of EFS Standard storage for 17 days (GB-Hours): 100 GB x 17 days x (24 hours / day) = 40,800 GB-Hours
+Total EFS Standard storage usage (GB-Hours): 67,200 GB-Hours + 40,800 GB-Hours = 108,000 GB-Hours
+
+IA Storage:
+500 GB of EFS IA for 14 days (GB-Hours): 500 GB x 14 x (24 hours / day) = 168,000 GB-Hours
+100 GB of files from EFS Standard to EFS IA for 17 days (GB-Hours) = 100 GB x 17 x (24 hours / day) = 40,800 GB-Hours
+450 GB of EFS IA (after 50 GB is moved to EFS Archive) = 450 GB x 17 x (24 hours / day) = 183,600 GB-Hours
+
+Total EFS IA usage (GB-Hours): 168,000 GB-Hours + 40,800 GB-Hours + 326,400 GB-Hours = 392,400 GB-Hours
+
+Archive Storage:
+2 TB of EFS IA for 31 days (GB-Hours): 1,000 GB x 14 x (24 hours / day) = 1,488,000 GB-Hours
+50 GB of files from EFS IA to EFS Archive for 17 days (GB-Hours): 50 GB x 17 x (24 hours / day) = 20,400 GB-Hours
+Total EFS Archive storage usage (GB-Hours): 1,488,000 GB-Hours + 20,400 GB-Hours = 1,508,400 GB-Hours
+
+Next, we convert the storage usage into GB-months and calculate the storage charge:
+Total EFS Standard charge: 108,000 GB-Hours x (1 month / 744 hours) x $0.30/GB-month = $43.55
+Total EFS IA charge: 392,400 GB-Hours x (1 month / 744 hours) x $0.0165/GB-month = $8.70
+Total EFS Archive charge: 1,508,400 GB-Hours x (1 month / 744 hours) x $0.008/GB-month = $16.22
+Total EFS storage charge: $43.55 + $8.70 + $16.22 = $68.47
+
+Next, we calculate the access charges for files in EFS IA and EFS Archive:
+
+IA Data Tiering:
+Data Tiering (files moved from EFS Standard to EFS IA): 100 GB * $0.01/GB = $1.00
+IA read access charge: 200 GB * $0.01/GB = $2.00
+
+Elastic Throughput read charge: 200 GB * $0.03/GB = $6.00
+
+Total EFS IA tiering and access charges: $1.00 + $2.00 + $6.00 = $9.00
+
+Archive Data Tiering:
+Data Tiering (files moved from Infrequent Access to Archive): 50 GB * $0.03/GB = $1.50
+Archive read access charge: 100 GB *$0.03/GB = $3.00
+
+Elastic Throughput read charge: 100 GB * $0.03/GB = $3.00
+
+Total EFS IA tiering and access charges: $1.50 + $3.00 + $3.00 = $7.50
+
+Total EFS tiering and access charge: $9.00 + $7.50 = $16.50
+
+Finally, we calculate the total EFS charge for the month:
+
+Total monthly charges = Total storage charge + Total access charge = $68.47 + $16.50 = $84.97 (TCO - $0.0315/GB)
+Throughput Used
+
+You can access your data for read and write operations using Elastic Throughput. With Elastic Throughput, performance automatically scales with your workload activity, and you only pay for the throughput you use (data transferred for your file systems per month). The Elastic Throughput amount billed in a month is based on the read and write data transferred within a month and measured in “GB transferred.”
+
+You can use Provisioned Throughput if you know your application’s throughput usage and peak throughput requirements. Provisioned Throughput amount billed in a month is based on the average throughput provisioned in excess of what your EFS Standard allows for the month, up to the prevailing Bursting baseline throughput limits in the AWS Region, and measured in "MB/s-Month."
+
+Elastic Throughput Example:
+
+Assume your file system is located in the US East (N. Virginia) Region and has 100 GB of EFS Standard storage, for the entirety of a 31-day month. Assume that your workload’s data transfer is 75% read operations and 25% write operations, drives a peak throughput of 100 MB/s for 3 hours a day and 3 days a week, and is idle for the remainder of the time.  
+
+Total monthly Elastic Throughput charge
+
+Assuming all of your data transferred is to EFS Standard Storage, at the end of the month, you would have the following usage in GB:
+
+Total Elastic Throughput Data (GB) in the month: 100 MB/s x (60 minutes x 60 seconds x 3 hours) x 3 days x 4 weeks/1000 = 12,960 GB 
+Total Elastic Throughput Read Data (GB): 75% x 12,960 GB = 9,720 GB
+Total Elastic Throughput Write Data (GB): 25% x 12,960 GB = 3,240 GB
+
+We then calculate the total monthly charges for Elastic Throughput: 
+
+Elastic Throughput Read Data charges: 9,720 GB x $0.03/GB = $291.60 
+Elastic Throughput Write Data charges: 3,240 GB x $0.06/GB = $194.40
+We then calculate the total monthly charges for Elastic Throughput:
+Total Monthly Elastic Throughput Charge = $291.60 + $194.40 = $486.00
+
+Provisioned Throughput Example:
+
+Assuming the same assumptions as the Elastic Throughput example above (your file system is located in the US East (N. Virginia) Region and has 100 GB of EFS Standard storage, for the entirety of a 31-day month. Assume that your workload’s data transfer is 75% read operations and 25% write operations, drives a peak throughput of 100 MB/s for 3 hours a day and 3 days a week, and
+is idle for the remainder of the time). The throughput amount billed in a month is based on the average throughput provisioned in excess of what your EFS Standard storage allows for the month (50 KBps of Baseline throughput per 1 GB of Standard storage)
+
+Baseline throughput (MB/s-Month) =100 GB standard storage * 50 KBps/1000 = 5 MB/s-Month.
+Total billable Provisioned Throughput (MB/s-Month) = Throughput Configured –
+Baseline throughput = 100 MB/s-Month – 5 MB/s-Month = 95 MB/s-Month
+Total monthly Provisioned Throughput Charge = 95 MB/s-Month * $6/MB/s-month = $570.00
+Data protection
+
+You may optionally use EFS Replication or AWS Backup to protect your data. With EFS Replication, you pay for the storage, access charges from Infrequent Access and Archive classes, and data transfer changes if your destination file system is in a different AWS Region. With AWS Backup, you pay for the average amount of data backed up and restored in a month.
+
+Replication
+
+This example reflects a scenario where you are replicating file systems across Regions using EFS Replication. The example is focused on costs directly related to EFS Replication.
+
+Assume you have an EFS file system in the US East (North Virginia) Region with 1 TB of data. This file system is being replicated to the US West (Oregon) Region. Assume the destination file system uses a 7-day EFS Lifecycle Management Policy to move files into the EFS IA class.
+
+When replication is first turned on, the entire source file system is copied to the destination file system. The replicated data will first land in the EFS Standard class in the destination file system. If files aren’t accessed for the duration of the EFS Lifecycle Management policy (7 days), they will move to the EFS IA class.
+
+Initial sync:
+
+First, we calculate the pro-rated storage usage for the destination file system:
+Total EFS Standard usage (GB-hours): 1,000 GB * 7 days * (24 hours / day) = 168,000 GB-hours
+Total EFS IA usage (GB-hours): 1,000 GB * 24 days * (24 hours / day / 31-day month) = 576,000 GB-hours
+
+Next, we convert the storage usage into GB-months and calculate the storage charge for the destination file system:
+
+Total EFS Standard charge: 168,000 * (1 month / 744 hours) * $0.30/GB-month = $67.74
+Total EFS IA charge: 576,000 * (1 month / 744 hours) * $0.025/GB-month = $19.36
+Total storage charges for initial sync = $67.74 + $19.36 = $87.10
+Then we calculate the Data transfer charges for the source file system’s initial replication to the destination file system:
+Total EFS Replication data transfer charges for 1 TB of data: 1,000 GB * $0.02/GB = $20.00
+
+Total charges for initial sync = Total storage charges for initial sync + Total data transfer charges for initial sync = $87.10 + $20.00 = $107.10
+
+Incremental replication:
+
+Consider that the source file systems add 150 GB of new data after 7 days. The new data will be replicated to the destination file system and will reside in the EFS Standard class for 7 days based on the Lifecycle Management Policy as before. The pro-rated storage usage for 150 GB of new data is calculated as follows:
+
+Total EFS Standard usage (GB-hours): 150 GB * 7 days * (24 hours / day) = 25,200 GB-hours
+Total EFS IA usage (GB-hours): 150 GB * 17 days * (24 hours / day) = 61,200 GB-hours
+
+Next, we convert the storage usage into GB-months and calculate the storage charge for the 150 GB of new data added to the destination file system: 
+
+Total EFS Standard charge: 25,200 * (1 month / 744 hours) * $0.30/GB-month = $10.16
+Total EFS IA charge: 61,200 * (1 month / 744 hours) * $0.025/GB-month = $2.06
+Total storage charges for incremental replication = $10.16 + $2.06 = $12.22
+
+Lastly, we calculate the data transfer charges for 150 GB of incremental data:
+
+Total data transfer charges for incremental replication: 150 GB * $0.02/GB = $3.00
+Total charges for incremental replication = Total storage charges for incremental replication + Total data transfer charges for incremental replication = $12.22 + $3.00 = $15.22
+
+Total charges related to EFS Replication = Total charges for initial sync + Total charges for incremental replication = $107.10 + $15.22 = $122.32
+
+Backup
+
+See AWS Backup Pricing for Backup pricing examples.
+
+For more EFS pricing information, visit the Amazon EFS Pricing page.
+Do your prices include taxes?
+
+Except as otherwise noted, our prices are exclusive of applicable taxes and duties, including VAT and applicable sales tax. For customers with a Japanese billing address, use of AWS services is subject to Japanese Consumption Tax. Learn more .
+Access from AWS services
+Can I access Amazon EFS from Amazon ECS containers?
+
+Yes. You can access EFS from containerized applications launched by Amazon ECS using both EC2 and Fargate launch types by referencing an EFS file system in your task definition. Find instructions for getting started in the ECS documentation .
+Can I access Amazon EFS from Amazon Elastic Kubernetes Service (EKS) pods?
+
+Yes. You can access EFS from containerized applications launched by Amazon EKS , with either EC2  or Fargate  launch types, using the EFS CSI driver. Find instructions for getting started in the EKS documentation .
+Can I access Amazon EFS from AWS Lambda functions?
+
+Yes. You can access EFS from functions running in Lambda  by referencing an EFS file system in your function settings. Find instructions for getting started in the Lambda documentation .
+Can I access Amazon EFS from Amazon SageMaker?
+
+Yes. You can access training data in EFS from Amazon SageMaker training jobs by referencing an EFS file system in your CreateTrainingJob request . EFS is also automatically used for home directories created by SageMaker Studio .

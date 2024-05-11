@@ -1,0 +1,77 @@
+
+
+Q: What is Amazon Elastic Kubernetes Service (Amazon EKS)?
+
+A: Amazon EKS is a managed service that makes it easy for you to run Kubernetes on AWS without installing and operating your own Kubernetes control plane or worker nodes.
+
+Q: What is Kubernetes?
+
+A: Kubernetes is an open-source container orchestration system allowing you to deploy and manage containerized applications at scale. Kubernetes arranges containers into logical groupings for management and discoverability, then launches them onto clusters of Amazon Elastic Compute Cloud (Amazon EC2) instances. Using Kubernetes, you can run containerized applications including microservices, batch processing workers, and platforms as a service (PaaS) using the same toolset on premises and in the cloud.
+
+Q: Why should I use Amazon EKS?
+
+A: Amazon EKS provisions and scales the Kubernetes control plane, including the application programming interface (API) servers and backend persistence layer, across multiple AWS Availability Zones (AZs) for high availability and fault tolerance. Amazon EKS automatically detects and replaces unhealthy control plane nodes and patches the control plane. You can run EKS using AWS Fargate, which provides serverless compute for containers. Fargate removes the need to provision and manage servers, lets you specify and pay for resources per application, and improves security through application isolation by design.
+
+Amazon EKS is integrated with many AWS services to provide scalability and security for your applications. These services include Elastic Load Balancing for load distribution, AWS Identity and Access Management (IAM) for authentication, Amazon Virtual Private Cloud (VPC) for isolation, and AWS CloudTrail for logging.
+
+Q: How does Amazon EKS work?
+
+A: Amazon EKS works by provisioning (starting) and managing the Kubernetes control plane and worker nodes for you. At a high level, Kubernetes consists of two major components: a cluster of 'worker nodes' running your containers, and the control plane managing when and where containers are started on your cluster while monitoring their status.
+
+Without Amazon EKS, you have to run both the Kubernetes control plane and the cluster of worker nodes yourself. With Amazon EKS, you provision your worker nodes using a single command in the EKS console, command-line interface (CLI), or API. AWS handles provisioning, scaling, and managing the Kubernetes control plane in a highly available and secure configuration. This removes a significant operational burden and allows you to focus on building applications instead of managing AWS infrastructure.
+
+Q: Which operating systems does Amazon EKS support?
+
+A: Amazon EKS supports Kubernetes-compatible Linux x86, ARM, and Windows Server operating system distributions. Amazon EKS provides optimized AMIs for Amazon Linux 2, Bottlerocket, and Windows Server 2019. At this time, there is no Amazon EKS optimized AMI for AL2023. EKS- optimized AMIs for other Linux distributions, such as Ubuntu, are available from their respective vendors.
+
+Q: I have a feature request, who do I tell?
+
+A: Please let us know what we can add or do better by opening a feature request on the AWS Container Services Public Roadmap
+Integrations
+
+Q: Does Amazon EKS work with my existing Kubernetes applications and tools?
+
+A: Amazon EKS runs the open-source Kubernetes software, so you can use all the existing plug-ins and tooling from the Kubernetes community. Applications running on Amazon EKS are fully compatible with applications running on any standard Kubernetes environment, whether running in on-premises data centers or public clouds. This means that you can easily migrate any standard Kubernetes application to Amazon EKS without any code modifications.
+
+Q: Does Amazon EKS work with AWS Fargate?
+
+A: Yes. You can run Kubernetes applications as serverless containers using AWS Fargate and Amazon EKS.
+
+Q: What are Amazon EKS add-ons?
+
+A: EKS Add-Ons let you enable and manage Kubernetes operational software, which provides capabilities like observability, scaling, networking, and AWS cloud resource integrations for your EKS clusters. At launch, EKS add-ons supports controlling the launch and version of the AWS VPC CNI plugin through the EKS API.
+
+Q: Why should I use Amazon EKS add-ons?
+
+A: Amazon EKS add-ons provides one-click installation and management of Kubernetes operational software. Go from cluster creation to running applications in a single command, while easily keeping the operational software required for your cluster up to date. This ensures your Kubernetes clusters are secure and stable and reduces the amount of work needed to start and manage production-ready Kubernetes clusters on AWS.
+Kubernetes versions and updates
+
+Q: Which Kubernetes versions does Amazon EKS support?
+
+A: See the Amazon EKS documentation for currently supported Kubernetes versions. Amazon EKS will continue to add support for additional Kubernetes versions in the future.
+
+Q: Can I update my Kubernetes cluster to a new version?
+
+A: Yes. Amazon EKS performs managed, in-place cluster upgrades for both Kubernetes and Amazon EKS platform versions. This simplifies cluster operations and lets you take advantage of the latest Kubernetes features, as well as the updates to Amazon EKS configuration and security patches.
+
+There are two types of updates you can apply to your Amazon EKS cluster: Kubernetes version updates and Amazon EKS platform version updates. As new Kubernetes versions are released and validated for use with Amazon EKS, we will support three stable Kubernetes versions as part of the update process at any given time.
+
+Q: What is an EKS platform version?
+
+A: Amazon EKS platform versions represent the capabilities of the cluster control plane, such as which Kubernetes API server flags are enabled, as well as the current Kubernetes patch version. Each Kubernetes minor version has one or more associated Amazon EKS platform versions. The platform versions for different Kubernetes minor versions are independent.
+
+When a new Kubernetes minor version is available in Amazon EKS (for example, 1.13), the initial Amazon EKS platform version for that Kubernetes minor version starts at eks.1. However, Amazon EKS releases new platform versions periodically to enable new Kubernetes control plane settings and to provide security fixes.
+
+Q: Why would I want manual control over Kubernetes version updates?
+
+A: New versions of Kubernetes introduce significant change to the Kubernetes API, which can change application behavior. Manual control over Kubernetes cluster versioning lets you test applications against new versions of Kubernetes before upgrading production clusters. Amazon EKS offers the ability to choose when you introduce changes to your EKS cluster.
+
+Q: How do I update my worker nodes?
+
+A: AWS publishes EKS-optimized Amazon Machine Images (AMIs) that include the necessary worker node binaries (Docker and Kubelet). This AMI is updated regularly and includes the most up-to-date version of these components. You can update your EKS managed nodes to the latest versions of the EKS-optimized AMIs with a single command in the EKS console, API, or CLI.
+
+If you are building your own custom AMIs to use for EKS worker nodes, AWS also publishes Packer scripts that document our build steps, allowing you to identify the binaries included in each version of the AMI.
+
+Q: What is Amazon EKS extended support?
+
+A: Amazon EKS extended support for Kubernetes versions lets you use a Kubernetes minor version for up to 26 months from the time the version is generally available from Amazon EKS. Amazon EKS versions in extended support receive ongoing security patches for the Kubernetes control plane managed by Amazon EKS. Additionally, Amazon EKS will release critical patches for the Amazon VPC CNI, kube-proxy, and CoreDNS add-ons, AWS-published EKS Optimized Amazon Machine Images (AMIs) for Amazon Linux, Bottlerocket, Windows, and EKS Fargate nodes. AWS backs all Amazon EKS versions in both standard and extended support with full technical support. Extended support for Kubernetes versions is available in all AWS Regions where Amazon EKS is available, including AWS GovCloud (US) Regions. Learn more about the Amazon EKS version support policy in the Amazon EKS documentation.

@@ -1,0 +1,106 @@
+Amazon RDS for Oracle FAQs
+Licensing and Support
+Q: What types of licensing options are available with Amazon RDS for Oracle?
+There are two types of licensing options available for using Amazon RDS for Oracle:
+Bring Your Own License (BYOL): In this licensing model, you can use your existing Oracle Database licenses to run Oracle deployments on Amazon RDS. To run a DB instance under the BYOL model, you must have the appropriate Oracle Database license (with Software Update License & Support) for the DB instance class and Oracle Database edition you wish to run. You must also follow Oracle's policies for licensing Oracle Database software in the cloud computing environment. DB instances reside in the Amazon EC2 environment, and Oracle's licensing policy for Amazon EC2 is located here.
+License Included: In the "License Included" service model, you do not need separately purchased Oracle licenses; the Oracle Database software has been licensed by AWS for your use subject to Section 10.3.1 of the AWS Service Terms. "License Included" pricing is inclusive of software, underlying hardware resources, and Amazon RDS management capabilities.
+ 
+Q: Which Oracle Database Editions are available with Amazon RDS for Oracle?
+Amazon RDS currently supports the following Oracle Database editions under each of the licensing models below:
+BYOL: Standard Edition Two (SE2), and Enterprise Edition (EE)
+License Included: Standard Edition Two (SE2)
+ 
+Q: What are the licensing policies for using Amazon RDS for Oracle?
+BYOL: To run a DB instance under the BYOL model, you must have the appropriate Oracle Database license (with Software Update License & Support) for the DB instance class and Oracle Database edition you wish to run. You must follow Oracle's policies for licensing Oracle Database software in the cloud computing environment. DB instances reside in the Amazon EC2 environment, and Oracle's licensing policy for Amazon EC2 is located here.
+License Included: In the "License Included" service model, you do not need separately purchased Oracle licenses; the Oracle Database software has been licensed by AWS for your use subject to Section 10.3.1 of the AWS Service Terms.
+ 
+Q: How is Amazon RDS for Oracle supported?
+BYOL: Under this model, you continue to use your active Oracle support account and contact Oracle directly for Oracle Database specific service requests. If you have an active AWS Support account, you can contact AWS Support for Amazon RDS specific issues. Amazon Web Services and Oracle have multi-vendor support process for cases that require assistance from both organizations.
+License Included: In this model, if you have an active AWS Support account, you should contact AWS Support for both Amazon RDS and Oracle Database specific service requests.
+ 
+Q: How does the license option impact DB instance scaling?
+BYOL: You may scale your DB instances in accordance with the terms of your Oracle license(s).
+License Included: DB instances running Oracle may be scaled up and down at any point, subject to the prevailing hourly pricing for each DB instance class.
+For more information on the scaling implications of reserved DB instances, see the reserved instance page.
+ 
+Q: How does the license option impact version upgrades?
+BYOL: You should have "Software Update License & Support" from Oracle to use Amazon RDS for Oracle Database.
+License Included: The cost of the "Software Update License" is embedded in the hourly price, enabling access to Oracle Database software updates.
+ 
+Q: Can I change the licensing option for my DB instance (e.g. from 'BYOL' to 'License Included')?
+Yes, you can change your license options through the AWS CLI or through the AWS console by selecting Modify Instance and selecting the appropriate option in the ‘Licensing Model’ dropdown.
+ 
+Q: Can I change the Oracle edition I'm running for a DB instance (e.g. from Oracle 11g R2 SE2 to EE)?
+For the BYOL model, you can migrate from the SE2 editions of Oracle software to Enterprise Edition as long as you possess an unused Oracle license appropriate for the edition and class of DB instance you plan to run. You cannot go from Enterprise Edition to other editions. To change the edition and retain your data, you should take a snapshot of your running DB instance and then create a new DB instance of the desired edition from that snapshot. You should then delete the old DB instance, unless you wish to keep it running and have the appropriate Oracle Database licenses.
+Database Engine Versions
+Q: What are Amazon RDS DB engine versions for Oracle and how do they relate to Oracle Patch Sets?
+ 
+For Oracle Database version 12.1 and lower, Amazon RDS DB Engine Version names are in the form X.Y.Z, where: X = major version (e.g., 12.1), Y = release level (e.g., 0.2), and Z = version number within the RDS release series (e.g., v20). For example, an Amazon RDS DB Engine Version for Oracle could be 12.1.0.2.v20.
+ 
+For Oracle Database version 12.2 and higher, Amazon RDS DB Engine Version names are in the form A.B.C.D, where: A = the annual release version family (e.g. 19.0.0.0), B = quarterly Release Update (e.g. ru-2020-04), C = quarterly Release Update Revision (e.g. rur-2020-04), and D = version number within the RDS release series (e.g., r1). For example, an Amazon RDS DB Engine Version for Oracle could be 19.0.0.0.ru-2020-04.rur-2020-04.r1. Release Update Revisions are not currently used by RDS, but the RUR is included in the name in case they are in the future.
+ 
+Oracle releases updates for supported major versions on a quarterly basis - Patch Set Updates (PSU) in the case of 12.1 and lower, and Release Updates (RU) for 12.2 and higher. These include critical security updates as well as non-security fixes recommended by Oracle. The Amazon RDS DB Engine Versions are built with a given PSU or RU as a baseline and may contain additional fixes beyond it.
+ 
+For a full list of patches included in each version, please visit the  documentation.
+ 
+From the Amazon RDS standpoint, a version change would be considered major if either major version or release level is being changed. For example, going from 12.1.0.2.v20 to 12.2.0.1.rur-2020-04.rur-2020-04.r1 or from 19.0.0.0.ru-2020-04.rur-2020 04.r1 to 21.0.0.0.ru-2020-04.rur-2020-04.r1 would be a **major** version upgrade. A version change would be considered minor if going from 12.1.0.2.v20 to 12.1.0.2.v22 or 19.0.0.0.ru 2020-04.rur-2020-04.r1 to 19.0.0.0.ru-2020-10.rur-2020-10.r1.
+ 
+For the latest list of major versions supported by Amazon RDS for Oracle, please visit the documentation.
+ 
+Q: What is the patch set composition of my DB engine version for Oracle?
+Refer to the Amazon RDS User Guide for details of the patch set composition of each DB engine version of Oracle.
+ 
+Q: Does Amazon RDS provide guidelines for upgrading engine versions or deprecation of engine versions that are currently supported?
+Yes. Please refer to the Amazon RDS FAQs.
+ 
+Q: What are the various database versions supported by Amazon RDS for Oracle?
+For the information on various versions supported by Amazon RDS for Oracle, refer to the Oracle Database Engine Release Notes.
+Q: Does Amazon RDS for Oracle support Oracle Market-Driven Support (MDS) for 11.2.0.4?
+
+Please reach out to your AWS Account team or AWS Support for more information on Oracle MDS for Amazon RDS for Oracle. 
+
+Q: Where can I find the end of support timeline for the version 12.1.0.2 and 12.2.0.1 by Amazon RDS for Oracle?
+Please refer to the forum post.
+
+Options and Features
+Q: What types of replication does Amazon RDS support for Oracle?
+Amazon RDS for Oracle supports two types of replication technologies - Amazon RDS Multi-AZ and Oracle Replicas. Multi-AZ deployments are supported for both the License Included and Bring Your Own License (BYOL) licensing models, while the Replicas are supported for Bring Your Own License (BYOL) model only. Amazon RDS for Oracle provides Multi-AZ deployment to provide enhanced availability and durability for database (DB) instances within a specific AWS Region and is often an effective disaster recovery (DR) solution for most use cases. For customers running mission critical databases who have a business requirement for their DR configuration to span across different AWS regions, Oracle Replicas feature is an ideal choice.
+ 
+Amazon RDS for Oracle Replicas are complementary to Amazon RDS Multi-AZ deployments. The Amazon RDS Multi-AZ provides high availability and data protection, the associated in-region Oracle Replica renders the scalability of read-only workloads. While the cross-region Oracle Replica provides Disaster Recovery in addition to the read scalability.
+ 
+Additionally, you can use logical replication solutions such as Amazon Database Migration Service (DMS), Oracle GoldenGate, and others. These solutions are typically customer managed, and capture changes from archived redo logs in order to replicate them to other data stores.
+ 
+Q: Does Amazon RDS use Oracle Data Guard for Multi-AZ deployments?
+Oracle Data Guard is a High Availability feature available for Enterprise Edition of Oracle database. Amazon RDS currently uses a different synchronous replication technology and automatic failover functionality to provide Multi-AZ deployments for Oracle DB Instances. Multi-AZ deployments are available for all Oracle database editions supported by Amazon RDS.
+ 
+Amazon RDS for Oracle Read Replicas (both in-region and cross-region) use Oracle Active Data Guard between the primary and the physical standby (Read Replica) DB instances. Amazon RDS for Oracle configures asynchronous Data Guard replication between the primary and the Read Replica. If the replica is in read-only mode, make sure that you have Active Data Guard licenses. If you place the replica in mounted mode, you don't need Active Data Guard licenses. Only the Oracle DB engine supports mounted replicas.
+ 
+Q: Will I need an additional license(s) if I use Multi-AZ deployments for my Oracle DB Instances under the "BYOL" licensing model?
+Yes, we expect that you will need to use twice as many licenses for Multi-AZ deployments as you would for a corresponding Single-AZ deployment to account for the stand by DB Instance. However, you should review your Oracle Software Licensing Agreement and comply with Oracle’s licensing policies.
+ 
+Q: Is Oracle RAC supported on Amazon RDS?
+No, RAC is not currently supported.
+ 
+Q: Which Enterprise Edition Options are supported on Amazon RDS?
+Refer to the "Database Feature Support" section of the documentation page.
+ 
+Q: Which character sets are supported on Amazon RDS for Oracle?
+Amazon RDS supports the thirty character sets in the Oracle "Recommended ASCII Database Character Sets" list. You can specify your desired character set when creating a new database instance. This is optional and the default character set is AL32UTF8. For more information, please refer to the Amazon RDS Documentation.
+ 
+Q: Who manages the Oracle Wallet and Master Encryption Key when using Transparent Data Encryption on Amazon RDS?
+Amazon RDS manages the Oracle Wallet and Master Encryption Key for the DB Instance.
+ 
+Q: How do I know if Amazon RDS supports a specific Oracle Database feature?
+Oracle Database supports a number of features that vary with the edition of Oracle database you run. Refer to the Amazon RDS User Guide to know about the Oracle features that Amazon RDS currently supports.
+ 
+Q: Do you support instances with larger memory footprint but with lower vCPU count?
+Amazon RDS for Oracle supports extended memory instances for the R5 instance type. These instances offer low vCPU count but with greater memory footprint, which allow customers to right-size their workloads and save costs. For more information, refer to the  supported instance types in Amazon RDS for Oracle.
+ 
+Q: Does Amazon RDS Database Activity Streams support Amazon RDS for Oracle?
+Yes, Database Activity Streams (DAS) for Amazon Relational Database Service (Amazon RDS) for Oracle provides a near real-time stream of all audited statements (SELECT, DML, DDL, DCL, TCL) executed in your DB instance. The audit data is collected from the unified database audit, while the storage and processing of database activity is managed outside your database. As part of the deployment of DAS, your Database Administrator specifies the native Oracle Database unified audit policies on the given objects. Then your Security Administrator starts DAS on your Amazon RDS for Oracle DB instance and provides an AWS Key Management Service (KMS) key for encryption. Your database activity is encrypted and then asynchronously pushed to an Amazon Kinesis data stream provisioned on behalf of your Amazon RDS for Oracle DB instance. Permissions to enable and disable DAS can be managed by IAM, enabling separation of duties between security/compliance personnel and DBAs. You can learn more about Amazon RDS Database Activity Streams for Oracle in the documentation.
+ 
+Q: How can I perform cross-region backups and point-in-time-restore (PiTR) for my disaster recovery needs?
+Amazon RDS supports Cross-Region automated backups for Oracle. When this feature is enabled, the snapshots and archived redo log backups captured and retained in the source Region where your RDS instance resides are automatically replicated to a second Region. RDS then maintains the snapshot and archived logs according to your chosen backup retention period to enable point-in-time restore (PITR) capability in the destination Region. This feature is ideal if you need a cost-effective DR capability that helps save on compute and, in some cases, licensing costs until a PITR is needed in another Region. For more information, see this blog post.
+ 
+Q: Can I auto upgrade the current time zone file to the latest version on my DB instance?
+Yes, Amazon RDS supports  time zone file auto upgrade for Oracle. To enable this feature, you have to add TIMEZONE_FILE_AUTOUPGRADE option. For more information, review the  documentation.

@@ -1,0 +1,16 @@
+##### Case Study: Cathay Pacific Airways
+
+Anyone who has purchased an airline ticket online knows how prices can change from one minute to the next. This fluctuation is in part a result of passengers looking for the lowest price and airlines looking to optimize revenue per aircraft, per departure. For Cathay Pacific Airways Ltd. (Cathay Pacific), which operates passenger and cargo services in more than 200 global locations, it's critical to have a revenue optimization system that processes those bookings with efficiency and stability.
+
+Running its passenger revenue optimization system (PROS) on premises placed a heavy maintenance burden on Cathay Pacific's small DevOps team and provided suboptimal compute power. 
+
+Based in Hong Kong, Cathay Pacific was born out of two pilots' desire to bring necessary goods into post-World War II China. The airline now serves customers all over the world with destinations across five continents. For its customers booking flights, Cathay Pacific uses PROS, which “basically processes all our bookings to optimize revenue,” says Lawrence Fong, general manager of information technology at Cathay Pacific. The airline has been using PROS for over 10 years.
+
+But Cathay Pacific ran into a number of challenges running the massive PROS solution on premises. It required difficult, costly hardware upgrades to the infrastructure every few years to keep up with demand. In addition, Cathay Pacific could not take advantage of PROS's standard analytics module because the on-premises infrastructure did not provide enough compute power. “PROS is a massive system that requires huge computing power,” says Fong. “And hosting it on premises required us to upgrade the infrastructure every 2-3 years, which involved a lot of work and risk every single time.” The airline needed a scalable, high-performance solution to reduce the time required to get its new features to market while supplying data compliance and cybersecurity.
+
+Cathay Pacific knew it wanted to move the Oracle-based PROS to the cloud, but the airline wanted an efficient solution that was manageable for its small DevOps team and would also free up the team's time to focus on innovation. AWS was a contender for this move and an organization Cathay Pacific was familiar with, having previously moved more than 65 applications to AWS. Cathay Pacific has seen the benefits of using AWS services for those other applications, including cutting costs by 50 percent and speeding up the software deployment cycle by 67 percent. Even through usage spikes during promotional campaigns, Cathay Pacific increased its availability from 99.95 percent in 2019 to 99.99 percent in the first half of 2020. On AWS, the airline can also implement changes and updates without worrying about downtime and negative effects on the customer experience.
+
+After evaluating options for PROS based on the criteria of performance, scalability, cost savings, and risk, the airline is evaluating multiple cloud service provider as its database provider. 
+
+##### About Cathay Pacific Airways
+Cathay Pacific is an international cargo and passenger airline registered and based in Hong Kong. The airline operates globally with more than 200 destinations in Asia, North America, Europe, Africa, and Australia.

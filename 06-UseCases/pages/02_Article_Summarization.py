@@ -7,7 +7,7 @@ import utils.streamlit_lib as streamlit_lib
 helpers.set_page_config()
 
 
-text, code = st.columns([0.6,0.4])
+text, code = st.columns([0.7,0.3])
 
 prompt = """Meet Carbon Maps, a new French startup that raised $4.3 million (€4 million) just a few weeks after its inception. The company is building a software-as-a-service platform for the food industry so that they can track the environmental impact of each of their products in their lineup. The platform can be used as a basis for eco ratings. \
 While there are quite a few carbon accounting startups like Greenly, Sweep, Persefoni and Watershed, Carbon Maps isn't an exact competitor as it doesn't calculate a company's carbon emissions as a whole. It doesn't focus on carbon emissions exclusively either. Carbon Maps focuses on the food industry and evaluates the environmental impact of products — not companies. \
@@ -81,13 +81,13 @@ with text:
     st.header("Article Summarization")
     st.write("In this example, we want to create a summary of this very long article with 5 bullet points:")
     with st.form('form1'):
-        prompt = st.text_area(":orange[Article]", prompt, height=500)
+        prompt_data = st.text_area(":orange[Article]", prompt, height=500)
         submit = st.form_submit_button("Summarize",type='primary')
         
     if submit:
         with st.spinner("Thinking..."):
             output = helpers.invoke_model(client=helpers.bedrock_runtime_client(), 
-                                prompt=prompt, 
+                                prompt=prompt_data, 
                                 model=model_id,
                                 temperature=temperature,
                                 top_p=topP,
