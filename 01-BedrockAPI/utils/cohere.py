@@ -35,19 +35,21 @@ accept = 'application/json'
 content_type = 'application/json'
 
 
-def getmodelIds_claude3():
+def getmodelIds():
     models = []
     available_models = bedrock.list_foundation_models()
 
     for model in available_models['modelSummaries']:
-        if "cohere.command" in model['modelId']:
+        if model['modelId'] in ['cohere.command-text-v14:7:4k','cohere.command-light-text-v14:7:4k']:
+            continue
+        elif "cohere.command" in model['modelId']:
             models.append(model['modelId'])
 
     return models
 
 
 def modelId():
-    models = getmodelIds_claude3()
+    models = getmodelIds()
     model = st.selectbox(
         'model', models, index=models.index("cohere.command-text-v14"))
 
@@ -100,7 +102,8 @@ def prompt_box(key, model, context=None, height=100, streaming=False, **params):
     return response
 
 
-def tune_parameters():
+def tune_parameters(model):
+    params = ''
     temperature = st.slider(
         'temperature', min_value=0.0, max_value=1.0, value=0.1, step=0.1)
     p = st.slider('p', min_value=0.0, max_value=1.0, value=0.9, step=0.1)
@@ -109,20 +112,30 @@ def tune_parameters():
         'max_tokens', min_value=50, max_value=4096, value=2048, step=1)
     stop_sequences = st.text_input('stop_sequences', value='User:')
     # stream = st.checkbox('stream', value=True, disabled=True)
-    num_generations = st.slider(
-        'num_generations', min_value=1, max_value=5, value=1, step=1)
-    return_likelihoods = st.radio(
-        'return_likelihoods', ["NONE", "ALL", "GENERATION"], horizontal=True)
-    params = {
-        "temperature": temperature,
-        "p": p,
-        "k": k,
-        "stop_sequences": [stop_sequences],
-        "max_tokens": max_tokens,
-        # "stream": stream,
-        "num_generations": num_generations,
-        "return_likelihoods": return_likelihoods
-    }
+    if not model.startswith('cohere.command-r'):
+        num_generations = st.slider(
+            'num_generations', min_value=1, max_value=5, value=1, step=1)
+        return_likelihoods = st.radio(
+            'return_likelihoods', ["NONE", "ALL", "GENERATION"], horizontal=True)
+        params = {
+            "temperature": temperature,
+            "p": p,
+            "k": k,
+            "stop_sequences": [stop_sequences],
+            "max_tokens": max_tokens,
+            # "stream": stream,
+            "num_generations": num_generations,
+            "return_likelihoods": return_likelihoods
+        }
+    elif model.startswith('cohere.command-r'):
+        params = {
+            "temperature": temperature,
+            "p": p,
+            "k": k,
+            "stop_sequences": [stop_sequences],
+            "max_tokens": max_tokens,
+            # "stream": stream,
+        }
 
     return params
 
@@ -130,9 +143,15 @@ def tune_parameters():
 def invoke_model(prompt, model, **params):
 
     output = ''
-    input = {
-        'prompt': prompt
-    }
+    input =''
+    if not model.startswith('cohere.command-r'):
+        input = {
+            'prompt': prompt
+        }
+    elif model.startswith('cohere.command-r'):
+        input = {
+            'message': prompt
+        }
 
     input.update(params)
     body = json.dumps(input)
@@ -140,6 +159,7 @@ def invoke_model(prompt, model, **params):
         body=body, modelId=model, accept=accept, contentType=content_type)
     response_body = json.loads(response.get('body').read())
     results = response_body['generations']
+    # results = response_body['text']
     # for result in results:
     # 	output = output + result['text']
 

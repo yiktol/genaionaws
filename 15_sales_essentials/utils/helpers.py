@@ -89,8 +89,8 @@ def generate_image(provider,model, prompt,negative_prompt,**params):
 
 def set_page_config():
 	st.set_page_config( 
-	page_title="Challenge",  
-	page_icon=":rock:",
+	page_title="Lead Generator",  
+	page_icon=":rocket:",
 	layout="wide",
 	initial_sidebar_state="expanded",
 )

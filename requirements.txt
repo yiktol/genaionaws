@@ -28,3 +28,4 @@ ipython
 jsonlines
 bert_score
 plotly
+googlesearch-python

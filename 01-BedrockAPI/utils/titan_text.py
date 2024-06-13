@@ -39,7 +39,9 @@ def getmodelIds():
 	available_models = bedrock.list_foundation_models()
 
 	for model in available_models['modelSummaries']:
-		if "amazon.titan-tg1-large" in model['modelId'] or "amazon.titan-text" in model['modelId']:
+		if model['modelId'] in ['amazon.titan-text-express-v1:0:8k','amazon.titan-text-lite-v1:0:4k']:
+			continue
+		elif "amazon.titan-tg1-large" in model['modelId'] or "amazon.titan-text" in model['modelId']:
 			models.append(model['modelId'])
 
 	return models

@@ -60,6 +60,8 @@ def getmodelIds(providername='AI21'):
 	available_models = bedrock.list_foundation_models()
 	
 	for model in available_models['modelSummaries']:
+		if model['modelId'] in ['ai21.j2-ultra-v1:0:8k']:
+			continue
 		if providername in model['providerName']:
 			models.append(model['modelId'])
 			

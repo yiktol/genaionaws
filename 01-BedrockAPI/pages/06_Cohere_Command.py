@@ -24,7 +24,7 @@ with code:
 		streaming = st.checkbox('Streaming',value=True)
 		
 	with st.container(border=True):
-		params = cohere.tune_parameters()
+		params = cohere.tune_parameters(model)
 
 with text:
 	st.title('Cohere')

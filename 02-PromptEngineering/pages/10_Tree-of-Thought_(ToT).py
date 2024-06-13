@@ -68,12 +68,8 @@ with code:
 		models = helpers.getmodelIds(provider)
 		model = st.selectbox(
 			'model', models, index=models.index(helpers.getmodelId(provider)))
-		temperature = st.slider('temperature', min_value=0.0, max_value= 1.0, value = st.session_state[suffix]['temperature'], step = 0.1)
-		topP = st.slider('top_p', min_value=0.0, max_value=1.0, value = st.session_state[suffix]['topP'], step = 0.1)
-		if provider in ["Anthropic","Cohere","Mistral"]:
-			topK = st.slider('top_k', min_value=0, max_value=200, value = st.session_state[suffix]['topK'], step = 1)
-		maxTokenCount = st.slider('max_tokens', min_value=50, max_value=4096, value = st.session_state[suffix]['maxTokenCount'], step = 100)
-
+	with st.container(border=True):
+		params = helpers.tune_parameters(provider)
 
 with text:
 	with st.expander("See Diagram"):
@@ -82,30 +78,24 @@ with text:
 	tab1, tab2 = st.tabs(["ToT-1", "ToT-2"])
 
 	with tab1:
-		st.markdown(questions[0]['context'])
+		# st.markdown(questions[0]['context'])
 		output = helpers.prompt_box(questions[0]['id'], provider,
 							model,
-       						prompt=questions[0]['prompt'],
-							maxTokenCount=maxTokenCount,
-							temperature=temperature,
-							topP=topP,
-       						topK=topK,
-							context=questions[0]['context'])
+       						context=f"{questions[0]['context']}\n{questions[0]['prompt']}",
+             				height=400,
+							**params)
 		
 		if output:
 			st.write("### Answer")
 			st.info(output)
 
 	with tab2:
-		st.markdown(questions[1]['context'])
+		# st.markdown(questions[1]['context'])
 		output = helpers.prompt_box(questions[1]['id'], provider,
 							model,
-       						prompt=questions[1]['prompt'],
-							maxTokenCount=maxTokenCount,
-							temperature=temperature,
-							topP=topP,
-       						topK=topK,
-							context=questions[1]['context'])
+       						context=f"{questions[1]['context']}\n{questions[1]['prompt']}",
+							height=350,
+							**params)
 		
 		if output:
 			st.write("### Answer")

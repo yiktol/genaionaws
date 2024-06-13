@@ -62,7 +62,9 @@ def getmodelIds():
 	available_models = bedrock.list_foundation_models()
 	
 	for model in available_models['modelSummaries']:
-		if "anthropic.claude-v2" in model['modelId']  or "anthropic.claude-instant" in model['modelId']:
+		if model['modelId'] in ['anthropic.claude-instant-v1:2:100k','anthropic.claude-v2:0:18k','anthropic.claude-v2:0:100k','anthropic.claude-v2:1:18k','anthropic.claude-v2:1:200k']:
+			continue
+		elif "anthropic.claude-v2" in model['modelId']  or "anthropic.claude-instant" in model['modelId']:
 			models.append(model['modelId'])
 			
 	return models

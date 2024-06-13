@@ -6,7 +6,7 @@ helpers.set_page_config()
 
 questions = [
 	{"id": 1, "prompt": "When I was 6 my sister was half my age. \nNow I'm 70 how old is my sister?",
-	 "context": None},
+	 "context": ""},
 	{"id": 2, "prompt": "Q: When I was 6 my sister was half my age. Now I'm 70 how old is my sister?\n\nA:",
 	 "context": """Q: There are 15 trees in the grove. Grove workers will plant trees in the grove today. After they are done,
 there will be 21 trees. How many trees did the grove workers plant today?\n
@@ -87,11 +87,8 @@ with code:
 		models = helpers.getmodelIds(provider)
 		model = st.selectbox(
 			'model', models, index=models.index(helpers.getmodelId(provider)))
-		temperature = st.slider('temperature', min_value=0.0, max_value= 1.0, value = st.session_state[suffix]['temperature'], step = 0.1)
-		topP = st.slider('top_p', min_value=0.0, max_value=1.0, value = st.session_state[suffix]['topP'], step = 0.1)
-		if provider in ["Anthropic","Cohere","Mistral"]:
-			topK = st.slider('top_k', min_value=0, max_value=200, value = st.session_state[suffix]['topK'], step = 1)
-		maxTokenCount = st.slider('max_tokens', min_value=50, max_value=4096, value = st.session_state[suffix]['maxTokenCount'], step = 100)
+	with st.container(border=True):
+		params = helpers.tune_parameters(provider)
 
 
 with text:
@@ -101,13 +98,8 @@ with text:
 	with tab1:
 		output = helpers.prompt_box(questions[0]['id'], provider,
 							model,
-       						prompt=questions[0]['prompt'],
-							maxTokenCount=maxTokenCount,
-							temperature=temperature,
-							topP=topP,
-       						topK=topK,
-							context=None)
-		
+       						context=f"{questions[0]['context']}\n{questions[0]['prompt']}",
+							**params)
 		if output:
 			st.write("### Answer")
 			st.info(output)
@@ -116,12 +108,8 @@ with text:
 
 		output = helpers.prompt_box(questions[1]['id'], provider,
 							model,
-							prompt=questions[1]['prompt'],
-							maxTokenCount=maxTokenCount,
-							temperature=temperature,
-							topP=topP,
-       						topK=topK,
-							context=questions[1]['context'])
+							context=f"{questions[1]['context']}\n{questions[1]['prompt']}",
+							**params)
 		
 		if output:
 			st.write("### Answer")

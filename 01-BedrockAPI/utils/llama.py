@@ -65,6 +65,8 @@ def getmodelIds(providername='Meta'):
 	available_models = bedrock.list_foundation_models()
 	
 	for model in available_models['modelSummaries']:
+		if model['modelId'] in ['meta.llama2-13b-chat-v1:0:4k','meta.llama2-70b-chat-v1:0:4k','meta.llama2-13b-v1:0:4k','meta.llama2-70b-v1:0:4k']:
+			continue
 		if providername in model['providerName']:
 			models.append(model['modelId'])
 			

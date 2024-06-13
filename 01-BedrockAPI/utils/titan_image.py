@@ -38,7 +38,9 @@ def getmodelIds():
     available_models = bedrock.list_foundation_models()
 
     for model in available_models['modelSummaries']:
-        if "amazon.titan-image" in model['modelId']:
+        if model['modelId'] in ['amazon.titan-image-generator-v1:0']:
+            continue
+        elif "amazon.titan-image" in model['modelId']:
             models.append(model['modelId'])
 
     return models

@@ -37,7 +37,9 @@ def getmodelIds_claude3():
     available_models = bedrock.list_foundation_models()
 
     for model in available_models['modelSummaries']:
-        if "anthropic.claude-3" in model['modelId']:
+        if model['modelId'] in ['anthropic.claude-3-sonnet-20240229-v1:0:28k','anthropic.claude-3-sonnet-20240229-v1:0:200k','anthropic.claude-3-haiku-20240307-v1:0:48k','anthropic.claude-3-haiku-20240307-v1:0:200k']:
+            continue
+        elif "anthropic.claude-3" in model['modelId']:
             models.append(model['modelId'])
 
     return models
