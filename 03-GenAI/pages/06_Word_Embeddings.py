@@ -18,7 +18,7 @@ st.header("Word Embeddings")
 st.write("After the step of tokenization, the transformer model then encodes these tokens into n-dimensional vectors.")
 
 with st.form("myform"):
-    selected_animals = st.multiselect("What your favorite anilmals:",animals,animals)
+    selected_animals = st.multiselect("Enter Words:",animals,animals)
     submit = st.form_submit_button("Generate Embeddings",type="primary")
 
 txt_array=[]

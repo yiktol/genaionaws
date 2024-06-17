@@ -1,7 +1,7 @@
 # Python program to generate word vectors using Word2Vec
 import streamlit as st
 # importing all necessary modules
-from gensim.models import Word2Vec
+# from gensim.models import Word2Vec
 import gensim
 from nltk.tokenize import sent_tokenize, word_tokenize
 import warnings

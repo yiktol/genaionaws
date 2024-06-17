@@ -188,7 +188,7 @@ def main2(model_id):
 						format="%(levelname)s: %(message)s")
 
 	input_image = "images/sg_skyline.jpg"
-	st.image(input_image, width=600)
+	st.image(input_image, width=800)
  
 	with st.container(border=True):
 		input_text = st.text_area("Enter your user prompt here", value="What's in this image?", height=100,)

@@ -5,7 +5,7 @@
 
 cd /home/ubuntu/environment/genaionaws
 
-pip install -r /home/ubuntu/environment/genaionaws/requirements.txt
+pip install -U -r /home/ubuntu/environment/genaionaws/requirements.txt
 
 cd /home/ubuntu/environment/genaionaws/01-BedrockAPI
 streamlit run Home.py --server.port 8080 &
