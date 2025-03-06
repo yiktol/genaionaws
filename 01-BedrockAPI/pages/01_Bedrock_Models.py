@@ -70,7 +70,7 @@ with st.container():
             provider = st.selectbox('Provider', ('Amazon', 'Stability',
                                     'AI21', 'Anthropic', 'Cohere', 'Meta', 'Mistral'),)
             Region = st.selectbox('Region', ('us-east-1', 'us-west-2',
-                                'ap-southeast-1', 'ap-northeast-1', 'eu-central-1',))
+                                'ap-southeast-1', 'ap-southeast-2','ap-northeast-1', 'eu-central-1',))
     with pycode:
         st.code(show_code(provider, Region), language="python")
         
