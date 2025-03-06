@@ -23,7 +23,7 @@ Here is the sample code to classify students into athletics, musician, or magici
 
     if Examples == "Example1":
         with st.form("myform"):
-            prompt = st.text_area(":orange[Enter your query here:]", height = 50, value='Ellison sends a spell to prevent Professor Wang from entering the classroom'),
+            prompt = st.text_area(":orange[Enter your query here:]", height = 68, value='Ellison sends a spell to prevent Professor Wang from entering the classroom'),
             t1=st.text_area('Class1',value="{'name': 'athletics', 'description': 'all students with a talent in sports'}"),
             t2=st.text_area('Class2',value="{'name': 'musician', 'description': 'all students with a talent in music'}"),
             t3=st.text_area('Class3',value="{'name': 'magician', 'description': 'all students with a talent in witch craft'}"),

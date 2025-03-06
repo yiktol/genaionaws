@@ -55,7 +55,7 @@ with st.container():
         st.markdown(t)
     with col2:
         with st.container(border=True):
-            provider = st.selectbox('Provider',helpers.list_providers, index=3)
+            provider = st.selectbox('Provider',helpers.list_providers, index=0)
             models = helpers.getmodelIds(provider)
             model_id = st.selectbox(
                 'model', models, index=models.index(helpers.getmodelId(provider)))     

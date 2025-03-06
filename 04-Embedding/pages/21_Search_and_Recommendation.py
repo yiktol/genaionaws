@@ -25,7 +25,7 @@ with text:
 Here is the sample code to perform search and recommendation:""")
 
     with st.form("myform"):
-        prompt = st.text_area(":orange[Enter your query here:]", height = 50, value='Isaac Newton'),
+        prompt = st.text_area(":orange[Enter your query here:]", height = 68, value='Isaac Newton'),
         t1=st.text_area('Text1',value="The theory of general relativity says that the observed gravitational effect between masses results from their warping of spacetime."),
         t2=st.text_area('Text2',value="Quantum mechanics allows the calculation of properties and behaviour of physical systems. It is typically applied to microscopic systems: molecules, atoms and sub-atomic particles."),
         t3=st.text_area('Text3',value="Wavelet theory is essentially the continuous-time theory that corresponds to dyadic subband transforms — i.e., those where the L (LL) subband is recursively split over and over."),

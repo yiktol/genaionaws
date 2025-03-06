@@ -36,7 +36,7 @@ text, code = st.columns([0.4, 0.6])
 with text:
 
     with st.form("myform"):
-        prompt = st.text_area(":orange[Enter your prompt here:]", height = 50, value="Hello"),
+        prompt = st.text_area(":orange[Enter your prompt here:]", height = 68, value="Hello"),
         text1=st.text_area('Text1',value="Hi"),
         text2=st.text_area('Text2',value="Good Day"),
         text3=st.text_area('Text3',value="How are you"),

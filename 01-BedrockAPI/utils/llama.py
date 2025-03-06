@@ -10,7 +10,7 @@ bedrock = boto3.client(service_name='bedrock', region_name='us-east-1')
 bedrock_runtime = boto3.client(service_name='bedrock-runtime', region_name='us-east-1')
 
 params = {
-	"model": "meta.llama2-70b-chat-v1",
+	"model": "meta.llama3-70b-instruct-v1:0",
 	'max_gen_len': 1024,
 	'temperature': 0.1,
 	'top_p': 0.9
@@ -75,7 +75,7 @@ def getmodelIds(providername='Meta'):
 def modelId():
 	models = getmodelIds()
 	model = st.selectbox(
-		'model', models, index=models.index("meta.llama2-70b-chat-v1"))  
+		'model', models, index=models.index("meta.llama3-70b-instruct-v1:0"))  
  
 	return model
 

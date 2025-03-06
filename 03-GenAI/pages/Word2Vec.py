@@ -10,7 +10,7 @@ import nltk
 from helpers import set_page_config
 
 set_page_config()
-nltk.download('punkt')
+# nltk.download('punkt')
 warnings.filterwarnings(action='ignore')
 
 st.title("Vertorizer using using Word2Vec")

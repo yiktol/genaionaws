@@ -34,10 +34,10 @@ with text:
     
     def token_form(item_num):
         with st.form(f"myform-{item_num}"):
-            prompt = st.text_area(":orange[Enter your prompt here:]", height = 30, value=dataset[item_num]['text']),
+            prompt = st.text_area(":orange[Enter your prompt here:]", height = 68, value=dataset[item_num]['text']),
             options=st.multiselect('Options',dataset[item_num]['options'],dataset[item_num]['options'])
             submit = st.form_submit_button("Decode",type="primary")
-            print(prompt[0])
+            # print(prompt[0])
             
         return submit, prompt[0], options
 

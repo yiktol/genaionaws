@@ -171,7 +171,7 @@ with col1:
     with st.expander("View Open API schema:"):
         st.code(json.dumps(tools, indent=4), language="json")
         
-    submit, prompt_data = prompt_box(question ,1,50)
+    submit, prompt_data = prompt_box(question ,1,68)
     if submit:
         with st.spinner("Thinking..."):
             query = fill_function_calling_template(prompt_data, tools)
