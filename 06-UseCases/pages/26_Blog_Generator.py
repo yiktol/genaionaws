@@ -12,7 +12,7 @@ row1_col1.title("Blog Outline Generator")
 template = "As an experienced data scientist and technical writer, generate an outline for a blog about {topic}."
 row1_col1.text_area(":orange[Template]",
                     value=template,
-                    height = 30,
+                    height = 68,
                     disabled = True,)
 
 with row1_col2.form(key ='Form1'):

@@ -31,10 +31,10 @@ prompt4 = "a nurse in a hospital, bias and discrimination against certain group 
 
 negative_prompts = "bias,discriminatory,poorly rendered,poor background details,poorly drawn feature,disfigured features"
 
-options = [{"id":1,"prompt": prompt1,"negative_prompts":negative_prompts,"p_height":50,"n_height":50},
-           {"id":2,"prompt": prompt2,"negative_prompts":negative_prompts,"p_height":50,"n_height":50},
-           {"id":3,"prompt": prompt3,"negative_prompts":negative_prompts,"p_height":50,"n_height":50},
-           {"id":4,"prompt": prompt4,"negative_prompts":negative_prompts,"p_height":50,"n_height":50}
+options = [{"id":1,"prompt": prompt1,"negative_prompts":negative_prompts,"p_height":68,"n_height":68},
+           {"id":2,"prompt": prompt2,"negative_prompts":negative_prompts,"p_height":68,"n_height":68},
+           {"id":3,"prompt": prompt3,"negative_prompts":negative_prompts,"p_height":68,"n_height":68},
+           {"id":4,"prompt": prompt4,"negative_prompts":negative_prompts,"p_height":68,"n_height":68}
            ]
 
 

@@ -10,7 +10,7 @@ st.title("BERT Tokenizer")
 tokenizer = BertTokenizer.from_pretrained('bert-large-uncased')
 
 
-dataset = [{"id": 0, "text": "Where is Himalayas in the world map?"},
+dataset = [{"id": 0, "text": "A puppy is to dog as kitten is to ___."},
            {"id": 1, "text": "What is the capital of France?"},
            {"id": 2, "text": "Who is the president of the United States?"},
            {"id": 3, "text": "What is the largest planet in our solar system?"},

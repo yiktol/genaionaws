@@ -10,17 +10,18 @@ import nltk
 from helpers import set_page_config
 
 set_page_config()
-# nltk.download('punkt')
+nltk.download('punkt')
+nltk.download('punkt_tab')
 warnings.filterwarnings(action='ignore')
 
 st.title("Vertorizer using using Word2Vec")
 
-vector_size = st.slider(":orange[Dimensions]",min_value=1,max_value=10,value=1,step = 1)
+vector_size = st.slider(":orange[Dimensions]",min_value=1,max_value=100,value=1,step = 1)
 
 with st.form("myform"):
     f = st.text_input("Enter a prompt to vectorize", 
                       placeholder="Hello World",
-                      value="Hello World")
+                      value="A puppy is to dog as kitten is to  ___.")
     submitted = st.form_submit_button("Vectorize")
 
 data = []
@@ -29,6 +30,7 @@ if f:
 # iterate through each sentence in the file
 	for i in sent_tokenize(f):
 		temp = []
+		# print(i)
 
 		# tokenize the sentence into words
 		for j in word_tokenize(i):

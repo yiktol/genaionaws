@@ -13,16 +13,15 @@ prompt_embedding = []
 text, code = st.columns([0.5, 0.5])
 
 
-animals = ["cat","bird","bear","human","tiger","lion","leopard","dog","puppy","panda","dolphin","squirrel","mouse","hamster",]
-planets = ["mercury","venus","earth","mars","jupiter","saturn","uranus","neptune"]
+animals = ["cat","bird","bear","human","tiger","lion","leopard","panda","dolphin","squirrel","mouse","hamster"]
+planets = ["mercury","venus","earth","jupiter","saturn","uranus","neptune"]
 colors = ["orange","yellow","green","blue","purple","pink","brown","gray","black","white"]
 
 
 dataset = [
-    {"id": 1, "text": "A puppy is to dog as kitten is to  .", "options": animals},
-    {"id": 2, "text": "Men are from Mars, Women are from  .", "options": planets},
-    {"id": 3, "text": "Roses are red Violets are  .", "options": colors}
-    
+    {"id": 1, "text": "Roses are red Violets are ___.", "options": colors},
+    {"id": 2, "text": "Men are from Mars, Women are from ___.", "options": planets},
+    {"id": 3, "text": "A puppy is to dog as kitten is to  ___.", "options": animals}
 ]
 
 
