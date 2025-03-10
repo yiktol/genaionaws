@@ -26,7 +26,7 @@ with col1:
     
         prompt_text = st.text_area("Prompt text", 
                                 "rocket ship launching from forest with flower garden under a blue sky, masterful, ghibli",
-                                height=50)
+                                height=68)
         
         process_button = st.button("Generate", type="primary")
         
@@ -46,7 +46,7 @@ with col2:
     st.subheader("New image")
     prompt_text2 = st.text_area("Modify Image Prompt", 
                             "crayon drawing of rocket ship launching from forest",
-                            height=50)
+                            height=68)
     
     process_button2 = st.button("Modify", type="primary")
     st.subheader("Result")

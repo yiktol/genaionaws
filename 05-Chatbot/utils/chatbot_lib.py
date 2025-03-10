@@ -3,6 +3,7 @@ import boto3
 from langchain.memory import ConversationSummaryBufferMemory
 from langchain.llms.bedrock import Bedrock
 from langchain.chains import ConversationChain
+from langchain_aws import BedrockLLM
 
 bedrock = boto3.client(
     service_name='bedrock-runtime',
@@ -22,7 +23,7 @@ def get_llm():
         "frequencyPenalty": {"scale": 0 } 
     }
     
-    llm = Bedrock(
+    llm = BedrockLLM(
         client=bedrock,
         model_id="ai21.j2-ultra-v1", #set the foundation model
         model_kwargs=model_kwargs) #configure the properties for Claude
