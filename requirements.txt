@@ -31,4 +31,8 @@ plotly
 googlesearch-python
 pillow
 statsmodels
+imblearn
 wordcloud
+shap
+xgboost
+Jinja2
