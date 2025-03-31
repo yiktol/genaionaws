@@ -29,3 +29,6 @@ jsonlines
 bert_score
 plotly
 googlesearch-python
+pillow
+statsmodels
+wordcloud

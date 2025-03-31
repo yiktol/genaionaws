@@ -49,4 +49,7 @@ streamlit run Home.py --server.port 8092 &
 cd /home/ubuntu/environment/genaionaws/15_sales_essentials
 streamlit run Home.py --server.port 8093 &
 
+cd /home/ubuntu/environment/genaionaws/00-MLBasics
+streamlit run Home.py --server.port 8094 &
+
 
