@@ -778,9 +778,7 @@ def industry_use_cases():
             
             Machine learning is transforming production with predictive maintenance, quality control, and process optimization.
             
-            **Key
-User: complete the last line and continue
-Model: ```python
+
             **Key Applications:**
             
             1. **Predictive Maintenance**
