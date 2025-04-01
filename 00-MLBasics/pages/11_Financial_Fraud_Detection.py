@@ -1152,7 +1152,7 @@ with tabs[3]:
         security_alerts.append("Very short time since last transaction (potential automated attack)")
     
     # Detect fraud with the trained model
-    if st.button("Analyze Transaction"):
+    if st.button("Analyze Transaction", type='primary'):
         # Scale the features
         transaction_scaled = scaler.transform(transaction_df)
         

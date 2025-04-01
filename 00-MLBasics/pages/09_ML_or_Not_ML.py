@@ -101,7 +101,7 @@ def main():
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         if not st.session_state.game_active:
-            if st.button("Start Game", use_container_width=True):
+            if st.button("Start Game", use_container_width=True, type="primary"):
                 st.session_state.game_active = True
                 st.session_state.score = 0
                 st.session_state.questions_asked = 0

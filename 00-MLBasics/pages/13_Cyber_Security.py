@@ -137,7 +137,7 @@ elif page == "Train Model":
         test_size = st.slider("Test set percentage", 0.1, 0.4, 0.2, 0.05)
     
     # Train button
-    if st.button("Train Model"):
+    if st.button("Train Model", type='primary'):
         with st.spinner("Generating and processing data..."):
             # Generate data
             data = generate_sample_data(sample_size)
