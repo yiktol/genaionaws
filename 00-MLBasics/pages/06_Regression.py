@@ -199,7 +199,7 @@ with tab1:
     # Choose model
     selected_model = st.selectbox("Select Model for Prediction", list(model_results.keys()))
     
-    if st.button("Predict Price"):
+    if st.button("Predict Price", type="primary"):
         model = model_results[selected_model]['model']
         prediction = model.predict(input_scaled)[0]
         

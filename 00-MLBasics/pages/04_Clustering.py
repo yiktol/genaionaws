@@ -566,7 +566,7 @@ with tab2:
     new_customer_selected_features = new_customer_data[selected_features]
     
     # Predict cluster
-    if st.button("Predict Customer Segment"):
+    if st.button("Predict Customer Segment", type="primary"):
         cluster, pca_projection = predict_cluster(
             new_customer_selected_features, 
             clustering_results, 

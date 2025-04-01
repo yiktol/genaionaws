@@ -333,14 +333,9 @@ with tab1:
     """)
     
     col1, col2 = st.columns([3, 2])
+    input_data = pd.DataFrame({})
     
-    with col1:
-        # Text inputs
-        product_title = st.text_input("Product Title", "Wireless Bluetooth Headphones with Noise Cancellation")
-        product_desc = st.text_area("Product Description", 
-            "Premium quality headphones with active noise cancellation technology. " + 
-            "Long battery life and comfortable ear cups for extended use. " + 
-            "Compatible with all Bluetooth devices.")
+
     
     with col2:
         # Numeric inputs
@@ -353,10 +348,20 @@ with tab1:
         seller_response = st.number_input("Seller Response Time (hours)", min_value=1, max_value=72, value=24)
         review_count = st.number_input("Number of Reviews", min_value=0, max_value=10000, value=120)
     
-    # Choose model
-    selected_model = st.selectbox("Select Model for Prediction", list(model_results.keys()))
+    with col1:
+        # Text inputs
+        product_title = st.text_input("Product Title", "Wireless Bluetooth Headphones with Noise Cancellation")
+        product_desc = st.text_area("Product Description", 
+            "Premium quality headphones with active noise cancellation technology. " + 
+            "Long battery life and comfortable ear cups for extended use. " + 
+            "Compatible with all Bluetooth devices.")
+
+        # Choose model
+        selected_model = st.selectbox("Select Model for Prediction", list(model_results.keys()))
+        
+        submitted = st.button("Predict Category", type="primary")
     
-    if st.button("Predict Category"):
+    if submitted:
         # Create input dataframe for prediction
         input_data = pd.DataFrame({
             'title': [product_title],
@@ -370,7 +375,7 @@ with tab1:
             'seller_response_time': [seller_response],
             'review_count': [review_count]
         })
-        
+    
         # Get model
         model = model_results[selected_model]['model']
         

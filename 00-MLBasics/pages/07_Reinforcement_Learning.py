@@ -316,7 +316,7 @@ def main():
             st.pyplot(fig_initial)
             
         with col2:
-            train_button = st.button("Train Agent")
+            train_button = st.button("Train Agent", type="primary")
             
             if train_button:
                 progress_bar = st.progress(0)

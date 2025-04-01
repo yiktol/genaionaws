@@ -549,7 +549,7 @@ def show_introduction():
     
     with col2:
         st.image("https://img.freepik.com/premium-vector/doctor-patient-laptop-with-healthcare-medical-icons-monitor_333239-21.jpg", 
-                caption="Healthcare ML Applications", use_column_width=True)
+                caption="Healthcare ML Applications", use_container_width=True)
         
         st.markdown("""
         ### Benefits of ML in Healthcare
@@ -660,7 +660,7 @@ def show_heart_disease_prediction(results, X, scaler, feature_desc):
                                 help=feature_desc['thal'])
             
             
-        submitted = st.form_submit_button(label="Predict Heart Disease Risk")
+        submitted = st.form_submit_button(label="Predict Heart Disease Risk", type="primary")
         
         
     
@@ -881,7 +881,7 @@ def show_diabetes_prediction(results, X, scaler, feature_desc):
                                 value=35,
                                 help=feature_desc['Age'])
         
-        submit_button = st.form_submit_button(label="Predict Diabetes Risk")
+        submit_button = st.form_submit_button(label="Predict Diabetes Risk", type="primary")
     
     # When form is submitted
     if submit_button:
@@ -1517,7 +1517,7 @@ def show_about_ml_healthcare():
         """)
     
     with col2:
-        st.image("https://img.freepik.com/free-vector/medical-technology-science-background-vector-blue-with-digital-healthcare_53876-117739.jpg", caption="AI in Healthcare", use_column_width=True)
+        st.image("https://img.freepik.com/free-vector/medical-technology-science-background-vector-blue-with-digital-healthcare_53876-117739.jpg", caption="AI in Healthcare", use_container_width=True)
         
         st.markdown("""
         ### ML Technologies in Medical Use Today

@@ -99,7 +99,7 @@ with tab1:
             credit_score = st.number_input("Credit Score", min_value=300, max_value=850, value=700)
             debt_to_income = st.number_input("Debt-to-Income Ratio (0-1)", min_value=0.0, max_value=1.0, value=0.3, format="%.2f")
         
-        submit_button = st.form_submit_button("Predict Loan Approval")
+        submit_button = st.form_submit_button("Predict Loan Approval", type="primary")
     
     if submit_button:
         # Create a DataFrame for the new application
