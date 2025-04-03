@@ -4,6 +4,7 @@ from langchain.memory import ConversationSummaryBufferMemory
 from langchain.llms.bedrock import Bedrock
 from langchain.chains import ConversationChain
 from langchain_aws import BedrockLLM
+from langchain_aws import ChatBedrock
 
 bedrock = boto3.client(
     service_name='bedrock-runtime',
@@ -14,18 +15,14 @@ bedrock = boto3.client(
 def get_llm():
         
     model_kwargs = { #AI21
-        "maxTokens": 1024, 
-        "temperature": 0, 
-        "topP": 0.5, 
-        "stopSequences": ["Human:"], 
-        "countPenalty": {"scale": 0 }, 
-        "presencePenalty": {"scale": 0 }, 
-        "frequencyPenalty": {"scale": 0 } 
+        "maxTokenCount": 1024, 
+        "temperature": 1
+        # "top_p": 0.5
     }
     
-    llm = BedrockLLM(
+    llm = ChatBedrock(
         client=bedrock,
-        model_id="ai21.j2-ultra-v1", #set the foundation model
+        model_id="amazon.titan-text-premier-v1:0", #set the foundation model
         model_kwargs=model_kwargs) #configure the properties for Claude
     
     return llm

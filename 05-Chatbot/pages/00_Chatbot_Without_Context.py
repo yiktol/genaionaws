@@ -49,10 +49,11 @@ if input_text: #run the code in this if block after the user submits a chat mess
     
     st.session_state.chat_history.append({"role":"user", "text":input_text}) #append the user's latest message to the chat history
     
-    chat_response = glib.get_chat_response(input_text=input_text, memory=st.session_state.memory) #call the model through the supporting library
+    
     
     with st.chat_message("assistant"): #display a bot chat message
         with st.spinner("Thinking..."):
+            chat_response = glib.get_chat_response(input_text=input_text, memory=st.session_state.memory) #call the model through the supporting library
             st.markdown(chat_response) #display bot's latest response
         
         st.session_state.chat_history.append({"role":"assistant", "text":chat_response}) #append the bot's latest message to the chat history
